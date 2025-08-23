@@ -9,7 +9,7 @@ import { Shield, Zap, Eye, Lock } from "lucide-react";
 function FeatureGrid() {
   return (
     <div className="grid gap-8 md:grid-cols-3" id="features">
-      <div className="bg-background border-foreground rounded-md p-6 ring">
+      <div className="bg-background ring-ring/20 rounded-md p-6 shadow-sm ring">
         <div className="flex items-center space-x-3 pb-4">
           <Zap className="h-8 w-8" />
           <h3 className="text-xl font-black tracking-tight uppercase">
@@ -22,7 +22,7 @@ function FeatureGrid() {
         </p>
       </div>
 
-      <div className="bg-background border-foreground rounded-md p-6 ring">
+      <div className="bg-background ring-ring/20 rounded-md p-6 shadow-sm ring">
         <div className="flex items-center space-x-3 pb-4">
           <Shield className="h-8 w-8" />
           <h3 className="text-xl font-black tracking-tight uppercase">
@@ -35,7 +35,7 @@ function FeatureGrid() {
         </p>
       </div>
 
-      <div className="bg-background border-foreground rounded-md p-6 ring">
+      <div className="bg-background ring-ring/20 rounded-md p-6 shadow-sm ring">
         <div className="mb-4 flex items-center space-x-3">
           <Eye className="h-8 w-8" />
           <h3 className="text-xl font-black tracking-tight uppercase">
@@ -53,7 +53,7 @@ function FeatureGrid() {
 
 function FeatureWhole() {
   return (
-    <div className="bg-background border-ring rounded-md p-8 shadow-xs ring">
+    <div className="bg-background ring-ring/20 rounded-md p-8 shadow-sm ring">
       <div className="flex items-start space-x-4">
         <Lock className="h-8 w-8 flex-shrink-0 pt-1" />
         <div>
@@ -80,11 +80,9 @@ export default function InitialDisplay() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="space-y-8 pb-16 text-center">
-        <h2 className="text-6xl leading-none font-black tracking-tighter uppercase">
-          VISUALIZE
-          <br />
-          <span className="">BIM DATA</span>
+      <div className="space-y-8 pb-8 text-center">
+        <h2 className="tracking text-6xl leading-none font-black tracking-tighter">
+          Visualize BIM data
         </h2>
         <div className="mx-auto h-1 w-24 bg-black"></div>
         <p className="mx-auto max-w-2xl text-xl leading-tight font-medium">
@@ -99,7 +97,7 @@ export default function InitialDisplay() {
           onDrop={handleDrop}
           onError={console.error}
           src={files}
-          className="accent-red-50"
+          className=""
         >
           <DropzoneEmptyState />
           <DropzoneContent />
