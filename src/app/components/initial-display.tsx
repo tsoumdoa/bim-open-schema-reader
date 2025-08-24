@@ -80,6 +80,7 @@ function FeatureWhole() {
     </div>
   );
 }
+
 function InvalidFileAlertDialog(props: {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -107,15 +108,16 @@ function InvalidFileAlertDialog(props: {
   );
 }
 
-export default function InitialDisplay() {
-  const [files, setFiles] = useState<File[] | undefined>();
+export default function InitialDisplay(props: {
+  setFiles: (files: File[] | undefined) => void;
+  files: File[] | undefined;
+  handleProcess: () => void;
+  isProcessing: boolean;
+}) {
   const [invalidFileSelected, setInvalidFileSelected] = useState(false);
+
   const handleDrop = async (files: File[]) => {
-    if (!files || files.length === 0) return;
-    const file = files[0];
-    const arrayBuffer = await file.arrayBuffer();
-    // console.log(files[0]);
-    // setFiles(files);
+    props.setFiles(files);
   };
 
   return (
@@ -136,19 +138,35 @@ export default function InitialDisplay() {
       </div>
 
       <div className="flex flex-col gap-y-12">
-        <Dropzone
-          maxFiles={1}
-          onDrop={handleDrop}
-          onError={() => setInvalidFileSelected(true)}
-          src={files}
-          className=""
-          accept={{
-            "application/zip": [".zip"],
-          }}
-        >
-          <DropzoneEmptyState />
-          <DropzoneContent />
-        </Dropzone>
+        <div className="relative">
+          <Dropzone
+            maxFiles={1}
+            onDrop={handleDrop}
+            onError={() => setInvalidFileSelected(true)}
+            src={props.files}
+            className=""
+            accept={{
+              "application/zip": [".zip"],
+            }}
+          >
+            <DropzoneEmptyState />
+            <DropzoneContent />
+          </Dropzone>
+
+          {props.files && props.files.length > 0 && (
+            <div className="absolute right-2 bottom-2">
+              <Button
+                onClick={props.handleProcess}
+                disabled={props.isProcessing}
+                className="w-full md:w-auto"
+                variant="secondary"
+                size="sm"
+              >
+                {props.isProcessing ? "Processing..." : "Process"}
+              </Button>
+            </div>
+          )}
+        </div>
 
         <FeatureWhole />
         <FeatureGrid />
