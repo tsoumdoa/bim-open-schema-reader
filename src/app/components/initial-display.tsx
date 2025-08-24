@@ -3,6 +3,16 @@ import {
   DropzoneContent,
   DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { Shield, Zap, Eye, Lock } from "lucide-react";
 
@@ -70,16 +80,50 @@ function FeatureWhole() {
     </div>
   );
 }
+function InvalidFileAlertDialog(props: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) {
+  return (
+    <AlertDialog open={props.open}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Invalid file selected</AlertDialogTitle>
+          <AlertDialogDescription>
+            Please select a valid BIM file (.parquete.zip) to continue.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction
+            onClick={() => {
+              props.setOpen(false);
+            }}
+          >
+            Close
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 export default function InitialDisplay() {
   const [files, setFiles] = useState<File[] | undefined>();
-  const handleDrop = (files: File[]) => {
-    console.log(files);
-    setFiles(files);
+  const [invalidFileSelected, setInvalidFileSelected] = useState(false);
+  const handleDrop = async (files: File[]) => {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    const arrayBuffer = await file.arrayBuffer();
+    // console.log(files[0]);
+    // setFiles(files);
   };
 
   return (
     <div className="mx-auto max-w-4xl">
+      <InvalidFileAlertDialog
+        open={invalidFileSelected}
+        setOpen={setInvalidFileSelected}
+      />
       <div className="space-y-8 pb-8 text-center">
         <h2 className="tracking text-6xl leading-none font-black tracking-tighter">
           Visualize BIM data
@@ -93,11 +137,14 @@ export default function InitialDisplay() {
 
       <div className="flex flex-col gap-y-12">
         <Dropzone
-          maxFiles={3}
+          maxFiles={1}
           onDrop={handleDrop}
-          onError={console.error}
+          onError={() => setInvalidFileSelected(true)}
           src={files}
           className=""
+          accept={{
+            "application/zip": [".zip"],
+          }}
         >
           <DropzoneEmptyState />
           <DropzoneContent />
