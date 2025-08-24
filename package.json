@@ -9,6 +9,7 @@
 		"lint": "eslint"
 	},
 	"dependencies": {
+		"@duckdb/duckdb-wasm": "1.29.1-dev132.0",
 		"@radix-ui/react-alert-dialog": "^1.1.15",
 		"@radix-ui/react-slot": "^1.2.3",
 		"@zip.js/zip.js": "^2.7.72",

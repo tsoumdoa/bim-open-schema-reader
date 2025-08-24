@@ -5,7 +5,9 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <h1 className="text-2xl font-black tracking-tight uppercase">
-              BIM Open Schema Reader
+              <a href="/" className="">
+                BIM Open Schema Reader
+              </a>
             </h1>
           </div>
           <nav className="hidden items-center space-x-8 md:flex">
