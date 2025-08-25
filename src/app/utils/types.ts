@@ -14,5 +14,5 @@ export const validFileNames = [
 
 export type ParquetBlob = {
   filename: string;
-  parquet: Blob;
+  parquet: Uint8Array;
 };

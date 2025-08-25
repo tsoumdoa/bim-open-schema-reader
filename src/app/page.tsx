@@ -66,7 +66,12 @@ export default function Home() {
       for (const entry of entries) {
         if (!entry.directory) {
           const blob = await entry.getData(new BlobWriter());
-          parquetData.current.push({ filename: entry.filename, parquet: blob });
+          const arrayBuffer = await blob.arrayBuffer();
+          const uint8 = new Uint8Array(arrayBuffer);
+          parquetData.current.push({
+            filename: entry.filename,
+            parquet: uint8,
+          });
         }
       }
       await reader.close();

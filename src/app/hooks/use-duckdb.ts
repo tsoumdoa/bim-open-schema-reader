@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import * as duckdb from "@duckdb/duckdb-wasm";
 
 async function initDuckDB() {
@@ -17,19 +17,22 @@ async function initDuckDB() {
 
   await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
   URL.revokeObjectURL(worker_url);
+  const c = await db.connect();
 
-  return await db.connect();
+  return { db, c };
 }
 
 export function useDuckDB() {
-  const [db, setDb] = useState<duckdb.AsyncDuckDBConnection | null>(null);
+  const connectionRef = useRef<duckdb.AsyncDuckDBConnection>(null);
+  const dbRef = useRef<duckdb.AsyncDuckDB>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
   const init = async () => {
     try {
-      const db = await initDuckDB();
-      setDb(db);
+      const { db, c } = await initDuckDB();
+      dbRef.current = db;
+      connectionRef.current = c;
       setLoading(false);
     } catch (e) {
       setError(e as Error);
@@ -39,9 +42,9 @@ export function useDuckDB() {
   useEffect(() => {
     init();
     return () => {
-      db?.close();
+      connectionRef?.current?.close();
     };
   }, []);
 
-  return { db, error, loading };
+  return { connectionRef, dbRef, error, loading };
 }
