@@ -1,4 +1,3 @@
-
 // prettier.config.js, .prettierrc.js, prettier.config.mjs, or .prettierrc.mjs
 
 /**
@@ -10,7 +9,14 @@ const config = {
 	tabWidth: 2,
 	semi: true,
 	singleQuote: false,
-	plugins: ["prettier-plugin-tailwindcss"],
+	plugins: [
+		"prettier-plugin-tailwindcss",
+		"prettier-plugin-sql",
+		"prettier-plugin-embed",
+	],
+	embeddedSqlTags: ["sql"],
+	language: "sql",
+	keywordCase: "upper",
 };
 
 export default config;
