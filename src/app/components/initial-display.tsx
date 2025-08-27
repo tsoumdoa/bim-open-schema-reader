@@ -122,7 +122,7 @@ export default function InitialDisplay(props: {
 	};
 
 	return (
-		<div className="mx-auto max-w-4xl">
+		<div className="mx-auto max-w-4xl w-full">
 			<InvalidFileAlertDialog
 				open={invalidFileSelected}
 				setOpen={setInvalidFileSelected}
