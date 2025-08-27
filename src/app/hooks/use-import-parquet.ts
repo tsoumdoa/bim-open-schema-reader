@@ -1,7 +1,7 @@
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { useEffect, useRef, useState } from "react";
 import { ParquetBlob } from "../utils/types";
-import { importParquetFromBuffer } from "../utils/duckdb-wasm-helpers";
+import { initTables, registerParquetFile } from "../utils/duckdb-wasm-helpers";
 
 export function useImportParquet(
 	db: duckdb.AsyncDuckDB,
@@ -21,22 +21,16 @@ export function useImportParquet(
 				//promise.all is ok cuz it rejects if any of the promises rejects
 				//(i.e. promise.allsettled allow partial success, which is not what we want here)
 				await Promise.all(
-					parquetFileEntries.map(async (entry) => {
-						const { filename, parquet } = entry;
-						await importParquetFromBuffer(
-							db,
-							c,
-							parquet,
-							filename.replace(".parquet", ""),
-							filename
-						);
+					parquetFileEntries.map(async (entry, i) => {
+						registerParquetFile(db, entry);
 					})
 				);
+				await initTables(c);
+				setIsInitializing(false);
 				setIsInitialized(true);
 			} catch (err) {
-				setError(err as Error);
-			} finally {
 				setIsInitializing(false);
+				setError(err as Error);
 			}
 		};
 
