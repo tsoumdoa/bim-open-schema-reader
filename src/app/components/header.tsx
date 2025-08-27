@@ -6,14 +6,15 @@ export default function Header() {
 				<div className="flex items-center justify-between">
 					<div className="flex items-center space-x-3">
 						<h1 className="text-2xl font-black tracking-tight uppercase">
-							<Link href="/" className="">
+							<a href="/" className="">
 								BIM Open Schema Reader
-							</Link>
+							</a>
 						</h1>
 					</div>
 					<nav className="hidden items-center space-x-8 md:flex">
 						<Link
-							href="#features"
+							href="https://github.com/tsoumdoa/bim-open-schema-reader"
+							target="_blank"
 							className="hover: text-sm font-bold tracking-wider uppercase"
 						>
 							GitHub Repo
