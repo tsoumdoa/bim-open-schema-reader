@@ -51,5 +51,5 @@ export async function registerParquetFile(
 
 export async function initTables(c: duckdb.AsyncDuckDBConnection) {
 	const query = createBosTable() + createHelperViwers;
-	await runQuery(c, query);
+	await c.query(query);
 }

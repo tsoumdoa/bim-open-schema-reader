@@ -18,14 +18,16 @@ export function useImportParquet(
 			if (hasRun.current) return;
 			hasRun.current = true;
 			try {
-				//promise.all is ok cuz it rejects if any of the promises rejects
-				//(i.e. promise.allsettled allow partial success, which is not what we want here)
 				await Promise.all(
 					parquetFileEntries.map(async (entry, i) => {
 						registerParquetFile(db, entry);
 					})
 				);
+				// TODO: check whhy it takes so long
+				const start = Date.now();
 				await initTables(c);
+				const end = Date.now();
+				console.log(`Initialized in ${end - start}ms`);
 				setIsInitializing(false);
 				setIsInitialized(true);
 			} catch (err) {
