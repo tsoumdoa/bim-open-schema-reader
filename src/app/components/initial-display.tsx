@@ -20,15 +20,15 @@ function FeatureGrid() {
 	return (
 		<div className="grid gap-8 md:grid-cols-3" id="features">
 			<div className="bg-background ring-ring/20 rounded-md p-6 shadow-sm ring">
-				<div className="flex items-center space-x-3 pb-4">
+				<div className="flex items-center space-x-3 pb-4 ">
 					<Zap className="h-8 w-8" />
 					<h3 className="text-xl font-black tracking-tight uppercase">
-						FAST PROCESSING
+						ULTRA-FAST QUERIES
 					</h3>
 				</div>
 				<p className="leading-relaxed font-medium">
-					Optimized algorithms for quick parsing and visualization of large BIM
-					datasets directly in your browser.
+					Powered by DuckDB-Wasm, run lightning-fast SQL queries on BIM Open
+					Schema data exported from Revit — all directly in your browser.
 				</p>
 			</div>
 
@@ -36,12 +36,12 @@ function FeatureGrid() {
 				<div className="flex items-center space-x-3 pb-4">
 					<Shield className="h-8 w-8" />
 					<h3 className="text-xl font-black tracking-tight uppercase">
-						PRIVACY FIRST
+						100% PRIVATE
 					</h3>
 				</div>
 				<p className="leading-relaxed font-medium">
-					No data uploads, no cloud processing. Your sensitive BIM data stays
-					completely private and secure.
+					No servers, no uploads, no cloud. Everything runs locally in your
+					browser, keeping your BIM data fully private and secure.
 				</p>
 			</div>
 
@@ -49,12 +49,13 @@ function FeatureGrid() {
 				<div className="mb-4 flex items-center space-x-3">
 					<Eye className="h-8 w-8" />
 					<h3 className="text-xl font-black tracking-tight uppercase">
-						RICH VISUALIZATION
+						FLEXIBLE ANALYSIS
 					</h3>
 				</div>
 				<p className="leading-relaxed font-medium">
-					Interactive charts, graphs, and data tables to help you understand and
-					analyze your BIM data effectively.
+					Write and customize any SQL queries you want. Explore, filter, and
+					analyze your model data with interactive tables, charts, and
+					visualizations.
 				</p>
 			</div>
 		</div>
