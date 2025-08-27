@@ -11,6 +11,7 @@ export function useImportParquet(
 	const hasRun = useRef(false); // kidna have to do this due to react strict mode
 	const [isInitializing, setIsInitializing] = useState(true);
 	const [isInitialized, setIsInitialized] = useState(false);
+	const [error, setError] = useState<Error | null>(null);
 
 	useEffect(() => {
 		const run = async () => {
@@ -33,8 +34,7 @@ export function useImportParquet(
 				);
 				setIsInitialized(true);
 			} catch (err) {
-				// 	TODO: thinking about how to handle errors for user...
-				console.error("Failed to import parquet files:", err);
+				setError(err as Error);
 			} finally {
 				setIsInitializing(false);
 			}
@@ -43,5 +43,5 @@ export function useImportParquet(
 		run();
 	}, [db, c, parquetFileEntries]);
 
-	return { hasRun, isInitializing, isInitialized };
+	return { error, isInitializing, isInitialized };
 }

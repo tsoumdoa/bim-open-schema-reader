@@ -8,15 +8,17 @@ export function useRunDuckDbQuery(
 ) {
 	const [headers, setHeaders] = useState<string[]>([]);
 	const [rows, setRows] = useState<(string | number)[][]>([]);
+	const [runSuccess, setRunSuccess] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
-
+		setRunSuccess(false);
 		const run = async () => {
 			const res = await runQuery(c, query);
 			if (!cancelled) {
 				setHeaders(res.headers);
 				setRows(res.rows);
+				setRunSuccess(true);
 			}
 		};
 
@@ -27,5 +29,5 @@ export function useRunDuckDbQuery(
 		};
 	}, [c, query]);
 
-	return { headers, rows };
+	return { headers, rows, runSuccess };
 }
