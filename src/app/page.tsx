@@ -57,7 +57,7 @@ export default function Home() {
 		<div className="bg-background min-h-screen ">
 			<Header />
 			<UnzipFailedAlertDialog open={open} setOpen={setOpen} />
-			<main className="px-4 py-8">
+			<main className="px-4 py-2">
 				{dbReady ? (
 					<AnalyticalDisplay
 						parquetFileEntries={parquetData.current}

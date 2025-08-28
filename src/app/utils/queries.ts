@@ -10,7 +10,7 @@ export const createBosTable = () => {
         CREATE VIEW ${fileName.replace(".parquet", "")} AS
         SELECT
           *,
-          (row_number() OVER () - 1) AS Index
+          (row_number() OVER () - 1) AS index
         FROM
           ${fileName};
       `;
@@ -21,10 +21,10 @@ export const createBosTable = () => {
 export const createHelperViwesAndTables = sql`
   -- parameter enum table
   CREATE
-  OR REPLACE TABLE Enum_Parameter (Index INTEGER, ParameterType VARCHAR(20));
+  OR REPLACE TABLE Enum_Parameter (index INTEGER, ParameterType VARCHAR(20));
 
   INSERT INTO
-    Enum_Parameter (Index, ParameterType)
+    Enum_Parameter (index, ParameterType)
   VALUES
     (0, 'Int'),
     (1, 'Double'),
@@ -32,10 +32,10 @@ export const createHelperViwesAndTables = sql`
     (3, 'String'),
     (4, 'Point');
 
-  CREATE TABLE IF NOT EXISTS Enum_RelationType (Index INTEGER, RelationType VARCHAR(20));
+  CREATE TABLE IF NOT EXISTS Enum_RelationType (index INTEGER, RelationType VARCHAR(20));
 
   INSERT INTO
-    Enum_RelationType (Index, RelationType)
+    Enum_RelationType (index, RelationType)
   VALUES
     (0, 'PartOf'),
     (1, 'ElementOf'),

@@ -18,10 +18,13 @@ function DashboardContainer(props: {
 	);
 	return (
 		<div className="">
-			<div className="text-center">
-				<p className="text-lg">{props.fileName}</p>
-				<div className="w-[20rem]">
-					{runSuccess && <DisplayTableInfo headers={headers} rows={rows} />}
+			<div className="">
+				<p className="text-sm py-2">file name: {props.fileName}</p>
+				<div className="flex fiex-row items-start gap-x-2">
+					<div className="">
+						{runSuccess && <DisplayTableInfo headers={headers} rows={rows} />}
+					</div>
+					<div className="w-full">Where does this go?</div>
 				</div>
 			</div>
 		</div>
