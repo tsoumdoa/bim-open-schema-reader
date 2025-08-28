@@ -36,7 +36,9 @@ export function DisplayTableInfo(props: {
 				{props.rows.map((row, i) => (
 					<TableRow key={i}>
 						<TableCell className="font-medium text-left">{row[0]}</TableCell>
-						<TableCell className="text-left">{mergeNameAndType(row[1], row[2])}</TableCell>
+						<TableCell className="text-left">
+							{mergeNameAndType(row[1], row[2])}
+						</TableCell>
 					</TableRow>
 				))}
 			</TableBody>

@@ -1,7 +1,6 @@
 import * as duckdb from "@duckdb/duckdb-wasm";
-
-export const sql = (strings: TemplateStringsArray, ...values: string[]) =>
-	strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+import { ParquetBlob } from "./types";
+import { createBosTable, createHelperViwesAndTables } from "./queries";
 
 export async function runQuery(c: duckdb.AsyncDuckDBConnection, query: string) {
 	const res = await c.query(query);
@@ -41,4 +40,17 @@ export async function importParquetFromBuffer(
 		`CREATE TABLE ${tableName} AS
    SELECT * FROM ${filename}`
 	);
+}
+
+export async function registerParquetFile(
+	db: duckdb.AsyncDuckDB,
+	entry: ParquetBlob
+) {
+	await db.registerFileBuffer(entry.filename, entry.parquet);
+}
+
+export async function initTables(c: duckdb.AsyncDuckDBConnection) {
+	const query = createBosTable() + createHelperViwesAndTables;
+
+	await c.query(query);
 }
