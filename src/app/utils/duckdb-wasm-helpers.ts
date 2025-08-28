@@ -1,11 +1,6 @@
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { ParquetBlob } from "./types";
-import {
-	addIndexToTables,
-	createBosTable,
-	createHelperViwesAndTables,
-	encodedCreateBosTable,
-} from "./queries";
+import { createBosTable, createHelperViwesAndTables } from "./queries";
 
 export async function runQuery(c: duckdb.AsyncDuckDBConnection, query: string) {
 	const res = await c.query(query);
