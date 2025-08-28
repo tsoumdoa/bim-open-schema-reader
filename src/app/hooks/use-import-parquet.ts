@@ -23,11 +23,7 @@ export function useImportParquet(
 						registerParquetFile(db, entry);
 					})
 				);
-				// TODO: check whhy it takes so long
-				const start = Date.now();
 				await initTables(c);
-				const end = Date.now();
-				console.log(`Initialized in ${end - start}ms`);
 				setIsInitializing(false);
 				setIsInitialized(true);
 			} catch (err) {

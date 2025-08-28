@@ -7,9 +7,10 @@ export const createBosTable = () => {
 	return validFileNames
 		.map((fileName) => {
 			return sql`
-        CREATE TABLE ${fileName.replace(".parquet", "")} AS
+        CREATE VIEW ${fileName.replace(".parquet", "")} AS
         SELECT
-          *
+          *,
+          (row_number() OVER () - 1) AS Index
         FROM
           ${fileName};
       `;
@@ -17,76 +18,7 @@ export const createBosTable = () => {
 		.join("\n");
 };
 
-export const createHelperViwers = sql`
-  -- adding index to Documents, Entities, Points & Strings as those table don't have an idex
-  -- Entities table
-  CREATE TABLE Entities_New AS
-  SELECT
-    *,
-    (row_number() OVER () - 1) AS Index
-  FROM
-    Entities;
-
-  DROP TABLE Entities;
-
-  ALTER TABLE Entities_New
-  RENAME TO Entities;
-
-  -- Descriptors table
-  CREATE TABLE Descriptors_New AS
-  SELECT
-    *,
-    (row_number() OVER () - 1) AS Index
-  FROM
-    Descriptors;
-
-  DROP TABLE Descriptors;
-
-  ALTER TABLE Descriptors_New
-  RENAME TO Descriptors;
-
-  -- Documents table
-  CREATE TABLE Documents_New AS
-  SELECT
-    *,
-    (row_number() OVER () - 1) AS Index
-  FROM
-    Documents;
-
-  DROP TABLE Documents;
-
-  --Rename Documents Table
-  ALTER TABLE Documents_New
-  RENAME TO Documents;
-
-  -- Points table
-  CREATE TABLE Points_New AS
-  SELECT
-    *,
-    (row_number() OVER () - 1) AS Index
-  FROM
-    Points;
-
-  DROP TABLE Points;
-
-  --Rename Points Table
-  ALTER TABLE Points_New
-  RENAME TO Points;
-
-  -- Strings table
-  CREATE TABLE Strings_New AS
-  SELECT
-    *,
-    (row_number() OVER () - 1) AS Index
-  FROM
-    Strings;
-
-  DROP TABLE Strings;
-
-  --Rename Strings Table
-  ALTER TABLE Strings_New
-  RENAME TO Strings;
-
+export const createHelperViwesAndTables = sql`
   -- parameter enum table
   CREATE
   OR REPLACE TABLE Enum_Parameter (Index INTEGER, ParameterType VARCHAR(20));

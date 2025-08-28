@@ -1,6 +1,11 @@
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { ParquetBlob } from "./types";
-import { createBosTable, createHelperViwers } from "./queries";
+import {
+	addIndexToTables,
+	createBosTable,
+	createHelperViwesAndTables,
+	encodedCreateBosTable,
+} from "./queries";
 
 export async function runQuery(c: duckdb.AsyncDuckDBConnection, query: string) {
 	const res = await c.query(query);
@@ -50,6 +55,7 @@ export async function registerParquetFile(
 }
 
 export async function initTables(c: duckdb.AsyncDuckDBConnection) {
-	const query = createBosTable() + createHelperViwers;
+	const query = createBosTable() + createHelperViwesAndTables;
+
 	await c.query(query);
 }
