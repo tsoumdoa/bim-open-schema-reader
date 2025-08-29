@@ -153,6 +153,22 @@ export const listAllTableInfoWithColumnInfo = sql`
     table_name
 `;
 
+export const listCountByCategory = sql`
+  SELECT
+    e.category AS paramname,
+    COUNT(*) AS count
+  FROM
+    denorm_entities AS e
+    LEFT OUTER JOIN entityparameters AS ep ON e.index = ep.entity
+    LEFT OUTER JOIN denorm_entities AS e2 ON ep.value = e2.index
+    LEFT OUTER JOIN descriptors AS dsp ON ep.descriptor = dsp.index
+    LEFT OUTER JOIN strings AS paramname ON dsp.name = paramname.index
+  GROUP BY
+    e.category
+  ORDER BY
+    count DESC;
+`;
+
 // exmaple with string literal
 // export const listAllTableInfo = (tableName: string) => sql`
 //   SELECT

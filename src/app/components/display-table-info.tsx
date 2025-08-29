@@ -35,19 +35,17 @@ export function DisplayTableInfo(props: {
 	rows: (string | number)[][];
 }) {
 	return (
-		<ScrollArea className="h-full  w-fit min-w-40 rounded-md border">
-			<div className="p-4">
-				<h4 className="pb-2 text-sm leading-none font-medium text-neutral-600">
-					Table Info
-				</h4>
-				{props.rows.map((row, i) => (
-					<React.Fragment key={`table-row-${i}`}>
-						<div className="font-bold text-xs leading-tight">{row[0]}</div>
-						<div className="text-xs">{mergeNameAndType(row[1], row[2])}</div>
-						<Separator className="my-2" />
-					</React.Fragment>
-				))}
-			</div>
-		</ScrollArea>
+		<div className="p-4">
+			<h4 className="pb-2 text-sm leading-none font-medium text-neutral-600">
+				Table Info
+			</h4>
+			{props.rows.map((row, i) => (
+				<React.Fragment key={`table-row-${i}`}>
+					<div className="font-bold text-xs leading-tight">{row[0]}</div>
+					<div className="text-xs">{mergeNameAndType(row[1], row[2])}</div>
+					<Separator className="my-2" />
+				</React.Fragment>
+			))}
+		</div>
 	);
 }

@@ -6,6 +6,12 @@ import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { listAllTableInfoWithColumnInfo } from "../utils/queries";
 import { DisplayTableInfo } from "./display-table-info";
 import { SimpleErrMessage } from "./simple-err-message";
+import {
+	Sidebar,
+	SidebarProvider,
+	SidebarTrigger,
+} from "@/components/ui/sidebar";
+import ListDataByCategories from "./list-data-by-cagories";
 
 function DashboardContainer(props: {
 	db: duckdb.AsyncDuckDB;
@@ -17,17 +23,23 @@ function DashboardContainer(props: {
 		listAllTableInfoWithColumnInfo
 	);
 	return (
-		<div className="">
-			<div className="">
-				<p className="text-sm py-2">file name: {props.fileName}</p>
-				<div className="flex fiex-row items-start gap-x-2">
-					<div className="">
-						{runSuccess && <DisplayTableInfo headers={headers} rows={rows} />}
-					</div>
-					<div className="w-full">Where does this go?</div>
+		<SidebarProvider>
+			<Sidebar className="pt-11 overflow-y-scroll h-full">
+				{runSuccess && <DisplayTableInfo headers={headers} rows={rows} />}
+			</Sidebar>
+
+			<main>
+				<div className="flex flex-row items-center justify-between  gap-x-2">
+					<SidebarTrigger className="" />
+					<p className="text-sm py-2">
+						file name: <span className="font-bold">{props.fileName}</span>
+					</p>
 				</div>
-			</div>
-		</div>
+				<div className="flex fiex-row items-start gap-x-2">
+					<ListDataByCategories c={props.c} />
+				</div>
+			</main>
+		</SidebarProvider>
 	);
 }
 

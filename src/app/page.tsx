@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "./components/header";
-import InitialDisplay from "./components/initial-display";
+import InitialDisplay from "./components/display-initial";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -11,7 +11,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import AnalyticalDisplay from "./components/analytical-display";
+import AnalyticalDisplay from "./components/display-analytical";
 import { useHandleProcess } from "./hooks/use-handle-process";
 
 function UnzipFailedAlertDialog(props: {
