@@ -2,16 +2,12 @@ import { useDuckDB } from "../hooks/use-duckdb";
 import { ParquetBlob } from "../utils/types";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { useImportParquet } from "../hooks/use-import-parquet";
-import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
-import { listAllTableInfoWithColumnInfo } from "../utils/queries";
-import { DisplayTableInfo } from "./display-table-info";
 import { SimpleErrMessage } from "./simple-err-message";
 import {
 	Sidebar,
 	SidebarProvider,
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
-import ListDataByCategories from "./list-data-by-cagories";
 import SideBarContent from "./side-bar-content";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

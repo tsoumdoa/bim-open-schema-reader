@@ -28,14 +28,12 @@ export default function SideBarContent(props: {
 }) {
 	return (
 		<div className="space-y-1">
-			<AccordionDisplay
-				accordionTitle="Analytical"
-				children={<DisplayTableInfo c={props.duckDbConnection} />}
-			/>
-			<AccordionDisplay
-				accordionTitle="Category"
-				children={<ListDataByCategories c={props.duckDbConnection} />}
-			/>
+			<AccordionDisplay accordionTitle="Analytical">
+				<DisplayTableInfo c={props.duckDbConnection} />
+			</AccordionDisplay>
+			<AccordionDisplay accordionTitle="Category">
+				<ListDataByCategories c={props.duckDbConnection} />
+			</AccordionDisplay>
 		</div>
 	);
 }
