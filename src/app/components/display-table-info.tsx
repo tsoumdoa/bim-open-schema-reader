@@ -1,6 +1,8 @@
 import React from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import * as duckdb from "@duckdb/duckdb-wasm";
+import { listAllTableInfoWithColumnInfo } from "../utils/queries";
+import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 
 function mergeNameAndType(names: string | number, types: string | number) {
 	//bad bad bad but i know what i'm doing
@@ -30,16 +32,17 @@ function mergeNameAndType(names: string | number, types: string | number) {
 	);
 }
 
-export function DisplayTableInfo(props: {
-	headers: string[];
-	rows: (string | number)[][];
-}) {
+export function DisplayTableInfo(props: { c: duckdb.AsyncDuckDBConnection }) {
+	const { rows, isSuccess } = useRunDuckDbQuery(
+		props.c,
+		listAllTableInfoWithColumnInfo
+	);
+	if (!isSuccess) {
+		return <div>Loading...</div>;
+	}
 	return (
-		<div className="p-4">
-			<h4 className="pb-2 text-sm leading-none font-medium text-neutral-600">
-				Table Info
-			</h4>
-			{props.rows.map((row, i) => (
+		<div>
+			{rows.map((row, i) => (
 				<React.Fragment key={`table-row-${i}`}>
 					<div className="font-bold text-xs leading-tight">{row[0]}</div>
 					<div className="text-xs">{mergeNameAndType(row[1], row[2])}</div>

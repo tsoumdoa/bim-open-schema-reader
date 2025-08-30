@@ -73,8 +73,8 @@ function FeatureWhole() {
 					</h3>
 					<p className="text-lg leading-relaxed font-medium">
 						Your BIM data <strong>NEVER LEAVES YOUR COMPUTER.</strong> All
-						visualization and analysis happens entirely in your browser,
-						ensuring complete data privacy and security.
+						querying and analysis happens entirely in your browser, ensuring
+						complete data privacy and security.
 					</p>
 				</div>
 			</div>
@@ -127,18 +127,17 @@ export default function InitialDisplay(props: {
 				open={invalidFileSelected}
 				setOpen={setInvalidFileSelected}
 			/>
-			<div className="space-y-8 pb-8 text-center">
+			<div className="space-y-4 pb-4 text-center pt-4">
 				<h2 className="tracking text-6xl leading-none font-black tracking-tighter">
-					Visualize BIM data
+					Query BIM data
 				</h2>
-				<div className="mx-auto h-1 w-24 bg-black"></div>
 				<p className="mx-auto max-w-2xl text-xl leading-tight font-medium">
 					Upload your BIM data files and explore them with our powerful,
 					privacy-first visualization tool.
 				</p>
 			</div>
 
-			<div className="flex flex-col gap-y-12">
+			<div className="flex flex-col gap-y-8">
 				<div className="relative">
 					<Dropzone
 						maxFiles={1}

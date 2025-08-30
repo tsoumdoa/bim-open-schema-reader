@@ -4,28 +4,29 @@ import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 export default function ListDataByCategories(props: {
 	c: duckdb.AsyncDuckDBConnection;
 }) {
-	const { headers, rows, runSuccess } = useRunDuckDbQuery(
-		props.c,
-		listCountByCategory
-	);
-	console.log(headers, rows);
+	const { rows } = useRunDuckDbQuery(props.c, listCountByCategory);
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col text-xs">
 			<div className="overflow-x-auto">
 				<table className="table-auto w-full">
 					<thead>
-						<tr>
-							<th className="text-left">Category</th>
+						<tr className="tracking-tight">
+							<th className="text-left">Name</th>
 							<th className="text-left">Count</th>
 						</tr>
 					</thead>
 					<tbody>
-						{rows.map((row, index) => (
-							<tr key={`category-count-${index}`}>
-								<td className="text-left">{row[0]}</td>
-								<td className="text-left">{row[1]}</td>
-							</tr>
-						))}
+						{rows &&
+							rows.map((row, index) => (
+								<tr key={`category-count-${index}`}>
+									<td className="text-left tracking-tight ">
+										{row[0] || (
+											<span className="text-neutral-500">undefined</span>
+										)}
+									</td>
+									<td className="text-right pr-1">{row[1].toLocaleString()}</td>
+								</tr>
+							))}
 					</tbody>
 				</table>
 			</div>
