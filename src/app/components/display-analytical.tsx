@@ -31,7 +31,7 @@ function DashboardContainer(props: {
 						file name: <span className="font-bold">{props.fileName}</span>
 					</p>
 				</div>
-				<div className="flex fiex-row items-start gap-x-2">//todo</div>
+				<div className="flex fiex-row items-start gap-x-2">todo</div>
 			</main>
 		</SidebarProvider>
 	);
