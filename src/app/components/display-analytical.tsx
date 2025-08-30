@@ -2,29 +2,38 @@ import { useDuckDB } from "../hooks/use-duckdb";
 import { ParquetBlob } from "../utils/types";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { useImportParquet } from "../hooks/use-import-parquet";
-import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
-import { listAllTableInfoWithColumnInfo } from "../utils/queries";
-import { DisplayTableInfo } from "./display-table-info";
 import { SimpleErrMessage } from "./simple-err-message";
+import {
+	Sidebar,
+	SidebarProvider,
+	SidebarTrigger,
+} from "@/components/ui/sidebar";
+import SideBarContent from "./side-bar-content";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function DashboardContainer(props: {
 	db: duckdb.AsyncDuckDB;
 	c: duckdb.AsyncDuckDBConnection;
 	fileName: string;
 }) {
-	const { headers, rows, runSuccess } = useRunDuckDbQuery(
-		props.c,
-		listAllTableInfoWithColumnInfo
-	);
 	return (
-		<div className="">
-			<div className="text-center">
-				<p className="text-lg">{props.fileName}</p>
-				<div className="w-[20rem]">
-					{runSuccess && <DisplayTableInfo headers={headers} rows={rows} />}
+		<SidebarProvider>
+			<Sidebar className="pt-11 overflow-y-scroll h-full ">
+				<div className="p-2">
+					<SideBarContent duckDbConnection={props.c} />
 				</div>
-			</div>
-		</div>
+			</Sidebar>
+
+			<main>
+				<div className="flex flex-row items-center justify-between  gap-x-2">
+					<SidebarTrigger className="" />
+					<p className="text-sm py-2">
+						file name: <span className="font-bold">{props.fileName}</span>
+					</p>
+				</div>
+				<div className="flex fiex-row items-start gap-x-2">todo</div>
+			</main>
+		</SidebarProvider>
 	);
 }
 
@@ -60,6 +69,7 @@ export default function AnalyticalDisplay(props: {
 	parquetFileEntries: ParquetBlob[];
 }) {
 	const { dbRef, connectionRef, error, loading } = useDuckDB();
+	const queryClient = new QueryClient();
 
 	if (!error && loading) {
 		return <div>Initializing...</div>;
@@ -67,12 +77,14 @@ export default function AnalyticalDisplay(props: {
 
 	if (dbRef.current && connectionRef.current) {
 		return (
-			<DbDisplay
-				db={dbRef.current}
-				c={connectionRef.current}
-				parquetFileEntries={props.parquetFileEntries}
-				fileName={props.fileName}
-			/>
+			<QueryClientProvider client={queryClient}>
+				<DbDisplay
+					db={dbRef.current}
+					c={connectionRef.current}
+					parquetFileEntries={props.parquetFileEntries}
+					fileName={props.fileName}
+				/>
+			</QueryClientProvider>
 		);
 	}
 

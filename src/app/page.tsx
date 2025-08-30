@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "./components/header";
-import InitialDisplay from "./components/initial-display";
+import InitialDisplay from "./components/display-initial";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -11,7 +11,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import AnalyticalDisplay from "./components/analytical-display";
+import AnalyticalDisplay from "./components/display-analytical";
 import { useHandleProcess } from "./hooks/use-handle-process";
 
 function UnzipFailedAlertDialog(props: {
@@ -57,7 +57,7 @@ export default function Home() {
 		<div className="bg-background min-h-screen ">
 			<Header />
 			<UnzipFailedAlertDialog open={open} setOpen={setOpen} />
-			<main className="px-4 py-8">
+			<main className="px-4 py-2">
 				{dbReady ? (
 					<AnalyticalDisplay
 						parquetFileEntries={parquetData.current}
