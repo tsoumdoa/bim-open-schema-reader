@@ -13,7 +13,8 @@ export default function Header() {
 						<Link
 							href="https://github.com/tsoumdoa/bim-open-schema-reader"
 							target="_blank"
-							className="hover: text-sm font-bold tracking-wider uppercase"
+							rel="noopener noreferrer"
+							className="hover:underline text-sm font-bold tracking-wider uppercase"
 						>
 							GitHub Repo
 						</Link>
