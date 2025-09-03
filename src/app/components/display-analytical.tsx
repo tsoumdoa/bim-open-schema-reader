@@ -40,9 +40,10 @@ function DashboardMain(props: {
 	queryObjects: QueryObjects;
 	addQuery: (queryObject: QueryObject) => void;
 	removeQuery: (queryObject: QueryObject) => void;
+	duckdbConnection: duckdb.AsyncDuckDBConnection;
 }) {
 	return (
-		<div className="flex flex-col items-start gap-y-2">
+		<div className="flex max-w-full flex-col items-start gap-y-2">
 			{props.queryObjects.length > 0 &&
 				props.queryObjects.map((q, i) => {
 					return (
@@ -51,6 +52,7 @@ function DashboardMain(props: {
 							queryObject={q}
 							removeObject={props.removeQuery}
 							isDuplicated={checkDuplicated(props.queryObjects, q)}
+							duckDbConnection={props.duckdbConnection}
 						/>
 					);
 				})}
@@ -80,14 +82,15 @@ function DashboardContainer(props: {
 }) {
 	const { queryObjects, addQuery, removeQuery } = useQueryObjects();
 	return (
-		<SidebarProvider className="h-full min-h-0">
+		<SidebarProvider className="h-full min-h-0 w-full">
 			<SideBar db={props.db} c={props.c} fileName={props.fileName} />
-			<main>
+			<main className="relative w-full min-w-0">
 				<DashboardHeader db={props.db} c={props.c} fileName={props.fileName} />
 				<DashboardMain
 					queryObjects={queryObjects}
 					addQuery={addQuery}
 					removeQuery={removeQuery}
+					duckdbConnection={props.c}
 				/>
 			</main>
 		</SidebarProvider>

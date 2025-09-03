@@ -1,4 +1,5 @@
 import { Separator } from "@/components/ui/separator";
+import * as duckdb from "@duckdb/duckdb-wasm";
 import {
 	Tooltip,
 	TooltipContent,
@@ -16,6 +17,7 @@ import {
 import { Menu } from "lucide-react";
 import { useState } from "react";
 import SqlQueryCodeBlock from "./sql-code-block";
+import QueryResultDisplay from "./query-result-display";
 
 function DropDownMenu(props: {
 	queryObject: QueryObject;
@@ -79,11 +81,12 @@ export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
 	isDuplicated: boolean;
+	duckDbConnection: duckdb.AsyncDuckDBConnection;
 }) {
 	const [showSqlQuery, setShowSqlQuery] = useState(false);
 	return (
-		<div className="flex min-w-full flex-col gap-y-1">
-			<div className="flex flex-row items-center justify-start gap-x-2">
+		<div className="flex w-full flex-col gap-y-2">
+			<div className="flex w-full flex-row items-center justify-start gap-x-2">
 				{formatQueryName(props.queryObject, props.isDuplicated)}
 				<DropDownMenu
 					queryObject={props.queryObject}
@@ -95,6 +98,12 @@ export default function QueryDisplayItem(props: {
 			{showSqlQuery && (
 				<SqlQueryCodeBlock sqlQuery={props.queryObject.sqlQuery} />
 			)}
+			<div className="max-h-120 w-full min-w-0 overflow-auto">
+				<QueryResultDisplay
+					c={props.duckDbConnection}
+					query={props.queryObject.sqlQuery}
+				/>
+			</div>
 			<Separator className="my-4" />
 		</div>
 	);

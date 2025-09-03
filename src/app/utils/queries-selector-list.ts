@@ -1,4 +1,12 @@
-import { createBosTable } from "./queries";
+import { listGrids, listLevels } from "../sql/level-and-grid";
+import {
+	listGridWithCoredStatus,
+	listLevelWithCoredStatus,
+} from "../sql/level-and-grid-codrination-status";
+import { listWallBuildUps } from "../sql/wall-build-ups";
+import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
+import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
+import { wallIntStrEntityParameters } from "../sql/wall-int-str-entity-parameters";
 import { QueriesSelector } from "./types";
 
 export const queriesSelectorList: QueriesSelector[] = [
@@ -7,23 +15,23 @@ export const queriesSelectorList: QueriesSelector[] = [
 		queryObjects: [
 			{
 				queryTile: "List all levels",
-				sqlQuery: createBosTable(),
+				sqlQuery: listLevels,
 				explaination: "List all levels along with their coordinates",
 			},
 			{
 				queryTile: "List all grids",
-				sqlQuery: "SELECT * FROM Grids",
+				sqlQuery: listGrids,
 				explaination: "List all grids along with their coordinates",
 			},
 			{
 				queryTile: "Levels cordination view",
-				sqlQuery: "SELECT * FROM Levels_Coordinate",
+				sqlQuery: listLevelWithCoredStatus,
 				explaination:
 					"Compare levels with the linked models to check if they are in the same location",
 			},
 			{
 				queryTile: "Grids cordination view",
-				sqlQuery: "SELECT * FROM Grids_Coordinate",
+				sqlQuery: listGridWithCoredStatus,
 				explaination:
 					"Compare grids with the linked models to check if they are in the same location",
 			},
@@ -34,22 +42,22 @@ export const queriesSelectorList: QueriesSelector[] = [
 		queryObjects: [
 			{
 				queryTile: "Wall double and point parameters",
-				sqlQuery: "SELECT * FROM Wall_Double_Parameters",
+				sqlQuery: wallDoubleAndPointParameters,
 				explaination: "Wall double and point parameters",
 			},
 			{
 				queryTile: "Wall element basic info",
-				sqlQuery: "SELECT * FROM Wall_Element_Basic_Info",
+				sqlQuery: wallElementBasicInfo,
 				explaination: "Wall element basic info",
 			},
 			{
 				queryTile: "Wall int, str, and entity parameters",
-				sqlQuery: "SELECT * FROM Wall_Int_Str_Entity_Parameters",
+				sqlQuery: wallIntStrEntityParameters,
 				explaination: "Wall int, str, and entity parameters",
 			},
 			{
 				queryTile: "Wall build up schadule",
-				sqlQuery: "SELECT * FROM Wall_Buildup_Schedule",
+				sqlQuery: listWallBuildUps,
 				explaination: "Wall build up schadule",
 			},
 		],
