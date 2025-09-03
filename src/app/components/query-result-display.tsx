@@ -4,6 +4,7 @@ import {
 	Table,
 	TableBody,
 	TableCell,
+	TableHead,
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
@@ -11,20 +12,20 @@ import { formatData } from "../utils/format";
 
 function MainTable(props: { headers: string[]; rows: (string | number)[][] }) {
 	return (
-		<Table className="">
+		<Table className="overflow-auto">
 			<TableHeader className="">
 				<TableRow className="spacing font-semibold tracking-tight">
-					<TableCell
+					<TableHead
 						key={`header`}
-						className="sticky top-0 z-10 bg-white"
-					></TableCell>
+						className="sticky top-0 z-20 bg-white"
+					></TableHead>
 					{props.headers.map((header, i) => (
-						<TableCell
+						<TableHead
 							key={`${i}-${header}`}
-							className="sticky top-0 z-10 bg-white"
+							className="sticky top-0 z-20 bg-white"
 						>
 							{header}
-						</TableCell>
+						</TableHead>
 					))}
 				</TableRow>
 			</TableHeader>
