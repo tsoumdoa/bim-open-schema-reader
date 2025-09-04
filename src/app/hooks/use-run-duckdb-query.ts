@@ -1,33 +1,37 @@
 import { runQuery } from "../utils/duckdb-wasm-helpers";
-import { useState, useEffect } from "react";
 import * as duckdb from "@duckdb/duckdb-wasm";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 export function useRunDuckDbQuery(
 	c: duckdb.AsyncDuckDBConnection,
 	query: string
 ) {
-	const [headers, setHeaders] = useState<string[]>([]);
-	const [rows, setRows] = useState<(string | number)[][]>([]);
-	const [runSuccess, setRunSuccess] = useState(false);
+	const [queryTime, setQueryTime] = useState(0);
 
-	useEffect(() => {
-		let cancelled = false;
-		setRunSuccess(false);
-		const run = async () => {
-			const res = await runQuery(c, query);
-			if (!cancelled) {
-				setHeaders(res.headers);
-				setRows(res.rows);
-				setRunSuccess(true);
+	const { data, isLoading, isError, error, isSuccess } = useQuery({
+		queryKey: ["duckdb", query], // cache key: unique per query
+		retry: false,
+		queryFn: async () => {
+			try {
+				const start = performance.now();
+				const result = await runQuery(c, query);
+				const end = performance.now();
+				setQueryTime(end - start);
+				return result;
+			} catch (e) {
+				throw e;
 			}
-		};
+		},
+	});
 
-		run();
-
-		return () => {
-			cancelled = true; // cleanup in case component unmounts mid-query
-		};
-	}, [c, query]);
-
-	return { headers, rows, runSuccess };
+	return {
+		headers: data?.headers ?? [],
+		rows: data?.rows ?? [],
+		isLoading,
+		isError,
+		error,
+		isSuccess,
+		queryTime,
+	};
 }

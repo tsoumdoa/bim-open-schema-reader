@@ -3,10 +3,14 @@ import { ParquetBlob } from "./types";
 import { createBosTable, createHelperViwesAndTables } from "./queries";
 
 export async function runQuery(c: duckdb.AsyncDuckDBConnection, query: string) {
-	const res = await c.query(query);
-	const headers = res.schema.fields.map((f) => f.name);
-	const rows: (string | number)[][] = res.toArray().map(Object.values);
-	return { headers, rows };
+	try {
+		const res = await c.query(query);
+		const headers = res.schema.fields.map((f) => f.name);
+		const rows: (string | number)[][] = res.toArray().map(Object.values);
+		return { headers, rows };
+	} catch (e) {
+		throw e;
+	}
 }
 
 function sanitizeTableName(name: string) {

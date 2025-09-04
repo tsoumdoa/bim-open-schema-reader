@@ -1,5 +1,6 @@
 import { validFileNames } from "./types";
 
+// NOTE: boilerplate
 export const sql = (strings: TemplateStringsArray, ...values: string[]) =>
 	strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
 
@@ -10,7 +11,7 @@ export const createBosTable = () => {
         CREATE VIEW ${fileName.replace(".parquet", "")} AS
         SELECT
           *,
-          (row_number() OVER () - 1) AS Index
+          (row_number() OVER () - 1) AS index
         FROM
           ${fileName};
       `;
@@ -21,10 +22,10 @@ export const createBosTable = () => {
 export const createHelperViwesAndTables = sql`
   -- parameter enum table
   CREATE
-  OR REPLACE TABLE Enum_Parameter (Index INTEGER, ParameterType VARCHAR(20));
+  OR REPLACE TABLE Enum_Parameter (index INTEGER, ParameterType VARCHAR(20));
 
   INSERT INTO
-    Enum_Parameter (Index, ParameterType)
+    Enum_Parameter (index, ParameterType)
   VALUES
     (0, 'Int'),
     (1, 'Double'),
@@ -32,10 +33,10 @@ export const createHelperViwesAndTables = sql`
     (3, 'String'),
     (4, 'Point');
 
-  CREATE TABLE IF NOT EXISTS Enum_RelationType (Index INTEGER, RelationType VARCHAR(20));
+  CREATE TABLE IF NOT EXISTS Enum_RelationType (index INTEGER, RelationType VARCHAR(20));
 
   INSERT INTO
-    Enum_RelationType (Index, RelationType)
+    Enum_RelationType (index, RelationType)
   VALUES
     (0, 'PartOf'),
     (1, 'ElementOf'),
@@ -151,6 +152,22 @@ export const listAllTableInfoWithColumnInfo = sql`
     --where table_catalog LIKE 'memory'
   GROUP BY
     table_name
+`;
+
+export const listCountByCategory = sql`
+  SELECT
+    e.category AS paramname,
+    COUNT(*) AS count
+  FROM
+    denorm_entities AS e
+    LEFT OUTER JOIN entityparameters AS ep ON e.index = ep.entity
+    LEFT OUTER JOIN denorm_entities AS e2 ON ep.value = e2.index
+    LEFT OUTER JOIN descriptors AS dsp ON ep.descriptor = dsp.index
+    LEFT OUTER JOIN strings AS paramname ON dsp.name = paramname.index
+  GROUP BY
+    e.category
+  ORDER BY
+    count DESC;
 `;
 
 // exmaple with string literal
