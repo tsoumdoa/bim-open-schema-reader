@@ -7,7 +7,6 @@ export default function QueryResultDisplay(props: {
 	c: duckdb.AsyncDuckDBConnection;
 	query: string;
 }) {
-	console.log(props.query);
 	const { headers, rows, isLoading, isSuccess, queryTime, error } =
 		useRunDuckDbQuery(props.c, props.query);
 
