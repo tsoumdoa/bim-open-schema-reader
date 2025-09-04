@@ -3,6 +3,7 @@ import { JSX, useEffect, useLayoutEffect, useState } from "react";
 import { highlightAndFormatSql } from "../utils/shared";
 import { Button } from "@/components/ui/button";
 import { useRef } from "react";
+import { format } from "sql-formatter";
 
 function ShikiNodeFormatter(props: {
 	children: JSX.Element;
@@ -84,8 +85,10 @@ export default function SqlQueryCodeBlock(props: { sqlQuery: string }) {
 	const [nodes, setNodes] = useState<JSX.Element>();
 	const [lineLength, setLineLength] = useState(0);
 
+	const formattedQuery = format(props.sqlQuery, { language: "duckdb" });
+
 	useLayoutEffect(() => {
-		highlightAndFormatSql(props.sqlQuery, false).then(({ jsx, lineLength }) => {
+		highlightAndFormatSql(formattedQuery, false).then(({ jsx, lineLength }) => {
 			setNodes(jsx);
 			setLineLength(lineLength);
 		});
@@ -93,7 +96,7 @@ export default function SqlQueryCodeBlock(props: { sqlQuery: string }) {
 
 	const handleCopy = async () => {
 		try {
-			await navigator.clipboard.writeText(props.sqlQuery);
+			await navigator.clipboard.writeText(formattedQuery);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
 		} catch (err) {

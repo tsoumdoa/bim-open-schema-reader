@@ -7,13 +7,19 @@ export default function QueryResultDisplay(props: {
 	c: duckdb.AsyncDuckDBConnection;
 	query: string;
 }) {
-	const { headers, rows, isLoading, isSuccess, queryTime } = useRunDuckDbQuery(
-		props.c,
-		props.query
-	);
-	if (isLoading || !isSuccess) {
+	console.log(props.query);
+	const { headers, rows, isLoading, isSuccess, queryTime, error } =
+		useRunDuckDbQuery(props.c, props.query);
+
+	if (error) {
+		return (
+			<div className="text-sm font-semibold text-red-500">{error.message}</div>
+		);
+	}
+	if (isLoading) {
 		return <div>Loading...</div>;
 	}
+
 	if (isSuccess) {
 		const columnDef = headers.map((header, i) => {
 			return {

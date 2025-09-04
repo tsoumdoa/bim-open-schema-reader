@@ -4,11 +4,11 @@ export const listWallBuildUps = sql`
   SELECT
     e1.index AS entity_index,
     FIRST (e1.name) AS family_name,
+    ROUND(SUM(dp.value * 304.8), 1) AS total_thickness,
     LIST (e2.name) AS names,
     LIST (e3.name) AS materials,
     LIST (ROUND(dp.value * 304.8, 1)) AS thicknesses,
-    LIST (e2.category) AS categories,
-    ROUND(SUM(dp.value * 304.8), 1) AS total_thickness
+    LIST (e2.category) AS categories
   FROM
     denorm_entities AS e1
     LEFT JOIN relations AS rls1 ON e1.index = rls1.entitya

@@ -119,4 +119,20 @@
   body {
     @apply bg-background text-foreground;
   }
+  code {
+    counter-reset: step;
+    counter-increment: step 0;
+    font-style: --font-mono;
+    font-type: monospace;
+  }
+
+  code .line::before {
+    content: counter(step);
+    counter-increment: step;
+    width: 1rem;
+    margin-right: 1rem;
+    display: inline-block;
+    text-align: right;
+    color: oklch(70.8% 0 0);
+  }
 }

@@ -69,8 +69,8 @@ function SideBar(props: {
 	fileName: string;
 }) {
 	return (
-		<Sidebar className="h-full overflow-y-scroll pt-11">
-			<div className="p-2">
+		<Sidebar className="h-full pt-11">
+			<div className="overflow-auto p-2">
 				<SideBarContent duckDbConnection={props.c} />
 			</div>
 		</Sidebar>

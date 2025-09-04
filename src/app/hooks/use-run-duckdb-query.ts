@@ -11,12 +11,17 @@ export function useRunDuckDbQuery(
 
 	const { data, isLoading, isError, error, isSuccess } = useQuery({
 		queryKey: ["duckdb", query], // cache key: unique per query
+		retry: false,
 		queryFn: async () => {
-			const start = performance.now();
-			const result = await runQuery(c, query);
-			const end = performance.now();
-			setQueryTime(end - start);
-			return result;
+			try {
+				const start = performance.now();
+				const result = await runQuery(c, query);
+				const end = performance.now();
+				setQueryTime(end - start);
+				return result;
+			} catch (e) {
+				throw e;
+			}
 		},
 	});
 
