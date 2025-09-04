@@ -1,23 +1,32 @@
 import { runQuery } from "../utils/duckdb-wasm-helpers";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 export function useRunDuckDbQuery(
-  c: duckdb.AsyncDuckDBConnection,
-  query: string
+	c: duckdb.AsyncDuckDBConnection,
+	query: string
 ) {
-  const { data, isLoading, isError, error, isSuccess } = useQuery({
-    queryKey: ["duckdb", query], // cache key: unique per query
-    queryFn: () => runQuery(c, query),
-    enabled: !!query, // don’t run if query is empty
-  });
+	const [queryTime, setQueryTime] = useState(0);
 
-  return {
-    headers: data?.headers ?? [],
-    rows: data?.rows ?? [],
-    isLoading,
-    isError,
-    error,
-    isSuccess,
-  };
+	const { data, isLoading, isError, error, isSuccess } = useQuery({
+		queryKey: ["duckdb", query], // cache key: unique per query
+		queryFn: async () => {
+			const start = performance.now();
+			const result = await runQuery(c, query);
+			const end = performance.now();
+			setQueryTime(end - start);
+			return result;
+		},
+	});
+
+	return {
+		headers: data?.headers ?? [],
+		rows: data?.rows ?? [],
+		isLoading,
+		isError,
+		error,
+		isSuccess,
+		queryTime,
+	};
 }

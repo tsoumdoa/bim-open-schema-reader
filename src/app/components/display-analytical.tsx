@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AddQuery } from "./add-query-button";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import QueryDisplayItem from "./query-display-item";
+import GoBackToTop from "./go-back-to-top";
 
 function DashboardHeader(props: {
 	db: duckdb.AsyncDuckDB;
@@ -57,6 +58,7 @@ function DashboardMain(props: {
 					);
 				})}
 			<AddQuery addQuery={props.addQuery} />
+			<GoBackToTop />
 		</div>
 	);
 }

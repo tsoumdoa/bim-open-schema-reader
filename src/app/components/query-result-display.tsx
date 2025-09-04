@@ -1,55 +1,13 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import * as duckdb from "@duckdb/duckdb-wasm";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@/components/ui/table";
-import { formatData } from "../utils/format";
-
-function MainTable(props: { headers: string[]; rows: (string | number)[][] }) {
-	return (
-		<Table className="overflow-auto">
-			<TableHeader className="">
-				<TableRow className="spacing font-semibold tracking-tight">
-					<TableHead
-						key={`header`}
-						className="sticky top-0 z-20 bg-white"
-					></TableHead>
-					{props.headers.map((header, i) => (
-						<TableHead
-							key={`${i}-${header}`}
-							className="sticky top-0 z-20 bg-white"
-						>
-							{header}
-						</TableHead>
-					))}
-				</TableRow>
-			</TableHeader>
-			<TableBody className="text-xs">
-				{props.rows.map((row, i) => (
-					<TableRow key={`row-${i}`}>
-						<TableCell key={`cell-${i}`} className="text-neutral-500">
-							{i + 1}
-						</TableCell>
-						{row.map((cell, i) => (
-							<TableCell key={`cell-${i}`}>{formatData(cell)}</TableCell>
-						))}
-					</TableRow>
-				))}
-			</TableBody>
-		</Table>
-	);
-}
+import { formatToMs } from "../utils/format";
+import { DataTable } from "./data-table";
 
 export default function QueryResultDisplay(props: {
 	c: duckdb.AsyncDuckDBConnection;
 	query: string;
 }) {
-	const { headers, rows, isLoading, isSuccess } = useRunDuckDbQuery(
+	const { headers, rows, isLoading, isSuccess, queryTime } = useRunDuckDbQuery(
 		props.c,
 		props.query
 	);
@@ -57,6 +15,21 @@ export default function QueryResultDisplay(props: {
 		return <div>Loading...</div>;
 	}
 	if (isSuccess) {
-		return <MainTable headers={headers} rows={rows} />;
+		const columnDef = headers.map((header, i) => {
+			return {
+				accessorFn: (row: (string | number)[]) => row[i],
+				header: header,
+			};
+		});
+
+		return (
+			<div className="flex flex-col gap-y-2 overflow-auto">
+				<div className="text-xs text-neutral-500">
+					Query run in {formatToMs(queryTime)} - {rows.length.toLocaleString()}{" "}
+					rows returned
+				</div>
+				<DataTable columns={columnDef} data={rows} />
+			</div>
+		);
 	}
 }
