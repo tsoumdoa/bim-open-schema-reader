@@ -56,9 +56,9 @@ export const queriesSelectorList: QueriesSelector[] = [
 				explaination: "Wall int, str, and entity parameters",
 			},
 			{
-				queryTile: "Wall build up schadule",
+				queryTile: "Wall build up schedule",
 				sqlQuery: listWallBuildUps,
-				explaination: "Wall build up schadule",
+				explaination: "Wall build up schedule",
 			},
 		],
 	},
