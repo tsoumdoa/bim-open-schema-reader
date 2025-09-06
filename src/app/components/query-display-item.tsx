@@ -1,3 +1,4 @@
+"use no memo";
 import { Separator } from "@/components/ui/separator";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import {
@@ -17,7 +18,40 @@ import {
 import { Menu } from "lucide-react";
 import { useState } from "react";
 import SqlQueryCodeBlock from "./sql-code-block";
-import QueryResultDisplay from "./query-result-display";
+import QueryResultDisplayTable from "./query-result-display";
+
+function AboutMenuItem(props: { queryObject: QueryObject }) {
+	return (
+		<DropdownMenuItem className="text-xs">
+			<Tooltip delayDuration={150}>
+				<TooltipTrigger asChild>
+					<span className="text-md leading-tight font-bold hover:cursor-help">
+						About
+					</span>
+				</TooltipTrigger>
+				<TooltipContent side="top" align="start">
+					<p>{props.queryObject.explaination}</p>
+				</TooltipContent>
+			</Tooltip>
+		</DropdownMenuItem>
+	);
+}
+
+function ShowHideSqlQueryMenuItem(props: {
+	showSqlQuery: boolean;
+	setShowSqlQuery: (b: boolean) => void;
+}) {
+	return (
+		<DropdownMenuItem
+			className="text-xs"
+			onClick={() => {
+				props.setShowSqlQuery(!props.showSqlQuery);
+			}}
+		>
+			{props.showSqlQuery ? "Hide SQL Query" : "Show SQL Query"}
+		</DropdownMenuItem>
+	);
+}
 
 function DropDownMenu(props: {
 	queryObject: QueryObject;
@@ -36,26 +70,11 @@ function DropDownMenu(props: {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" side="bottom" className="text-xs">
-				<DropdownMenuItem className="text-xs">
-					<Tooltip delayDuration={150}>
-						<TooltipTrigger asChild>
-							<span className="text-md leading-tight font-bold hover:cursor-help">
-								About
-							</span>
-						</TooltipTrigger>
-						<TooltipContent side="top" align="start">
-							<p>{props.queryObject.explaination}</p>
-						</TooltipContent>
-					</Tooltip>
-				</DropdownMenuItem>
-				<DropdownMenuItem
-					className="text-xs"
-					onClick={() => {
-						props.setShowSqlQuery(!props.showSqlQuery);
-					}}
-				>
-					{props.showSqlQuery ? "Hide SQL Query" : "Show SQL Query"}
-				</DropdownMenuItem>
+				<AboutMenuItem queryObject={props.queryObject} />
+				<ShowHideSqlQueryMenuItem
+					showSqlQuery={props.showSqlQuery}
+					setShowSqlQuery={props.setShowSqlQuery}
+				/>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem className="text-xs text-red-500">
 					<p onClick={() => props.removeObject(props.queryObject)}>Delete</p>
@@ -82,12 +101,26 @@ export default function QueryDisplayItem(props: {
 	removeObject: (queryObject: QueryObject) => void;
 	isDuplicated: boolean;
 	duckDbConnection: duckdb.AsyncDuckDBConnection;
+	index: number;
+	displayExpanded: number;
+	setDisplayExpanded: (b: number) => void;
 }) {
 	const [showSqlQuery, setShowSqlQuery] = useState(false);
+	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
+	const isFocused = () => {
+		if (props.displayExpanded === -1) {
+			return true;
+		}
+		return props.displayExpanded === props.index;
+	};
+
 	return (
-		<div className="flex w-full flex-col gap-y-2">
+		<div
+			className={`${!isFocused() ? "opacity-35" : ""} flex w-full flex-col gap-y-2`}
+			key={`${props.index}-${queryName}`}
+		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
-				{formatQueryName(props.queryObject, props.isDuplicated)}
+				{queryName}
 				<DropDownMenu
 					queryObject={props.queryObject}
 					showSqlQuery={showSqlQuery}
@@ -98,10 +131,15 @@ export default function QueryDisplayItem(props: {
 			{showSqlQuery && (
 				<SqlQueryCodeBlock sqlQuery={props.queryObject.sqlQuery} />
 			)}
-			<div className="max-h-120 w-full min-w-0 overflow-auto">
-				<QueryResultDisplay
+
+			<div className="w-full min-w-0 overflow-auto">
+				<QueryResultDisplayTable
 					c={props.duckDbConnection}
 					query={props.queryObject.sqlQuery}
+					index={props.index}
+					displayExpanded={props.displayExpanded}
+					setDisplayExpanded={props.setDisplayExpanded}
+					lockScroll={!isFocused()}
 				/>
 			</div>
 			<Separator className="my-4" />

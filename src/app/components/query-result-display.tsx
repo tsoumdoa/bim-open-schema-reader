@@ -1,11 +1,15 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import * as duckdb from "@duckdb/duckdb-wasm";
-import { formatToMs } from "../utils/format";
 import { DataTable } from "./data-table";
+import { formatData } from "../utils/format";
 
-export default function QueryResultDisplay(props: {
+export default function QueryResultDisplayTable(props: {
 	c: duckdb.AsyncDuckDBConnection;
 	query: string;
+	index: number;
+	displayExpanded: number;
+	setDisplayExpanded: (b: number) => void;
+	lockScroll: boolean;
 }) {
 	const { headers, rows, isLoading, isSuccess, queryTime, error } =
 		useRunDuckDbQuery(props.c, props.query);
@@ -19,22 +23,34 @@ export default function QueryResultDisplay(props: {
 		return <div>Loading...</div>;
 	}
 
-	if (isSuccess) {
+	if (isSuccess && rows.length > 0) {
 		const columnDef = headers.map((header, i) => {
 			return {
 				accessorFn: (row: (string | number)[]) => row[i],
 				header: header,
+				// @ts-ignore
+				cell: (info) => {
+					return formatData(info.getValue());
+				},
 			};
 		});
 
 		return (
-			<div className="flex flex-col gap-y-2 overflow-auto">
-				<div className="text-xs text-neutral-500">
-					Query run in {formatToMs(queryTime)} - {rows.length.toLocaleString()}{" "}
-					rows returned
-				</div>
-				<DataTable columns={columnDef} data={rows} />
+			<div
+				className={`flex h-full flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"}`}
+			>
+				<DataTable
+					columns={columnDef}
+					data={rows}
+					queryTime={queryTime}
+					rowLength={rows.length}
+					index={props.index}
+					displayExpanded={props.displayExpanded}
+					setDisplayExpanded={props.setDisplayExpanded}
+				/>
 			</div>
 		);
+	} else {
+		return <div className="text-xs text-neutral-500">No results found.</div>;
 	}
 }

@@ -48,6 +48,7 @@ export function AddQuery(props: {
 			<DialogTrigger asChild>
 				<Button
 					variant="outline"
+					className="w-fit"
 					onClick={() => {
 						setIsOpen(true);
 					}}

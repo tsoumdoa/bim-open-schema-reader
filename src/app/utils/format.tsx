@@ -17,11 +17,19 @@ export const formatData = (data: string | number) => {
 		if (Array.isArray(json)) {
 			return (
 				<ul>
-
+					{json.map((item, i) => {
+						return (
+							<li key={i}>
+								{item ? (
+									formatData(item)
+								) : (
+									<span className="text-neutral-500">n/a</span>
+								)}
+							</li>
+						);
+					})}
 				</ul>
-
-
-			)
+			);
 		}
 
 		return JSON.stringify(data, null, 2); // pretty-print
