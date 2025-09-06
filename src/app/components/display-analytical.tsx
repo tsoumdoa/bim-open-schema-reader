@@ -88,8 +88,12 @@ function DashboardMain(props: {
 						</div>
 					);
 				})}
-			<AddQuery addQuery={props.addQuery} />
-			<GoBackToTop />
+			<AddQuery
+				addQuery={props.addQuery}
+				setDisplayExpanded={setDisplayExpanded}
+			/>
+
+			{displayExpanded === -1 && <GoBackToTop />}
 		</div>
 	);
 }
