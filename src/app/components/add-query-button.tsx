@@ -8,7 +8,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { ArrowDownRight, Info } from "lucide-react";
+import { ArrowDownRight } from "lucide-react";
 import {
 	Command,
 	CommandEmpty,
@@ -28,6 +28,7 @@ import { queriesSelectorList } from "../utils/queries-selector-list";
 
 export function AddQuery(props: {
 	addQuery: (queryObject: QueryObject) => void;
+	setDisplayExpanded: (b: number) => void;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -48,8 +49,10 @@ export function AddQuery(props: {
 			<DialogTrigger asChild>
 				<Button
 					variant="outline"
+					className="w-fit"
 					onClick={() => {
 						setIsOpen(true);
+						props.setDisplayExpanded(-1);
 					}}
 				>
 					Add Query

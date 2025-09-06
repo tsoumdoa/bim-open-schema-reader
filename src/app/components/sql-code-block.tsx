@@ -15,7 +15,6 @@ function ShikiNodeFormatter(props: {
 	useEffect(() => {
 		const el = containerRef.current;
 		if (el) {
-			// Check if content overflows vertically
 			setIsOverflowing(el.scrollHeight > el.clientHeight);
 		}
 	}, [props.children, props.lineLength]);
@@ -105,7 +104,7 @@ export default function SqlQueryCodeBlock(props: { sqlQuery: string }) {
 	};
 
 	return (
-		<div className="flex min-w-full flex-col rounded-t-xs ring-2 ring-neutral-200">
+		<div className="mb-2 flex min-w-full flex-col rounded-t-xs ring-2 ring-neutral-200">
 			<div className="flex items-center justify-between rounded-t-xs bg-neutral-200">
 				<span className="pl-2 text-xs font-medium text-neutral-800">
 					SQL Query

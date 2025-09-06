@@ -14,6 +14,7 @@ import { AddQuery } from "./add-query-button";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import QueryDisplayItem from "./query-display-item";
 import GoBackToTop from "./go-back-to-top";
+import { useEffect, useRef, useState } from "react";
 
 function DashboardHeader(props: {
 	db: duckdb.AsyncDuckDB;
@@ -43,22 +44,56 @@ function DashboardMain(props: {
 	removeQuery: (queryObject: QueryObject) => void;
 	duckdbConnection: duckdb.AsyncDuckDBConnection;
 }) {
+	const [displayExpanded, setDisplayExpanded] = useState(-1);
+	const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+	useEffect(() => {
+		if (displayExpanded !== -1 && itemRefs.current[displayExpanded]) {
+			const headerOffset = 44; // height of fixed header in px
+			const elementPosition =
+				itemRefs.current[displayExpanded].getBoundingClientRect().top +
+				window.scrollY;
+			const offsetPosition = elementPosition - headerOffset;
+
+			window.scrollTo({
+				top: offsetPosition,
+				behavior: "smooth",
+			});
+			document.body.style.overflow = "hidden";
+		} else {
+			document.body.style.overflow = "";
+		}
+	}, [displayExpanded]);
+
 	return (
-		<div className="flex max-w-full flex-col items-start gap-y-2">
+		<div className="flex h-full max-w-full flex-col gap-y-2">
 			{props.queryObjects.length > 0 &&
 				props.queryObjects.map((q, i) => {
 					return (
-						<QueryDisplayItem
+						<div
+							ref={(el) => {
+								itemRefs.current[i] = el;
+							}}
 							key={`${i}-${q.queryTile}`}
-							queryObject={q}
-							removeObject={props.removeQuery}
-							isDuplicated={checkDuplicated(props.queryObjects, q)}
-							duckDbConnection={props.duckdbConnection}
-						/>
+						>
+							<QueryDisplayItem
+								queryObject={q}
+								removeObject={props.removeQuery}
+								isDuplicated={checkDuplicated(props.queryObjects, q)}
+								duckDbConnection={props.duckdbConnection}
+								index={i}
+								displayExpanded={displayExpanded}
+								setDisplayExpanded={setDisplayExpanded}
+							/>
+						</div>
 					);
 				})}
-			<AddQuery addQuery={props.addQuery} />
-			<GoBackToTop />
+			<AddQuery
+				addQuery={props.addQuery}
+				setDisplayExpanded={setDisplayExpanded}
+			/>
+
+			{displayExpanded === -1 && <GoBackToTop />}
 		</div>
 	);
 }
