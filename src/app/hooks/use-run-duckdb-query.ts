@@ -34,7 +34,7 @@ export function useRunDuckDbQuery(
 					obj[header] = row[i];
 					return obj;
 				},
-				{} as Record<string, any>
+				{} as Record<string, unknown>
 			)
 		);
 	};
