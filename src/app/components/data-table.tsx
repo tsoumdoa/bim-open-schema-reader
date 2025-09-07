@@ -116,8 +116,7 @@ function DataTableHeader<TData>(props: {
 	queryTime: number;
 	rowLength: number;
 	getTableDataAsCsv: () => string;
-	//@ts-ignore
-	getTableDataAsJson: () => Record<string, any>[];
+	getTableDataAsJson: () => Record<string, unknown>[];
 }) {
 	const [openCopied, setOpenCopied] = useState(false);
 	const [fileFormat, setFileFormat] = useState<"csv" | "json">("csv");
@@ -351,8 +350,7 @@ export function DataTable<TData, TValue>(props: {
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
 	getTableDataAsCsv: () => string;
-	//@ts-ignore
-	getTableDataAsJson: () => Record<string, any>[];
+	getTableDataAsJson: () => Record<string, unknown>[];
 }) {
 	const {
 		columns,
