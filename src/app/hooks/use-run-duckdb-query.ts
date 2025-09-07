@@ -25,6 +25,26 @@ export function useRunDuckDbQuery(
 		},
 	});
 
+	const getTableDataAsJson = () => {
+		if (!data?.headers || !data?.rows) return [];
+
+		return data.rows.map((row) =>
+			data.headers.reduce(
+				(obj, header, i) => {
+					obj[header] = row[i];
+					return obj;
+				},
+				{} as Record<string, any>
+			)
+		);
+	};
+
+	const getTableDataAsCsv = () => {
+		const csvHeaders = data?.headers.join(",");
+		const csvRows = data?.rows.map((row) => row.join(",")).join("\n");
+		return `${csvHeaders}\n${csvRows}`;
+	};
+
 	return {
 		headers: data?.headers ?? [],
 		rows: data?.rows ?? [],
@@ -33,5 +53,7 @@ export function useRunDuckDbQuery(
 		error,
 		isSuccess,
 		queryTime,
+		getTableDataAsCsv,
+		getTableDataAsJson,
 	};
 }
