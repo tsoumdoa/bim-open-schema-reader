@@ -116,6 +116,7 @@ function DataTableHeader<TData>(props: {
 	queryTime: number;
 	rowLength: number;
 	getTableDataAsCsv: () => string;
+	//@ts-ignore
 	getTableDataAsJson: () => Record<string, any>[];
 }) {
 	const [openCopied, setOpenCopied] = useState(false);
@@ -350,6 +351,7 @@ export function DataTable<TData, TValue>(props: {
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
 	getTableDataAsCsv: () => string;
+	//@ts-ignore
 	getTableDataAsJson: () => Record<string, any>[];
 }) {
 	const {

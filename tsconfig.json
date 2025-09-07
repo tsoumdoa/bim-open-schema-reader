@@ -1,6 +1,5 @@
 {
 	"compilerOptions": {
-		"noImplicitAny": false,
 		"target": "ES2023",
 		"lib": [
 			"dom",
