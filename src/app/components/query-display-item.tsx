@@ -105,6 +105,7 @@ export default function QueryDisplayItem(props: {
 	index: number;
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
+	handleScrollBack: () => void;
 }) {
 	const [showSqlQuery, setShowSqlQuery] = useState(false);
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);

@@ -48,6 +48,19 @@ function DashboardMain(props: {
 	const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
 	useEffect(() => {
+		const escListener = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				setDisplayExpanded(-1);
+			}
+		};
+		document.addEventListener("keydown", escListener);
+
+		return () => {
+			document.removeEventListener("keydown", escListener);
+		};
+	}, []);
+
+	const handleScrollBack = () => {
 		if (displayExpanded !== -1 && itemRefs.current[displayExpanded]) {
 			const headerOffset = 44; // height of fixed header in px
 			const elementPosition =
@@ -63,6 +76,10 @@ function DashboardMain(props: {
 		} else {
 			document.body.style.overflow = "";
 		}
+	};
+
+	useEffect(() => {
+		handleScrollBack();
 	}, [displayExpanded]);
 
 	return (
@@ -84,6 +101,7 @@ function DashboardMain(props: {
 								index={i}
 								displayExpanded={displayExpanded}
 								setDisplayExpanded={setDisplayExpanded}
+								handleScrollBack={handleScrollBack}
 							/>
 						</div>
 					);

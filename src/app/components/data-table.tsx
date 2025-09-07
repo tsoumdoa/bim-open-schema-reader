@@ -200,7 +200,7 @@ function DataTableBody<TData, TValue>(props: {
 	} = props;
 	return (
 		<div
-			className={`overflow-auto ${index === displayExpanded ? "max-h-[80vh]" : "max-h-80"
+			className={`overflow-auto ${index === displayExpanded ? "h-[80vh]" : "max-h-80"
 				} `}
 			ref={tableContainerRef}
 		>
