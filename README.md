@@ -1,37 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BIM Open Schema Reader
 
-## Getting Started
+Ultra-fast, fully local BIM data analysis in your browser.  
+Powered by DuckDB-Wasm and Next.js.
 
-First, run the development server:
+- Ultra-fast queries: Run lightning-fast SQL on BIM Open Schema data exported from Revit.
+- 100% private: No servers, no uploads—everything runs locally in your browser.
+- Flexible analysis: Write custom SQL queries and explore results with interactive tables, charts, and visualizations.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## App
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Hosted version can be found here: https://rschema-reader.aectooling.com/
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What it is
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- A minimal, no-frills way to work with BIM Open Schema data using plain SQL.
+- Runs entirely in your browser, powered by DuckDB-Wasm for ultra-fast queries.
+- A starter toolkit to explore, filter, and analyze model data with simple, composable UI pieces.
 
-## Learn More
+## What it is not
 
-To learn more about Next.js, take a look at the following resources:
+- Not a dashboard builder or drag‑and‑drop BI tool.
+- BYO visualization/reporting: use this app to shape data with SQL, export the results, and visualize or report elsewhere.
+- A query sandbox: iterate on queries to discover exactly what you need—then reuse those queries in your own app.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## BIM Open Schema
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project is built on top of the BIM Open Schema created and maintained by Ara3D.  
+Learn more and access the schema here: https://github.com/ara3d/bim-open-schema
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This is open source under MIT. I haven’t set formal contribution guidelines yet—if you’re interested in contributing (features, fixes, docs, examples), please get in touch via Issues or Discussions. PRs welcome once we’ve aligned on scope.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# bim-open-schema-reader
+- Open an issue to discuss ideas
+- Keep PRs focused and include a brief description and screenshots if UI-related
