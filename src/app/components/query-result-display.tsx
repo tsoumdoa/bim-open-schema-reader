@@ -36,7 +36,7 @@ export default function QueryResultDisplayTable(props: {
 			return {
 				accessorFn: (row: (string | number)[]) => row[i],
 				header: header,
-				cell: (info) => {
+				cell: (info: any) => {
 					return formatData(info.getValue());
 				},
 			};
