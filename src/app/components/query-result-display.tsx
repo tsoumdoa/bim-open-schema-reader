@@ -11,8 +11,16 @@ export default function QueryResultDisplayTable(props: {
 	setDisplayExpanded: (b: number) => void;
 	lockScroll: boolean;
 }) {
-	const { headers, rows, isLoading, isSuccess, queryTime, error } =
-		useRunDuckDbQuery(props.c, props.query);
+	const {
+		headers,
+		rows,
+		isLoading,
+		isSuccess,
+		queryTime,
+		error,
+		getTableDataAsCsv,
+		getTableDataAsJson,
+	} = useRunDuckDbQuery(props.c, props.query);
 
 	if (error) {
 		return (
@@ -28,8 +36,7 @@ export default function QueryResultDisplayTable(props: {
 			return {
 				accessorFn: (row: (string | number)[]) => row[i],
 				header: header,
-				// @ts-ignore
-				cell: (info) => {
+				cell: (info: any) => {
 					return formatData(info.getValue());
 				},
 			};
@@ -37,7 +44,7 @@ export default function QueryResultDisplayTable(props: {
 
 		return (
 			<div
-				className={`flex h-full flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"}`}
+				className={`flex h-full max-w-[90rem] flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"}`}
 			>
 				<DataTable
 					columns={columnDef}
@@ -47,6 +54,8 @@ export default function QueryResultDisplayTable(props: {
 					index={props.index}
 					displayExpanded={props.displayExpanded}
 					setDisplayExpanded={props.setDisplayExpanded}
+					getTableDataAsCsv={getTableDataAsCsv}
+					getTableDataAsJson={getTableDataAsJson}
 				/>
 			</div>
 		);
