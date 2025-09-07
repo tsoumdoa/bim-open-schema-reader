@@ -75,6 +75,7 @@ function DropDownMenu(props: {
 					showSqlQuery={props.showSqlQuery}
 					setShowSqlQuery={props.setShowSqlQuery}
 				/>
+
 				<DropdownMenuSeparator />
 				<DropdownMenuItem className="text-xs text-red-500">
 					<p onClick={() => props.removeObject(props.queryObject)}>Delete</p>

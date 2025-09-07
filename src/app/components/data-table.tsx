@@ -42,7 +42,6 @@ import { TooltipTrigger } from "@radix-ui/react-tooltip";
 function ColumnSelector<TData>(props: { table: TableType<TData> }) {
 	const [toggleAll, setToggleAll] = useState(false);
 	const [open, setOpen] = useState(false);
-	const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
 			<DropdownMenuTrigger asChild>
@@ -54,19 +53,7 @@ function ColumnSelector<TData>(props: { table: TableType<TData> }) {
 					Columns <ChevronDown />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent
-				align="end"
-				className="z-50"
-				onMouseLeave={() => {
-					closeTimeout.current = setTimeout(() => setOpen(false), 250);
-				}}
-				onMouseEnter={() => {
-					if (closeTimeout.current) {
-						clearTimeout(closeTimeout.current);
-						closeTimeout.current = null;
-					}
-				}}
-			>
+			<DropdownMenuContent align="end" className="z-50">
 				{props.table
 					.getAllColumns()
 					.filter((column) => column.getCanHide())
@@ -105,7 +92,11 @@ function ColumnSelector<TData>(props: { table: TableType<TData> }) {
 	);
 }
 
-function CopiedMessage(props: { open: boolean; children?: React.ReactNode }) {
+function CopiedMessage(props: {
+	open: boolean;
+	fileFormat: "csv" | "json";
+	children?: React.ReactNode;
+}) {
 	return (
 		<Tooltip open={props.open}>
 			<TooltipTrigger asChild>
@@ -114,7 +105,7 @@ function CopiedMessage(props: { open: boolean; children?: React.ReactNode }) {
 				</span>
 			</TooltipTrigger>
 			<TooltipContent side="top" align="start">
-				<p>Copied to clipboard as csv</p>
+				<p>Copied to clipboard as {props.fileFormat}</p>
 			</TooltipContent>
 		</Tooltip>
 	);
@@ -127,11 +118,19 @@ function DataTableHeader<TData>(props: {
 	getTableDataAsCsv: () => string;
 	getTableDataAsJson: () => Record<string, any>[];
 }) {
-	const data = "todo";
 	const [openCopied, setOpenCopied] = useState(false);
-	const handleCopy = () => {
-		console.log(data);
-		navigator.clipboard.writeText(data);
+	const [fileFormat, setFileFormat] = useState<"csv" | "json">("csv");
+	const handleCopy = (fileFormat: "csv" | "json") => {
+		if (fileFormat === "json") {
+			setFileFormat("json");
+			const json = JSON.stringify(props.getTableDataAsJson(), (_, value) =>
+				typeof value === "bigint" ? value.toString() : value
+			);
+			navigator.clipboard.writeText(json);
+		} else {
+			setFileFormat("csv");
+			navigator.clipboard.writeText(props.getTableDataAsCsv());
+		}
 		setOpenCopied(true);
 		setTimeout(() => setOpenCopied(false), 800);
 	};
@@ -142,15 +141,40 @@ function DataTableHeader<TData>(props: {
 				{props.rowLength.toLocaleString()} rows returned
 			</div>
 			<div className="flex flex-row items-center gap-x-1 text-xs">
-				<CopiedMessage open={openCopied}>
-					<Button
-						size={"sm"}
-						variant="ghost"
-						className="hover:cursor-pointer hover:bg-transparent"
-						onClick={handleCopy}
-					>
-						<Copy className="h-3 w-3 text-neutral-800" />
-					</Button>
+				<CopiedMessage open={openCopied} fileFormat={fileFormat}>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								size={"sm"}
+								variant="ghost"
+								className="hover:cursor-pointer hover:bg-transparent"
+							>
+								<Copy className="h-3 w-3 text-neutral-800" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							align="start"
+							side="bottom"
+							className="text-xs"
+						>
+							<DropdownMenuItem
+								onClick={() => {
+									handleCopy("json");
+								}}
+								className="text-xs font-semibold"
+							>
+								Copy as json
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={() => {
+									handleCopy("csv");
+								}}
+								className="text-xs font-semibold"
+							>
+								Copy as csv
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</CopiedMessage>
 				<ColumnSelector table={props.table} />
 			</div>
