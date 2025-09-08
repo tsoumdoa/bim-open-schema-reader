@@ -82,14 +82,14 @@ export function AddQuery(props: {
 												onClick={() => {
 													handleSelectCommand(querySelector.queryCategory, q);
 												}}
-												key={`${querySelector.queryCategory}-${q.queryTile}-${i}`}
+												key={`${querySelector.queryCategory}-${q.queryTitle}-${i}`}
 											>
 												<CommandItem className="hover:cursor-pointer">
 													<Tooltip delayDuration={100}>
 														<TooltipTrigger className="hover:cursor-help">
 															<ArrowDownRight />
 														</TooltipTrigger>
-														<span>{q.queryTile}</span>
+														<span>{q.queryTitle}</span>
 														<TooltipContent
 															side="bottom"
 															align="start"

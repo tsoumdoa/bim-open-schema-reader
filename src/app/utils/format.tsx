@@ -44,3 +44,12 @@ export const formatToMs = (ms: number) => {
 		maximumFractionDigits: 1,
 	})}ms`;
 };
+
+export const formatForFileDownload = (queryTitle: string) => {
+	return queryTitle
+		.normalize("NFKD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.replace(/[^a-zA-Z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "")
+		.toLowerCase();
+};

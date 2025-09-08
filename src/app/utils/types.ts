@@ -25,9 +25,12 @@ export type QueriesSelector = {
 export type QueryObject = {
 	id?: string;
 	queryCategory?: string;
-	queryTile: string;
+	queryTitle: string;
 	explaination: string;
 	sqlQuery: string;
 };
+
+const exportFileTypes = ["csv", "tsv", "json"] as const;
+export type ExportFileType = (typeof exportFileTypes)[number];
 
 export type QueryObjects = QueryObject[];

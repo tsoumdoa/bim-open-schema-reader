@@ -10,6 +10,7 @@ export default function QueryResultDisplayTable(props: {
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
 	lockScroll: boolean;
+	fileDownloadName: string;
 }) {
 	const {
 		headers,
@@ -19,6 +20,7 @@ export default function QueryResultDisplayTable(props: {
 		queryTime,
 		error,
 		getTableDataAsCsv,
+		getTableDataAsTsv,
 		getTableDataAsJson,
 	} = useRunDuckDbQuery(props.c, props.query);
 
@@ -55,7 +57,9 @@ export default function QueryResultDisplayTable(props: {
 					displayExpanded={props.displayExpanded}
 					setDisplayExpanded={props.setDisplayExpanded}
 					getTableDataAsCsv={getTableDataAsCsv}
+					getTableDataAsTsv={getTableDataAsTsv}
 					getTableDataAsJson={getTableDataAsJson}
+					fileDownloadName={props.fileDownloadName}
 				/>
 			</div>
 		);

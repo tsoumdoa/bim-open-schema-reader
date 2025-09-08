@@ -14,23 +14,23 @@ export const queriesSelectorList: QueriesSelector[] = [
 		queryCategory: "Level and Grid",
 		queryObjects: [
 			{
-				queryTile: "List all levels",
+				queryTitle: "List all levels",
 				sqlQuery: listLevels,
 				explaination: "List all levels along with their coordinates",
 			},
 			{
-				queryTile: "List all grids",
+				queryTitle: "List all grids",
 				sqlQuery: listGrids,
 				explaination: "List all grids along with their coordinates",
 			},
 			{
-				queryTile: "Levels cordination view",
+				queryTitle: "Levels cordination view",
 				sqlQuery: listLevelWithCoredStatus,
 				explaination:
 					"Compare levels with the linked models to check if they are in the same location",
 			},
 			{
-				queryTile: "Grids cordination view",
+				queryTitle: "Grids cordination view",
 				sqlQuery: listGridWithCoredStatus,
 				explaination:
 					"Compare grids with the linked models to check if they are in the same location",
@@ -41,22 +41,22 @@ export const queriesSelectorList: QueriesSelector[] = [
 		queryCategory: "Wall",
 		queryObjects: [
 			{
-				queryTile: "Wall double and point parameters",
+				queryTitle: "Wall double and point parameters",
 				sqlQuery: wallDoubleAndPointParameters,
 				explaination: "Wall double and point parameters",
 			},
 			{
-				queryTile: "Wall element basic info",
+				queryTitle: "Wall element basic info",
 				sqlQuery: wallElementBasicInfo,
 				explaination: "Wall element basic info",
 			},
 			{
-				queryTile: "Wall int, str, and entity parameters",
+				queryTitle: "Wall int, str, and entity parameters",
 				sqlQuery: wallIntStrEntityParameters,
 				explaination: "Wall int, str, and entity parameters",
 			},
 			{
-				queryTile: "Wall build up schedule",
+				queryTitle: "Wall build up schedule",
 				sqlQuery: listWallBuildUps,
 				explaination: "Wall build up schedule",
 			},
