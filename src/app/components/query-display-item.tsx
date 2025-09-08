@@ -19,6 +19,7 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 import SqlQueryCodeBlock from "./sql-code-block";
 import QueryResultDisplayTable from "./query-result-display";
+import { formatForFileDownload } from "../utils/format";
 
 function AboutMenuItem(props: { queryObject: QueryObject }) {
 	return (
@@ -88,7 +89,7 @@ function DropDownMenu(props: {
 const formatQueryName = (queryObject: QueryObject, duplicated: boolean) => {
 	return (
 		<span>
-			{`${queryObject.queryTile} `}{" "}
+			{`${queryObject.queryTitle} `}{" "}
 			<span className="text-xs text-neutral-500">{`<${queryObject.queryCategory || "n/a"}>`}</span>
 			{duplicated && (
 				<span className="text-xs text-neutral-500">{` [${queryObject.id}]`}</span>
@@ -109,6 +110,8 @@ export default function QueryDisplayItem(props: {
 }) {
 	const [showSqlQuery, setShowSqlQuery] = useState(false);
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
+	const fileDownloadName = formatForFileDownload(props.queryObject.queryTitle);
+
 	const isFocused = () => {
 		if (props.displayExpanded === -1) {
 			return true;
@@ -142,6 +145,7 @@ export default function QueryDisplayItem(props: {
 					displayExpanded={props.displayExpanded}
 					setDisplayExpanded={props.setDisplayExpanded}
 					lockScroll={!isFocused()}
+					fileDownloadName={fileDownloadName}
 				/>
 			</div>
 			<Separator className="my-4" />

@@ -39,10 +39,18 @@ export function useRunDuckDbQuery(
 		);
 	};
 
+	const getTableDataAsCsvOrTsv = (delimiter: "," | "\t") => {
+		const jointHeaders = data?.headers.join(delimiter);
+		const jointRows = data?.rows.map((row) => row.join(delimiter)).join("\n");
+		return `${jointHeaders}\n${jointRows}`;
+	};
+
 	const getTableDataAsCsv = () => {
-		const csvHeaders = data?.headers.join(",");
-		const csvRows = data?.rows.map((row) => row.join(",")).join("\n");
-		return `${csvHeaders}\n${csvRows}`;
+		return getTableDataAsCsvOrTsv(",");
+	};
+
+	const getTableDataAsTsv = () => {
+		return getTableDataAsCsvOrTsv("\t");
 	};
 
 	return {
@@ -54,6 +62,7 @@ export function useRunDuckDbQuery(
 		isSuccess,
 		queryTime,
 		getTableDataAsCsv,
+		getTableDataAsTsv,
 		getTableDataAsJson,
 	};
 }

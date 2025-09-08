@@ -19,3 +19,13 @@ export async function highlightAndFormatSql(code: string, editable: boolean) {
 		lineLength: code.split("\n").length,
 	};
 }
+
+export function strinfigyJsonWithBigInt(
+	jsonObjArry: Record<string, unknown>[]
+) {
+	return JSON.stringify(
+		jsonObjArry,
+		(_, value) => (typeof value === "bigint" ? value.toString() : value),
+		2
+	);
+}

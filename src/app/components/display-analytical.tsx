@@ -33,7 +33,7 @@ function DashboardHeader(props: {
 
 function checkDuplicated(queryObjects: QueryObjects, queryObject: QueryObject) {
 	const duplicated = queryObjects.filter(
-		(q) => q.queryTile === queryObject.queryTile
+		(q) => q.queryTitle === queryObject.queryTitle
 	);
 	return duplicated.length > 1;
 }
@@ -91,7 +91,7 @@ function DashboardMain(props: {
 							ref={(el) => {
 								itemRefs.current[i] = el;
 							}}
-							key={`${i}-${q.queryTile}`}
+							key={`${i}-${q.queryTitle}`}
 						>
 							<QueryDisplayItem
 								queryObject={q}
