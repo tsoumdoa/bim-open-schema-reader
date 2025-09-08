@@ -16,7 +16,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SqlQueryCodeBlock from "./sql-code-block";
 import QueryResultDisplayTable from "./query-result-display";
 import { formatForFileDownload } from "../utils/format";
@@ -109,6 +109,7 @@ export default function QueryDisplayItem(props: {
 	handleScrollBack: () => void;
 }) {
 	const [showSqlQuery, setShowSqlQuery] = useState(false);
+	const [showDropDown, setShowDropDown] = useState(true);
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
 	const fileDownloadName = formatForFileDownload(props.queryObject.queryTitle);
 
@@ -119,6 +120,17 @@ export default function QueryDisplayItem(props: {
 		return props.displayExpanded === props.index;
 	};
 
+	useEffect(() => {
+		if (props.displayExpanded !== -1) {
+			setShowSqlQuery(false);
+			setShowDropDown(false);
+		}
+
+		if (props.displayExpanded === -1) {
+			setShowDropDown(true);
+		}
+	}, [props.displayExpanded]);
+
 	return (
 		<div
 			className={`${!isFocused() ? "opacity-35" : ""} flex w-full flex-col gap-y-2`}
@@ -126,12 +138,14 @@ export default function QueryDisplayItem(props: {
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
 				{queryName}
-				<DropDownMenu
-					queryObject={props.queryObject}
-					showSqlQuery={showSqlQuery}
-					setShowSqlQuery={setShowSqlQuery}
-					removeObject={props.removeObject}
-				/>
+				{showDropDown && (
+					<DropDownMenu
+						queryObject={props.queryObject}
+						showSqlQuery={showSqlQuery}
+						setShowSqlQuery={setShowSqlQuery}
+						removeObject={props.removeObject}
+					/>
+				)}
 			</div>
 			{showSqlQuery && (
 				<SqlQueryCodeBlock sqlQuery={props.queryObject.sqlQuery} />
