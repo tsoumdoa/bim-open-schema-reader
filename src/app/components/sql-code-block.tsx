@@ -1,4 +1,4 @@
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Save, SquarePen, X } from "lucide-react";
 import { JSX, useEffect, useLayoutEffect, useState } from "react";
 import { highlightAndFormatSql } from "../utils/shared";
 import { Button } from "@/components/ui/button";
@@ -79,10 +79,67 @@ function CopyButton(props: { copied: boolean; handleCopy: () => void }) {
 	);
 }
 
-export default function SqlQueryCodeBlock(props: { sqlQuery: string }) {
+function EditButton(props: {
+	mode: "view" | "editing" | "edited";
+	setMode: (b: "view" | "editing" | "edited") => void;
+	handleSave: () => void;
+}) {
+	const handleClick = () => {
+		if (props.mode === "view") {
+			props.setMode("editing");
+		}
+		if (props.mode === "editing") {
+			props.setMode("edited");
+		} else {
+			props.setMode("editing");
+		}
+	};
+	return (
+		<Button
+			variant="ghost"
+			size="sm"
+			onClick={() => handleClick()}
+			className="h-7 p-1 text-xs hover:cursor-pointer hover:bg-neutral-200"
+		>
+			{(props.mode === "view" || props.mode === "edited") && (
+				<>
+					<SquarePen className="mr-1 h-3 w-3" />
+					Edit
+				</>
+			)}
+			{props.mode === "editing" && (
+				<>
+					<Save className="mr-1 h-3 w-3" />
+					Save
+				</>
+			)}
+		</Button>
+	);
+}
+
+function CancelButton(props: { handleCancel: () => void }) {
+	return (
+		<Button
+			variant="ghost"
+			size="sm"
+			onClick={props.handleCancel}
+			className="h-7 p-1 text-xs hover:cursor-pointer hover:bg-neutral-200"
+		>
+			<X className="mr-1 h-3 w-3" />
+			Cancel
+		</Button>
+	);
+}
+
+export default function SqlQueryCodeBlock(props: {
+	sqlQuery: string;
+	mode: "view" | "editing" | "edited";
+	setMode: (b: "view" | "editing" | "edited") => void;
+}) {
 	const [copied, setCopied] = useState(false);
 	const [nodes, setNodes] = useState<JSX.Element>();
 	const [lineLength, setLineLength] = useState(0);
+	const [draftSql, setDraftSql] = useState<string>("");
 
 	const formattedQuery = format(props.sqlQuery, { language: "duckdb" });
 
@@ -91,7 +148,13 @@ export default function SqlQueryCodeBlock(props: { sqlQuery: string }) {
 			setNodes(jsx);
 			setLineLength(lineLength);
 		});
-	}, []);
+	}, [formattedQuery, props.mode]);
+
+	useEffect(() => {
+		if (props.mode === "editing") {
+			setDraftSql(formattedQuery);
+		}
+	}, [props.mode, formattedQuery]);
 
 	const handleCopy = async () => {
 		try {
@@ -103,15 +166,47 @@ export default function SqlQueryCodeBlock(props: { sqlQuery: string }) {
 		}
 	};
 
+	const handleCancel = () => {
+		props.setMode("view");
+	};
+
+	const handleSave = () => {
+		// todo pass the ref from the parents to update the display...
+		// Optionally format before saving
+		// const next = format(draftSql, { language: "duckdb" });
+		// Lift state up if parent owns it
+		// props.onChangeSql?.(next);
+		props.setMode("edited");
+	};
+
 	return (
 		<div className="mb-2 flex min-w-full flex-col rounded-t-xs ring-2 ring-neutral-200">
 			<div className="flex items-center justify-between rounded-t-xs bg-neutral-200">
 				<span className="pl-2 text-xs font-medium text-neutral-800">
 					SQL Query
 				</span>
-				<CopyButton copied={copied} handleCopy={handleCopy} />
+				<div>
+					{(props.mode === "view" || props.mode === "edited") && (
+						<CopyButton copied={copied} handleCopy={handleCopy} />
+					)}
+					{props.mode === "editing" && (
+						<CancelButton handleCancel={handleCancel} />
+					)}
+					<EditButton
+						mode={props.mode}
+						setMode={props.setMode}
+						handleSave={handleSave}
+					/>
+				</div>
 			</div>
-			{nodes ? (
+			{props.mode === "editing" ? (
+				<textarea
+					className="h-[60vh] min-h-0 w-full resize-y bg-white p-2 font-mono text-xs outline-none"
+					value={draftSql}
+					onChange={(e) => setDraftSql(e.target.value)}
+					spellCheck={false}
+				/>
+			) : nodes ? (
 				<ShikiNodeFormatter lineLength={lineLength}>{nodes}</ShikiNodeFormatter>
 			) : (
 				<div className="text-xs text-neutral-500">Loading...</div>

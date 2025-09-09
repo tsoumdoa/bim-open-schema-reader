@@ -98,6 +98,26 @@ const formatQueryName = (queryObject: QueryObject, duplicated: boolean) => {
 	);
 };
 
+const formatQueryNameEdited = (queryObject: QueryObject) => {
+	return (
+		<span className="italic">
+			{`${queryObject.queryTitle} `}{" "}
+			<span className="text-xs font-bold text-neutral-500">EDITED</span>
+		</span>
+	);
+};
+
+const formatQueryNameEditing = (queryObject: QueryObject) => {
+	return (
+		<span className="text-neutral-500 italic">
+			{`${queryObject.queryTitle} `}{" "}
+			<span className="text-xs font-bold text-pink-500 not-italic">
+				EDITING
+			</span>
+		</span>
+	);
+};
+
 export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
@@ -110,7 +130,19 @@ export default function QueryDisplayItem(props: {
 }) {
 	const [showSqlQuery, setShowSqlQuery] = useState(false);
 	const [showDropDown, setShowDropDown] = useState(true);
+	const [mode, setMode] = useState<"view" | "editing" | "edited">("view");
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
+	const queryNameDisplay = (m: string) => {
+		console.log(m);
+		switch (m) {
+			case "view":
+				return queryName;
+			case "editing":
+				return formatQueryNameEditing(props.queryObject);
+			case "edited":
+				return formatQueryNameEdited(props.queryObject);
+		}
+	};
 	const fileDownloadName = formatForFileDownload(props.queryObject.queryTitle);
 
 	const isFocused = () => {
@@ -137,7 +169,7 @@ export default function QueryDisplayItem(props: {
 			key={`${props.index}-${queryName}`}
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
-				{queryName}
+				{queryNameDisplay(mode)}
 				{showDropDown && (
 					<DropDownMenu
 						queryObject={props.queryObject}
@@ -148,7 +180,11 @@ export default function QueryDisplayItem(props: {
 				)}
 			</div>
 			{showSqlQuery && (
-				<SqlQueryCodeBlock sqlQuery={props.queryObject.sqlQuery} />
+				<SqlQueryCodeBlock
+					sqlQuery={props.queryObject.sqlQuery}
+					mode={mode}
+					setMode={setMode}
+				/>
 			)}
 
 			<div className="w-full min-w-0 overflow-auto">
