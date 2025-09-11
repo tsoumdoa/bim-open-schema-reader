@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import SqlQueryCodeBlock from "./sql-code-block";
 import QueryResultDisplayTable from "./query-result-display";
 import { formatForFileDownload } from "../utils/format";
+import { runFormat } from "../utils/shared";
 
 function AboutMenuItem(props: { queryObject: QueryObject }) {
 	return (
@@ -98,26 +99,6 @@ const formatQueryName = (queryObject: QueryObject, duplicated: boolean) => {
 	);
 };
 
-const formatQueryNameEdited = (queryObject: QueryObject) => {
-	return (
-		<span className="italic">
-			{`${queryObject.queryTitle} `}{" "}
-			<span className="text-xs font-bold text-neutral-500">EDITED</span>
-		</span>
-	);
-};
-
-const formatQueryNameEditing = (queryObject: QueryObject) => {
-	return (
-		<span className="text-neutral-500 italic">
-			{`${queryObject.queryTitle} `}{" "}
-			<span className="text-xs font-bold text-pink-500 not-italic">
-				EDITING
-			</span>
-		</span>
-	);
-};
-
 export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
@@ -128,21 +109,21 @@ export default function QueryDisplayItem(props: {
 	setDisplayExpanded: (b: number) => void;
 	handleScrollBack: () => void;
 }) {
+	const formatedQuery = runFormat(props.queryObject.sqlQuery);
+	const [sqlQuery, setSqlQuery] = useState<string>(formatedQuery); //default query
+	const [draftSql, setDraftSql] = useState<string>(formatedQuery); //for edit
+	const [newSqlQuery, setNewSqlQuery] = useState<string>(formatedQuery); //to rerun query
 	const [showSqlQuery, setShowSqlQuery] = useState(false);
 	const [showDropDown, setShowDropDown] = useState(true);
-	const [mode, setMode] = useState<"view" | "editing" | "edited">("view");
+	const [isEditing, setIsEditing] = useState(false);
+	const [isStale, setIsStale] = useState(false);
+	const [isEdited, setIsEdited] = useState(false);
+	const [isRerunning, setIsRerunning] = useState(false);
+	const [isRerunSuccess, setIsRerunSuccess] = useState(false);
+	const [isCanceled, setIsCanceled] = useState(false);
+	const [rerunError, setRerunError] = useState<boolean>(false);
+	const [handleCancelQuery, setHandleCancelQuery] = useState<boolean>(false);
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
-	const queryNameDisplay = (m: string) => {
-		console.log(m);
-		switch (m) {
-			case "view":
-				return queryName;
-			case "editing":
-				return formatQueryNameEditing(props.queryObject);
-			case "edited":
-				return formatQueryNameEdited(props.queryObject);
-		}
-	};
 	const fileDownloadName = formatForFileDownload(props.queryObject.queryTitle);
 
 	const isFocused = () => {
@@ -169,7 +150,13 @@ export default function QueryDisplayItem(props: {
 			key={`${props.index}-${queryName}`}
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
-				{queryNameDisplay(mode)}
+				<span>
+					{`${props.queryObject.queryTitle} `}{" "}
+					<span className="text-xs text-neutral-500">{`<${props.queryObject.queryCategory || "n/a"}>`}</span>
+					{props.isDuplicated && (
+						<span className="text-xs text-neutral-500">{` [${props.queryObject.id}]`}</span>
+					)}
+				</span>
 				{showDropDown && (
 					<DropDownMenu
 						queryObject={props.queryObject}
@@ -181,21 +168,45 @@ export default function QueryDisplayItem(props: {
 			</div>
 			{showSqlQuery && (
 				<SqlQueryCodeBlock
-					sqlQuery={props.queryObject.sqlQuery}
-					mode={mode}
-					setMode={setMode}
+					sqlQuery={sqlQuery}
+					setSqlQuery={setSqlQuery}
+					isEdited={isEdited}
+					isEditing={isEditing}
+					isStale={isStale}
+					isRerunning={isRerunning}
+					isRerunSuccess={isRerunSuccess}
+					isCanceled={isCanceled}
+					rerunError={rerunError}
+					setIsRerunning={setIsRerunning}
+					setNewSqlQuery={setNewSqlQuery}
+					setIsEdited={setIsEdited}
+					setIsEditing={setIsEditing}
+					setIsStale={setIsStale}
+					setIsRerunSuccess={setIsRerunSuccess}
+					setRerunError={setRerunError}
+					setIsCanceled={setIsCanceled}
+					draftSql={draftSql}
+					setDraftSql={setDraftSql}
+					setHandleCancelQuery={setHandleCancelQuery}
 				/>
 			)}
 
 			<div className="w-full min-w-0 overflow-auto">
 				<QueryResultDisplayTable
 					c={props.duckDbConnection}
-					query={props.queryObject.sqlQuery}
+					query={sqlQuery}
+					newQuery={newSqlQuery}
 					index={props.index}
 					displayExpanded={props.displayExpanded}
 					setDisplayExpanded={props.setDisplayExpanded}
 					lockScroll={!isFocused()}
 					fileDownloadName={fileDownloadName}
+					setIsRerunning={setIsRerunning}
+					setIsStale={setIsStale}
+					setIsRerunSuccess={setIsRerunSuccess}
+					setRerunError={setRerunError}
+					setHandleCancelQuery={setHandleCancelQuery}
+					handleCancelQuery={handleCancelQuery}
 				/>
 			</div>
 			<Separator className="my-4" />

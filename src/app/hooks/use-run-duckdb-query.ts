@@ -5,17 +5,18 @@ import { useState } from "react";
 
 export function useRunDuckDbQuery(
 	c: duckdb.AsyncDuckDBConnection,
-	query: string
+	initialSql: string
 ) {
 	const [queryTime, setQueryTime] = useState(0);
+	const [sql, setSql] = useState(initialSql);
 
 	const { data, isLoading, isError, error, isSuccess } = useQuery({
-		queryKey: ["duckdb", query], // cache key: unique per query
+		queryKey: ["duckdb", sql], // cache key: unique per query
 		retry: false,
 		queryFn: async () => {
 			try {
 				const start = performance.now();
-				const result = await runQuery(c, query);
+				const result = await runQuery(c, sql);
 				const end = performance.now();
 				setQueryTime(end - start);
 				return result;
@@ -24,6 +25,14 @@ export function useRunDuckDbQuery(
 			}
 		},
 	});
+
+	const cancelQuery = async () => {
+		c.cancelSent();
+	};
+
+	const run = async (nextSql: string) => {
+		setSql(nextSql); // triggers fetch for the new key
+	};
 
 	const getTableDataAsJson = () => {
 		if (!data?.headers || !data?.rows) return [];
@@ -45,14 +54,6 @@ export function useRunDuckDbQuery(
 		return `${jointHeaders}\n${jointRows}`;
 	};
 
-	const getTableDataAsCsv = () => {
-		return getTableDataAsCsvOrTsv(",");
-	};
-
-	const getTableDataAsTsv = () => {
-		return getTableDataAsCsvOrTsv("\t");
-	};
-
 	return {
 		headers: data?.headers ?? [],
 		rows: data?.rows ?? [],
@@ -61,8 +62,10 @@ export function useRunDuckDbQuery(
 		error,
 		isSuccess,
 		queryTime,
-		getTableDataAsCsv,
-		getTableDataAsTsv,
+		getTableDataAsCsv: () => getTableDataAsCsvOrTsv(","),
+		getTableDataAsTsv: () => getTableDataAsCsvOrTsv("\t"),
 		getTableDataAsJson,
+		cancelQuery,
+		run,
 	};
 }

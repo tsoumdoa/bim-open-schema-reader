@@ -2,15 +2,23 @@ import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { DataTable } from "./data-table";
 import { formatData } from "../utils/format";
+import { useEffect, useRef } from "react";
 
 export default function QueryResultDisplayTable(props: {
 	c: duckdb.AsyncDuckDBConnection;
 	query: string;
+	newQuery: string;
 	index: number;
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
 	lockScroll: boolean;
+	setHandleCancelQuery: (b: boolean) => void;
+	handleCancelQuery: boolean;
 	fileDownloadName: string;
+	setIsRerunning: (b: boolean) => void;
+	setIsRerunSuccess: (b: boolean) => void;
+	setIsStale: (b: boolean) => void;
+	setRerunError: (b: boolean) => void;
 }) {
 	const {
 		headers,
@@ -22,7 +30,49 @@ export default function QueryResultDisplayTable(props: {
 		getTableDataAsCsv,
 		getTableDataAsTsv,
 		getTableDataAsJson,
+		run,
+		cancelQuery,
 	} = useRunDuckDbQuery(props.c, props.query);
+
+	useEffect(() => {
+		if (props.handleCancelQuery) {
+			props.setIsRerunning(false);
+			props.setIsRerunSuccess(false);
+			props.setRerunError(false);
+			props.setHandleCancelQuery(false);
+			cancelQuery();
+		}
+	}, [props.handleCancelQuery]);
+
+	const rerunTrigeredRef = useRef(false);
+
+	useEffect(() => {
+		if (!isLoading && isSuccess) {
+			props.setRerunError(false);
+			props.setIsRerunning(false);
+			props.setIsStale(false);
+			if (rerunTrigeredRef.current) {
+				props.setIsRerunSuccess(true);
+				rerunTrigeredRef.current = false;
+			} else {
+				props.setIsRerunSuccess(false);
+			}
+		}
+		if (error) {
+			props.setIsRerunSuccess(false);
+			props.setIsRerunning(false);
+			props.setRerunError(true);
+		}
+	}, [isLoading, error, isSuccess]);
+
+	useEffect(() => {
+		props.setIsRerunSuccess(false);
+		if (props.newQuery !== props.query) {
+			rerunTrigeredRef.current = true;
+		}
+		props.setIsRerunning(true);
+		run(props.newQuery);
+	}, [props.newQuery]);
 
 	if (error) {
 		return (
