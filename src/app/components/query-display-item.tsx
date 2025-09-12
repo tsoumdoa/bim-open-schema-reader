@@ -1,4 +1,3 @@
-"use no memo";
 import { Separator } from "@/components/ui/separator";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import {
@@ -79,8 +78,11 @@ function DropDownMenu(props: {
 				/>
 
 				<DropdownMenuSeparator />
-				<DropdownMenuItem className="text-xs text-red-500">
-					<p onClick={() => props.removeObject(props.queryObject)}>Delete</p>
+				<DropdownMenuItem
+					className="text-xs text-red-500"
+					onClick={() => props.removeObject(props.queryObject)}
+				>
+					<p>Delete</p>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
