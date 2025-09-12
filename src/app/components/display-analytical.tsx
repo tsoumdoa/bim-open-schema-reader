@@ -14,7 +14,7 @@ import { AddQuery } from "./add-query-button";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import QueryDisplayItem from "./query-display-item";
 import GoBackToTop from "./go-back-to-top";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 function DashboardHeader(props: {
 	db: duckdb.AsyncDuckDB;
@@ -62,7 +62,7 @@ function DashboardMain(props: {
 
 	const handleScrollBack = () => {
 		if (displayExpanded !== -1 && itemRefs.current[displayExpanded]) {
-			const headerOffset = 44; // height of fixed header in px
+			const headerOffset = 84; // height of fixed header + some offset in px
 			const elementPosition =
 				itemRefs.current[displayExpanded].getBoundingClientRect().top +
 				window.scrollY;
@@ -72,18 +72,19 @@ function DashboardMain(props: {
 				top: offsetPosition,
 				behavior: "smooth",
 			});
+
 			document.body.style.overflow = "hidden";
 		} else {
 			document.body.style.overflow = "";
 		}
 	};
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		handleScrollBack();
 	}, [displayExpanded]);
 
 	return (
-		<div className="flex h-full max-w-full flex-col gap-y-2">
+		<div className="flex h-full min-h-0 max-w-full flex-1 flex-col gap-y-2">
 			{props.queryObjects.length > 0 &&
 				props.queryObjects.map((q, i) => {
 					return (
