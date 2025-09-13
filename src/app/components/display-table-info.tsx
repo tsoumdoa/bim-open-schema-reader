@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { listAllTableInfoWithColumnInfo } from "../utils/queries";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
+import { useDuckDb } from "./use-db";
 
 function mergeNameAndType(names: string | number, types: string | number) {
 	//bad bad bad but i know what i'm doing
@@ -32,9 +33,10 @@ function mergeNameAndType(names: string | number, types: string | number) {
 	);
 }
 
-export function DisplayTableInfo(props: { c: duckdb.AsyncDuckDBConnection }) {
+export function DisplayTableInfo() {
+	const { conn } = useDuckDb();
 	const { rows, isSuccess } = useRunDuckDbQuery(
-		props.c,
+		conn,
 		listAllTableInfoWithColumnInfo
 	);
 	if (!isSuccess) {

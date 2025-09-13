@@ -40,10 +40,10 @@ export function AddQuery(props: {
 		props.addQuery(queryObject);
 		setIsOpen(false);
 	};
-	const handleCreateCustomQuery = () => {
-		// TODO: have to implement
-		setIsOpen(false);
-	};
+	// const handleCreateCustomQuery = () => {
+	// 	// TODO: have to implement
+	// 	setIsOpen(false);
+	// };
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
@@ -107,6 +107,8 @@ export function AddQuery(props: {
 						})}
 					</CommandList>
 				</Command>
+				{/*
+
 				<Button
 					type="submit"
 					variant="outline"
@@ -114,6 +116,7 @@ export function AddQuery(props: {
 				>
 					Create a custom Query
 				</Button>
+					*/}
 				<DialogFooter className="flex w-full flex-row justify-start">
 					<Button
 						type="submit"

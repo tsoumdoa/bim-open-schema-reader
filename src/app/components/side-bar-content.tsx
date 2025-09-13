@@ -5,7 +5,6 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 import { DisplayTableInfo } from "./display-table-info";
-import * as duckdb from "@duckdb/duckdb-wasm";
 import ListDataByCategories from "./list-data-by-cagories";
 
 function AccordionDisplay(props: {
@@ -23,16 +22,14 @@ function AccordionDisplay(props: {
 		</Accordion>
 	);
 }
-export default function SideBarContent(props: {
-	duckDbConnection: duckdb.AsyncDuckDBConnection;
-}) {
+export default function SideBarContent() {
 	return (
 		<div className="space-y-1">
 			<AccordionDisplay accordionTitle="Analytical">
-				<DisplayTableInfo c={props.duckDbConnection} />
+				<DisplayTableInfo />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Category">
-				<ListDataByCategories c={props.duckDbConnection} />
+				<ListDataByCategories />
 			</AccordionDisplay>
 		</div>
 	);

@@ -1,76 +1,45 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
-import * as duckdb from "@duckdb/duckdb-wasm";
 import { DataTable } from "./data-table";
-import { formatData } from "../utils/format";
-import { useEffect, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
+import { useDuckDb } from "./use-db";
+import { QueryEditorState, QueryState } from "../utils/types";
 
 export default function QueryResultDisplayTable(props: {
-	c: duckdb.AsyncDuckDBConnection;
 	query: string;
 	newQuery: string;
 	index: number;
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
 	lockScroll: boolean;
-	setHandleCancelQuery: (b: boolean) => void;
-	handleCancelQuery: boolean;
 	fileDownloadName: string;
-	setIsRerunning: (b: boolean) => void;
-	setIsRerunSuccess: (b: boolean) => void;
-	setIsStale: (b: boolean) => void;
-	setRerunError: (b: boolean) => void;
+	handleCancelQueryRef: RefObject<{ cancelQuery: () => void } | null>;
+	queryEditorState: QueryEditorState;
+	setQueryEditorState: (b: QueryEditorState) => void;
+	queryState: QueryState;
+	setQueryState: (b: QueryState) => void;
 }) {
-	const {
-		headers,
-		rows,
-		isLoading,
-		isSuccess,
-		queryTime,
-		error,
-		getTableDataAsCsv,
-		getTableDataAsTsv,
-		getTableDataAsJson,
-		run,
-		cancelQuery,
-	} = useRunDuckDbQuery(props.c, props.query);
-
-	useEffect(() => {
-		if (props.handleCancelQuery) {
-			props.setIsRerunning(false);
-			props.setIsRerunSuccess(false);
-			props.setRerunError(false);
-			props.setHandleCancelQuery(false);
-			cancelQuery();
-		}
-	}, [props.handleCancelQuery]);
+	const { conn } = useDuckDb();
+	const runDuckDbQuery = useRunDuckDbQuery(conn, props.newQuery);
+	const { cancelQuery, isLoading, isSuccess, error, run, rows } =
+		runDuckDbQuery;
+	props.handleCancelQueryRef.current = { cancelQuery };
 
 	const rerunTrigeredRef = useRef(false);
 
 	useEffect(() => {
-		if (!isLoading && isSuccess) {
-			props.setRerunError(false);
-			props.setIsRerunning(false);
-			props.setIsStale(false);
-			if (rerunTrigeredRef.current) {
-				props.setIsRerunSuccess(true);
-				rerunTrigeredRef.current = false;
+		if (rerunTrigeredRef.current) {
+			if (isSuccess) {
+				props.setQueryEditorState("rerun");
 			} else {
-				props.setIsRerunSuccess(false);
+				props.setQueryEditorState("error");
 			}
 		}
-		if (error) {
-			props.setIsRerunSuccess(false);
-			props.setIsRerunning(false);
-			props.setRerunError(true);
-		}
-	}, [isLoading, error, isSuccess]);
+	}, [isSuccess, error]);
 
 	useEffect(() => {
-		props.setIsRerunSuccess(false);
 		if (props.newQuery !== props.query) {
 			rerunTrigeredRef.current = true;
 		}
-		props.setIsRerunning(true);
 		run(props.newQuery);
 	}, [props.newQuery]);
 
@@ -84,32 +53,16 @@ export default function QueryResultDisplayTable(props: {
 	}
 
 	if (isSuccess && rows.length > 0) {
-		const columnDef = headers.map((header, i) => {
-			return {
-				accessorFn: (row: (string | number)[]) => row[i],
-				header: header,
-				cell: (info: any) => {
-					return formatData(info.getValue());
-				},
-			};
-		});
-
 		return (
 			<div
 				className={`flex h-full max-w-[90rem] flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"}`}
 			>
 				<DataTable
-					columns={columnDef}
-					data={rows}
-					queryTime={queryTime}
-					rowLength={rows.length}
 					index={props.index}
 					displayExpanded={props.displayExpanded}
 					setDisplayExpanded={props.setDisplayExpanded}
-					getTableDataAsCsv={getTableDataAsCsv}
-					getTableDataAsTsv={getTableDataAsTsv}
-					getTableDataAsJson={getTableDataAsJson}
 					fileDownloadName={props.fileDownloadName}
+					runDuckDbQuery={runDuckDbQuery}
 				/>
 			</div>
 		);

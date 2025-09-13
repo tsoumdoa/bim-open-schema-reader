@@ -27,7 +27,7 @@ export function useRunDuckDbQuery(
 	});
 
 	const cancelQuery = async () => {
-		c.cancelSent();
+		await c.cancelSent();
 	};
 
 	const run = async (nextSql: string) => {

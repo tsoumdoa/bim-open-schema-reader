@@ -1,11 +1,15 @@
 import { Separator } from "@/components/ui/separator";
-import * as duckdb from "@duckdb/duckdb-wasm";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { QueryObject } from "../utils/types";
+import {
+	QueryDisplayState,
+	QueryEditorState,
+	QueryObject,
+	QueryState,
+} from "../utils/types";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -15,7 +19,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SqlQueryCodeBlock from "./sql-code-block";
 import QueryResultDisplayTable from "./query-result-display";
 import { formatForFileDownload } from "../utils/format";
@@ -39,25 +43,28 @@ function AboutMenuItem(props: { queryObject: QueryObject }) {
 }
 
 function ShowHideSqlQueryMenuItem(props: {
-	showSqlQuery: boolean;
-	setShowSqlQuery: (b: boolean) => void;
+	queryDisplayState: QueryDisplayState;
+	handleShowSqlQuery: () => void;
 }) {
 	return (
 		<DropdownMenuItem
 			className="text-xs"
 			onClick={() => {
-				props.setShowSqlQuery(!props.showSqlQuery);
+				props.handleShowSqlQuery();
 			}}
 		>
-			{props.showSqlQuery ? "Hide SQL Query" : "Show SQL Query"}
+			{props.queryDisplayState === "hidden"
+				? "Show SQL Query"
+				: "Hide SQL Query"}
 		</DropdownMenuItem>
 	);
 }
 
 function DropDownMenu(props: {
 	queryObject: QueryObject;
-	showSqlQuery: boolean;
-	setShowSqlQuery: (b: boolean) => void;
+	queryDisplayState: QueryDisplayState;
+
+	handleShowSqlQuery: () => void;
 	removeObject: (queryObject: QueryObject) => void;
 }) {
 	return (
@@ -73,8 +80,8 @@ function DropDownMenu(props: {
 			<DropdownMenuContent align="start" side="bottom" className="text-xs">
 				<AboutMenuItem queryObject={props.queryObject} />
 				<ShowHideSqlQueryMenuItem
-					showSqlQuery={props.showSqlQuery}
-					setShowSqlQuery={props.setShowSqlQuery}
+					queryDisplayState={props.queryDisplayState}
+					handleShowSqlQuery={props.handleShowSqlQuery}
 				/>
 
 				<DropdownMenuSeparator />
@@ -105,7 +112,6 @@ export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
 	isDuplicated: boolean;
-	duckDbConnection: duckdb.AsyncDuckDBConnection;
 	index: number;
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
@@ -115,16 +121,14 @@ export default function QueryDisplayItem(props: {
 	const [sqlQuery, setSqlQuery] = useState<string>(formatedQuery); //default query
 	const [draftSql, setDraftSql] = useState<string>(formatedQuery); //for edit
 	const [newSqlQuery, setNewSqlQuery] = useState<string>(formatedQuery); //to rerun query
-	const [showSqlQuery, setShowSqlQuery] = useState(false);
-	const [showDropDown, setShowDropDown] = useState(true);
-	const [isEditing, setIsEditing] = useState(false);
-	const [isStale, setIsStale] = useState(false);
-	const [isEdited, setIsEdited] = useState(false);
-	const [isRerunning, setIsRerunning] = useState(false);
-	const [isRerunSuccess, setIsRerunSuccess] = useState(false);
-	const [isCanceled, setIsCanceled] = useState(false);
-	const [rerunError, setRerunError] = useState<boolean>(false);
-	const [handleCancelQuery, setHandleCancelQuery] = useState<boolean>(false);
+
+	const [queryDisplayState, setQueryDisplayState] =
+		useState<QueryDisplayState>("hidden");
+	const [queryState, setQueryState] = useState<QueryState>("original");
+	const [queryEditorState, setQueryEditorState] =
+		useState<QueryEditorState>("rerun");
+
+	const handleCancelQueryRef = useRef<{ cancelQuery: () => void }>(null);
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
 	const fileDownloadName = formatForFileDownload(props.queryObject.queryTitle);
 
@@ -135,14 +139,20 @@ export default function QueryDisplayItem(props: {
 		return props.displayExpanded === props.index;
 	};
 
-	useEffect(() => {
-		if (props.displayExpanded !== -1) {
-			setShowSqlQuery(false);
-			setShowDropDown(false);
+	const handleShowSqlQuery = () => {
+		setQueryDisplayState("hidden");
+		if (queryDisplayState === "hidden") {
+			setQueryDisplayState("viewer");
+		} else {
+			setQueryDisplayState("hidden");
 		}
 
-		if (props.displayExpanded === -1) {
-			setShowDropDown(true);
+		props.setDisplayExpanded(-1);
+	};
+
+	useEffect(() => {
+		if (props.displayExpanded !== -1) {
+			setQueryDisplayState("hidden");
 		}
 	}, [props.displayExpanded]);
 
@@ -159,43 +169,33 @@ export default function QueryDisplayItem(props: {
 						<span className="text-xs text-neutral-500">{` [${props.queryObject.id}]`}</span>
 					)}
 				</span>
-				{showDropDown && (
-					<DropDownMenu
-						queryObject={props.queryObject}
-						showSqlQuery={showSqlQuery}
-						setShowSqlQuery={setShowSqlQuery}
-						removeObject={props.removeObject}
-					/>
-				)}
+				<DropDownMenu
+					queryObject={props.queryObject}
+					queryDisplayState={queryDisplayState}
+					handleShowSqlQuery={handleShowSqlQuery}
+					removeObject={props.removeObject}
+				/>
 			</div>
-			{showSqlQuery && (
+			{queryDisplayState !== "hidden" && (
 				<SqlQueryCodeBlock
 					sqlQuery={sqlQuery}
 					setSqlQuery={setSqlQuery}
-					isEdited={isEdited}
-					isEditing={isEditing}
-					isStale={isStale}
-					isRerunning={isRerunning}
-					isRerunSuccess={isRerunSuccess}
-					isCanceled={isCanceled}
-					rerunError={rerunError}
-					setIsRerunning={setIsRerunning}
+					newSqlQuery={newSqlQuery}
 					setNewSqlQuery={setNewSqlQuery}
-					setIsEdited={setIsEdited}
-					setIsEditing={setIsEditing}
-					setIsStale={setIsStale}
-					setIsRerunSuccess={setIsRerunSuccess}
-					setRerunError={setRerunError}
-					setIsCanceled={setIsCanceled}
 					draftSql={draftSql}
 					setDraftSql={setDraftSql}
-					setHandleCancelQuery={setHandleCancelQuery}
+					handleCancelQueryRef={handleCancelQueryRef}
+					queryEditorState={queryEditorState}
+					setQueryEditorState={setQueryEditorState}
+					queryState={queryState}
+					setQueryState={setQueryState}
+					queryDisplayState={queryDisplayState}
+					setQueryDisplayState={setQueryDisplayState}
 				/>
 			)}
 
 			<div className="w-full min-w-0 overflow-auto">
 				<QueryResultDisplayTable
-					c={props.duckDbConnection}
 					query={sqlQuery}
 					newQuery={newSqlQuery}
 					index={props.index}
@@ -203,12 +203,11 @@ export default function QueryDisplayItem(props: {
 					setDisplayExpanded={props.setDisplayExpanded}
 					lockScroll={!isFocused()}
 					fileDownloadName={fileDownloadName}
-					setIsRerunning={setIsRerunning}
-					setIsStale={setIsStale}
-					setIsRerunSuccess={setIsRerunSuccess}
-					setRerunError={setRerunError}
-					setHandleCancelQuery={setHandleCancelQuery}
-					handleCancelQuery={handleCancelQuery}
+					handleCancelQueryRef={handleCancelQueryRef}
+					queryEditorState={queryEditorState}
+					setQueryEditorState={setQueryEditorState}
+					queryState={queryState}
+					setQueryState={setQueryState}
 				/>
 			</div>
 			<Separator className="my-4" />

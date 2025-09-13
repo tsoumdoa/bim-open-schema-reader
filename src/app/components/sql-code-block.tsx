@@ -1,11 +1,23 @@
 import { Check, Copy, Play, Save, SquarePen, X } from "lucide-react";
-import { JSX, useEffect, useLayoutEffect, useCallback, useState } from "react";
+import {
+	JSX,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+	useState,
+	RefObject,
+} from "react";
 import { highlightAndFormatSql, runFormat } from "../utils/shared";
 import { Button } from "@/components/ui/button";
 import { useRef } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
 import { dracula } from "@uiw/codemirror-theme-dracula";
+import {
+	QueryDisplayState,
+	QueryEditorState,
+	QueryState,
+} from "../utils/types";
 
 function ShikiNodeFormatter(props: { children: JSX.Element }) {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -149,27 +161,20 @@ function CancelButton(props: {
 	);
 }
 
-export default function SqlQuerjCodeBlock(props: {
+export default function SqlQueryCodeBlock(props: {
 	sqlQuery: string;
-	setSqlQuery: (b: string) => void;
-	isEdited: boolean;
-	isEditing: boolean;
-	isStale: boolean;
-	isRerunning: boolean;
-	isRerunSuccess: boolean;
-	isCanceled: boolean;
-	rerunError: boolean;
-	setIsEdited: (b: boolean) => void;
-	setIsEditing: (b: boolean) => void;
-	setIsStale: (b: boolean) => void;
-	setIsRerunSuccess: (b: boolean) => void;
-	setIsRerunning: (b: boolean) => void;
-	setNewSqlQuery: (b: string) => void;
-	setRerunError: (b: boolean) => void;
-	setHandleCancelQuery: (b: boolean) => void;
-	setIsCanceled: (b: boolean) => void;
 	draftSql: string;
+	newSqlQuery: string;
+	handleCancelQueryRef: RefObject<{ cancelQuery: () => void } | null>;
+	queryDisplayState: QueryDisplayState;
+	queryEditorState: QueryEditorState;
+	queryState: QueryState;
+	setSqlQuery: (b: string) => void;
+	setNewSqlQuery: (b: string) => void;
 	setDraftSql: (b: string) => void;
+	setQueryDisplayState: (b: QueryDisplayState) => void;
+	setQueryEditorState: (b: QueryEditorState) => void;
+	setQueryState: (b: QueryState) => void;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [nodes, setNodes] = useState<JSX.Element>();
@@ -177,10 +182,17 @@ export default function SqlQuerjCodeBlock(props: {
 	const formatedQuery = runFormat(props.sqlQuery);
 
 	const onChange = useCallback((val: string) => {
-		props.setIsRerunSuccess(false);
+		props.setQueryEditorState("stale");
+		props.setQueryState("edited");
 		props.setDraftSql(val);
+
+		if (props.sqlQuery === val) {
+			props.setQueryState("original");
+		} else {
+			props.setQueryState("edited");
+		}
+
 		setLineLength(val.split("\n").length);
-		props.setIsStale(true);
 	}, []);
 
 	useLayoutEffect(() => {
@@ -201,47 +213,52 @@ export default function SqlQuerjCodeBlock(props: {
 	};
 
 	const handleCancelDraftMode = () => {
-		props.setIsEditing(false);
-		props.setDraftSql(props.sqlQuery); //u
-		props.setIsCanceled(false);
-		props.setIsRerunSuccess(false);
+		props.setDraftSql(props.sqlQuery);
+		props.setQueryDisplayState("viewer");
+		// if (props.queryEditorState !== "rerun") {
+		// 	props.setQueryEditorState("stale");
+		// }
 	};
 
 	const handleSave = () => {
-		props.setIsEditing(false); // which means close edit mode => save
-		props.setRerunError(false);
 		if (props.draftSql !== props.sqlQuery) {
 			props.setSqlQuery(props.draftSql); // update code display
 		}
-		props.setIsRerunSuccess(false);
+		props.setQueryDisplayState("viewer");
 	};
 
 	const handleSetToDraftMode = () => {
 		props.setDraftSql(props.sqlQuery);
-		props.setIsRerunSuccess(false);
-		props.setIsEditing(true);
-		props.setIsCanceled(false);
+		props.setQueryDisplayState("editor");
 	};
 
 	const handleRunButtonClick = () => {
-		props.setIsCanceled(false);
-		props.setNewSqlQuery(props.draftSql); //this trigers rerun with useEffect in SqlQueryCodeBlock
+		props.setNewSqlQuery(props.draftSql);
 	};
 
 	const handleCancelQuery = () => {
-		props.setHandleCancelQuery(true);
-		props.setIsCanceled(true);
+		props.handleCancelQueryRef.current?.cancelQuery();
+		if (props.queryEditorState !== "error") {
+			props.setQueryEditorState("stale");
+		}
 	};
+	const isEditing = props.queryDisplayState === "editor";
+	const isRunning = props.queryEditorState === "running";
+	const isStale = props.queryEditorState === "stale";
+	const isError = props.queryEditorState === "error";
+	const hasRerun =
+		props.queryEditorState === "rerun" && props.draftSql !== props.sqlQuery;
+	const isOriginal = props.queryState === "original";
 
 	return (
 		<div
-			className={`mb-2 flex min-w-full flex-col rounded-t-xs ring-2 ${props.isEditing ? "bg-[#282A36]" : "ring-neutral-200"}`}
+			className={`mb-2 flex min-w-full flex-col rounded-t-xs ring-2 ${isEditing ? "bg-[#282A36]" : "ring-neutral-200"}`}
 		>
 			<div
-				className={`flex items-center justify-between rounded-t-xs ${props.isEditing ? "bg-[#282A36]" : "bg-neutral-200"}`}
+				className={`flex items-center justify-between rounded-t-xs ${isEditing ? "bg-[#282A36]" : "bg-neutral-200"}`}
 			>
 				<span
-					className={`pl-2 text-xs font-medium ${props.isEditing ? "text-[#F8F8F2]" : "text-neutral-800"}`}
+					className={`pl-2 text-xs font-medium ${isEditing ? "text-[#F8F8F2]" : "text-neutral-800"}`}
 				>
 					SQL Query
 					{lineLength > 1 ? (
@@ -251,53 +268,48 @@ export default function SqlQuerjCodeBlock(props: {
 					)}{" "}
 				</span>
 				<div className="flex items-center gap-x-1 p-1">
-					{props.isStale && !props.rerunError && (
+					{isStale && !hasRerun && !isOriginal && (
 						<span className="px-1 text-xs text-red-500">STALE</span>
 					)}
-					{props.rerunError && (
+					{props.queryEditorState === "error" && (
 						<span className="px-1 text-xs text-red-500">ERROR</span>
 					)}
 
-					{props.isCanceled && (
+					{props.queryEditorState === "canceled" && (
 						<span className="px-1 text-xs text-red-500">CANCELED</span>
 					)}
 
-					{props.isRerunSuccess && !props.isCanceled && (
+					{hasRerun && (
 						<span className="px-1 text-xs text-green-500">Run Success</span>
 					)}
-					{props.isStale && (
+					{((!isOriginal && isStale && !hasRerun && isEditing) || isError) && (
 						<RunButton
 							handleRunButtonClick={handleRunButtonClick}
-							isEditing={props.isEditing}
-							isRunning={props.isRerunning}
+							isEditing={isEditing}
+							isRunning={isRunning}
 						/>
 					)}
 
-					{!props.isEditing && (
-						<CopyButton copied={copied} handleCopy={handleCopy} />
-					)}
-					{props.isEditing && (
+					{!isEditing && <CopyButton copied={copied} handleCopy={handleCopy} />}
+					{isEditing && !isStale && (
 						<CancelButton
 							handleCancel={handleCancelDraftMode}
 							handleCancelQuery={handleCancelQuery}
-							isRunningg={props.isRerunning}
+							isRunningg={isRunning}
 						/>
 					)}
-					{!props.isStale &&
-						!props.isRerunning &&
-						!props.rerunError &&
-						!props.isCanceled && (
-							<EditButton
-								handleSave={handleSave}
-								handleSetToDraftMode={handleSetToDraftMode}
-								isEditing={props.isEditing}
-							/>
-						)}
+					{(!isStale || isEditing) && !isError && (
+						<EditButton
+							handleSave={handleSave}
+							handleSetToDraftMode={handleSetToDraftMode}
+							isEditing={isEditing}
+						/>
+					)}
 				</div>
 			</div>
-			{props.isEditing ? (
+			{isEditing ? (
 				<CodeMirror
-					editable={!props.isRerunning}
+					editable={!isRunning}
 					value={props.draftSql}
 					height="400px"
 					extensions={[sql({})]}
