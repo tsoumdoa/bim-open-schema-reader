@@ -1,3 +1,5 @@
+import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
+
 export const validFileNames = [
 	"Points.parquet",
 	"Strings.parquet",
@@ -34,3 +36,4 @@ const exportFileTypes = ["csv", "tsv", "json"] as const;
 export type ExportFileType = (typeof exportFileTypes)[number];
 
 export type QueryObjects = QueryObject[];
+export type RunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;

@@ -22,6 +22,8 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { DataTableFooter } from "./data-table-footer";
 import { DataTableHeader } from "./data-table-header";
+import { RunDuckDbQuery } from "../utils/types";
+import { formatData } from "../utils/format";
 
 function DataTableBody<TData, TValue>(props: {
 	index: number;
@@ -116,27 +118,13 @@ function DataTableBody<TData, TValue>(props: {
 }
 
 export function DataTable<TData, TValue>(props: {
-	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
-	queryTime: number;
-	rowLength: number;
 	index: number;
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
-	getTableDataAsCsv: () => string;
-	getTableDataAsTsv: () => string;
-	getTableDataAsJson: () => Record<string, unknown>[];
 	fileDownloadName: string;
+	runDuckDbQuery: RunDuckDbQuery;
 }) {
-	const {
-		columns,
-		data,
-		queryTime,
-		rowLength,
-		index,
-		displayExpanded,
-		setDisplayExpanded,
-	} = props;
+	const { index, displayExpanded, setDisplayExpanded } = props;
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [isOverflowing, setIsOverflowing] = useState(false);
 	const pageSize = 30;
@@ -148,6 +136,17 @@ export function DataTable<TData, TValue>(props: {
 			setIsOverflowing(el.scrollWidth > el.clientWidth);
 		}
 	}, [tableContainerRef.current]);
+
+	const columns = props.runDuckDbQuery.headers.map((header, i) => {
+		return {
+			accessorFn: (row: (string | number)[]) => row[i],
+			header: header,
+			cell: (info: any) => {
+				return formatData(info.getValue());
+			},
+		};
+	}) as ColumnDef<TData, TValue>[];
+	const data = props.runDuckDbQuery.rows as TData[];
 
 	const table = useReactTable({
 		data,
@@ -170,11 +169,11 @@ export function DataTable<TData, TValue>(props: {
 		<div className={`${isOverflowing ? "w-full" : "w-fit"}`}>
 			<DataTableHeader
 				table={table}
-				queryTime={queryTime}
-				rowLength={rowLength}
-				getTableDataAsCsv={props.getTableDataAsCsv}
-				getTableDataAsTsv={props.getTableDataAsTsv}
-				getTableDataAsJson={props.getTableDataAsJson}
+				queryTime={props.runDuckDbQuery.queryTime}
+				rowLength={props.runDuckDbQuery.rows.length}
+				getTableDataAsCsv={props.runDuckDbQuery.getTableDataAsCsv}
+				getTableDataAsTsv={props.runDuckDbQuery.getTableDataAsTsv}
+				getTableDataAsJson={props.runDuckDbQuery.getTableDataAsJson}
 				fileDownloadName={props.fileDownloadName}
 			/>
 			<DataTableBody

@@ -15,7 +15,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SqlQueryCodeBlock from "./sql-code-block";
 import QueryResultDisplayTable from "./query-result-display";
 import { formatForFileDownload } from "../utils/format";
@@ -124,7 +124,7 @@ export default function QueryDisplayItem(props: {
 	const [isRerunSuccess, setIsRerunSuccess] = useState(false);
 	const [isCanceled, setIsCanceled] = useState(false);
 	const [rerunError, setRerunError] = useState<boolean>(false);
-	const [handleCancelQuery, setHandleCancelQuery] = useState<boolean>(false);
+	const handleCancelQueryRef = useRef<{ cancelQuery: () => void }>(null);
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
 	const fileDownloadName = formatForFileDownload(props.queryObject.queryTitle);
 
@@ -189,7 +189,7 @@ export default function QueryDisplayItem(props: {
 					setIsCanceled={setIsCanceled}
 					draftSql={draftSql}
 					setDraftSql={setDraftSql}
-					setHandleCancelQuery={setHandleCancelQuery}
+					handleCancelQueryRef={handleCancelQueryRef}
 				/>
 			)}
 
@@ -207,8 +207,7 @@ export default function QueryDisplayItem(props: {
 					setIsStale={setIsStale}
 					setIsRerunSuccess={setIsRerunSuccess}
 					setRerunError={setRerunError}
-					setHandleCancelQuery={setHandleCancelQuery}
-					handleCancelQuery={handleCancelQuery}
+					handleCancelQueryRef={handleCancelQueryRef}
 				/>
 			</div>
 			<Separator className="my-4" />

@@ -1,8 +1,7 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { DataTable } from "./data-table";
-import { formatData } from "../utils/format";
-import { useEffect, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
 
 export default function QueryResultDisplayTable(props: {
 	c: duckdb.AsyncDuckDBConnection;
@@ -12,37 +11,17 @@ export default function QueryResultDisplayTable(props: {
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
 	lockScroll: boolean;
-	setHandleCancelQuery: (b: boolean) => void;
-	handleCancelQuery: boolean;
 	fileDownloadName: string;
 	setIsRerunning: (b: boolean) => void;
 	setIsRerunSuccess: (b: boolean) => void;
 	setIsStale: (b: boolean) => void;
 	setRerunError: (b: boolean) => void;
+	handleCancelQueryRef: RefObject<{ cancelQuery: () => void } | null>;
 }) {
-	const {
-		headers,
-		rows,
-		isLoading,
-		isSuccess,
-		queryTime,
-		error,
-		getTableDataAsCsv,
-		getTableDataAsTsv,
-		getTableDataAsJson,
-		run,
-		cancelQuery,
-	} = useRunDuckDbQuery(props.c, props.query);
-
-	useEffect(() => {
-		if (props.handleCancelQuery) {
-			props.setIsRerunning(false);
-			props.setIsRerunSuccess(false);
-			props.setRerunError(false);
-			props.setHandleCancelQuery(false);
-			cancelQuery();
-		}
-	}, [props.handleCancelQuery]);
+	const runDuckDbQuery = useRunDuckDbQuery(props.c, props.newQuery);
+	const { cancelQuery, isLoading, isSuccess, error, run, rows } =
+		runDuckDbQuery;
+	props.handleCancelQueryRef.current = { cancelQuery };
 
 	const rerunTrigeredRef = useRef(false);
 
@@ -84,32 +63,16 @@ export default function QueryResultDisplayTable(props: {
 	}
 
 	if (isSuccess && rows.length > 0) {
-		const columnDef = headers.map((header, i) => {
-			return {
-				accessorFn: (row: (string | number)[]) => row[i],
-				header: header,
-				cell: (info: any) => {
-					return formatData(info.getValue());
-				},
-			};
-		});
-
 		return (
 			<div
 				className={`flex h-full max-w-[90rem] flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"}`}
 			>
 				<DataTable
-					columns={columnDef}
-					data={rows}
-					queryTime={queryTime}
-					rowLength={rows.length}
 					index={props.index}
 					displayExpanded={props.displayExpanded}
 					setDisplayExpanded={props.setDisplayExpanded}
-					getTableDataAsCsv={getTableDataAsCsv}
-					getTableDataAsTsv={getTableDataAsTsv}
-					getTableDataAsJson={getTableDataAsJson}
 					fileDownloadName={props.fileDownloadName}
+					runDuckDbQuery={runDuckDbQuery}
 				/>
 			</div>
 		);

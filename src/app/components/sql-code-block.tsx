@@ -1,5 +1,12 @@
 import { Check, Copy, Play, Save, SquarePen, X } from "lucide-react";
-import { JSX, useEffect, useLayoutEffect, useCallback, useState } from "react";
+import {
+	JSX,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+	useState,
+	RefObject,
+} from "react";
 import { highlightAndFormatSql, runFormat } from "../utils/shared";
 import { Button } from "@/components/ui/button";
 import { useRef } from "react";
@@ -166,10 +173,10 @@ export default function SqlQuerjCodeBlock(props: {
 	setIsRerunning: (b: boolean) => void;
 	setNewSqlQuery: (b: string) => void;
 	setRerunError: (b: boolean) => void;
-	setHandleCancelQuery: (b: boolean) => void;
 	setIsCanceled: (b: boolean) => void;
 	draftSql: string;
 	setDraftSql: (b: string) => void;
+	handleCancelQueryRef: RefObject<{ cancelQuery: () => void } | null>;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [nodes, setNodes] = useState<JSX.Element>();
@@ -229,8 +236,11 @@ export default function SqlQuerjCodeBlock(props: {
 	};
 
 	const handleCancelQuery = () => {
-		props.setHandleCancelQuery(true);
+		props.handleCancelQueryRef.current?.cancelQuery();
 		props.setIsCanceled(true);
+		props.setIsRerunning(false);
+		props.setIsRerunSuccess(false);
+		props.setRerunError(false);
 	};
 
 	return (
