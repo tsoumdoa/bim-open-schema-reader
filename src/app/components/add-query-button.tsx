@@ -40,10 +40,10 @@ export function AddQuery(props: {
 		props.addQuery(queryObject);
 		setIsOpen(false);
 	};
-	const handleCreateCustomQuery = () => {
-		// TODO: have to implement
-		setIsOpen(false);
-	};
+	// const handleCreateCustomQuery = () => {
+	// 	// TODO: have to implement
+	// 	setIsOpen(false);
+	// };
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>

@@ -36,7 +36,7 @@ export type QueriesSelector = {
 };
 
 export type QueryObject = {
-	id: string;
+	id?: string;
 	queryCategory?: string;
 	queryTitle: string;
 	explaination: string;
