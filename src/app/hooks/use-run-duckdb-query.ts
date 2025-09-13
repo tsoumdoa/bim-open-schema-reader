@@ -15,7 +15,6 @@ export function useRunDuckDbQuery(
 		retry: false,
 		queryFn: async () => {
 			try {
-				console.log("run query");
 				const start = performance.now();
 				const result = await runQuery(c, sql);
 				const end = performance.now();

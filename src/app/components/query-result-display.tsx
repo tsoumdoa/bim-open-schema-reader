@@ -1,10 +1,10 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
-import * as duckdb from "@duckdb/duckdb-wasm";
 import { DataTable } from "./data-table";
 import { RefObject, useEffect, useRef } from "react";
+import { useDuckDb } from "./use-db";
+import { QueryEditorState, QueryState } from "../utils/types";
 
 export default function QueryResultDisplayTable(props: {
-	c: duckdb.AsyncDuckDBConnection;
 	query: string;
 	newQuery: string;
 	index: number;
@@ -12,13 +12,14 @@ export default function QueryResultDisplayTable(props: {
 	setDisplayExpanded: (b: number) => void;
 	lockScroll: boolean;
 	fileDownloadName: string;
-	setIsRerunning: (b: boolean) => void;
-	setIsRerunSuccess: (b: boolean) => void;
-	setIsStale: (b: boolean) => void;
-	setRerunError: (b: boolean) => void;
 	handleCancelQueryRef: RefObject<{ cancelQuery: () => void } | null>;
+	queryEditorState: QueryEditorState;
+	setQueryEditorState: (b: QueryEditorState) => void;
+	queryState: QueryState;
+	setQueryState: (b: QueryState) => void;
 }) {
-	const runDuckDbQuery = useRunDuckDbQuery(props.c, props.newQuery);
+	const { conn } = useDuckDb();
+	const runDuckDbQuery = useRunDuckDbQuery(conn, props.newQuery);
 	const { cancelQuery, isLoading, isSuccess, error, run, rows } =
 		runDuckDbQuery;
 	props.handleCancelQueryRef.current = { cancelQuery };
@@ -26,30 +27,19 @@ export default function QueryResultDisplayTable(props: {
 	const rerunTrigeredRef = useRef(false);
 
 	useEffect(() => {
-		if (!isLoading && isSuccess) {
-			props.setRerunError(false);
-			props.setIsRerunning(false);
-			props.setIsStale(false);
-			if (rerunTrigeredRef.current) {
-				props.setIsRerunSuccess(true);
-				rerunTrigeredRef.current = false;
+		if (rerunTrigeredRef.current) {
+			if (isSuccess) {
+				props.setQueryEditorState("rerun");
 			} else {
-				props.setIsRerunSuccess(false);
+				props.setQueryEditorState("error");
 			}
 		}
-		if (error) {
-			props.setIsRerunSuccess(false);
-			props.setIsRerunning(false);
-			props.setRerunError(true);
-		}
-	}, [isLoading, error, isSuccess]);
+	}, [isSuccess, error]);
 
 	useEffect(() => {
-		props.setIsRerunSuccess(false);
 		if (props.newQuery !== props.query) {
 			rerunTrigeredRef.current = true;
 		}
-		props.setIsRerunning(true);
 		run(props.newQuery);
 	}, [props.newQuery]);
 
