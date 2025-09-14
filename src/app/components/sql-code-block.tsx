@@ -115,12 +115,14 @@ function RunButton(props: {
 }
 
 function EditButton(props: {
+	disabled: boolean;
 	handleSave: () => void;
 	handleSetToDraftMode: () => void;
 	isEditing: boolean;
 }) {
 	return (
 		<Button
+			disabled={props.disabled}
 			variant="ghost"
 			size="sm"
 			onClick={() =>
@@ -215,9 +217,7 @@ export default function SqlQueryCodeBlock(props: {
 	const handleCancelDraftMode = () => {
 		props.setDraftSql(props.sqlQuery);
 		props.setQueryDisplayState("viewer");
-		// if (props.queryEditorState !== "rerun") {
-		// 	props.setQueryEditorState("stale");
-		// }
+		props.setQueryEditorState("initial");
 	};
 
 	const handleSave = () => {
@@ -225,6 +225,7 @@ export default function SqlQueryCodeBlock(props: {
 			props.setSqlQuery(props.draftSql); // update code display
 		}
 		props.setQueryDisplayState("viewer");
+		props.setQueryEditorState("initial");
 	};
 
 	const handleSetToDraftMode = () => {
@@ -245,10 +246,13 @@ export default function SqlQueryCodeBlock(props: {
 	const isEditing = props.queryDisplayState === "editor";
 	const isRunning = props.queryEditorState === "running";
 	const isStale = props.queryEditorState === "stale";
-	const isError = props.queryEditorState === "error";
-	const hasRerun =
-		props.queryEditorState === "rerun" && props.draftSql !== props.sqlQuery;
-	const isOriginal = props.queryState === "original";
+	const hasRerunSuccess = props.queryEditorState === "rerun";
+
+	const displayStale = props.queryEditorState === "stale";
+	const displayError = props.queryEditorState === "error";
+	const displayCanceled = props.queryEditorState === "canceled";
+	const displayRunButton = isStale || displayError;
+	const displayCancelButton = isRunning || isEditing;
 
 	return (
 		<div
@@ -268,21 +272,21 @@ export default function SqlQueryCodeBlock(props: {
 					)}{" "}
 				</span>
 				<div className="flex items-center gap-x-1 p-1">
-					{isStale && !hasRerun && !isOriginal && (
+					{displayStale && (
 						<span className="px-1 text-xs text-red-500">STALE</span>
 					)}
-					{props.queryEditorState === "error" && (
+					{displayError && (
 						<span className="px-1 text-xs text-red-500">ERROR</span>
 					)}
 
-					{props.queryEditorState === "canceled" && (
+					{displayCanceled && (
 						<span className="px-1 text-xs text-red-500">CANCELED</span>
 					)}
 
-					{hasRerun && (
+					{hasRerunSuccess && (
 						<span className="px-1 text-xs text-green-500">Run Success</span>
 					)}
-					{((!isOriginal && isStale && !hasRerun && isEditing) || isError) && (
+					{displayRunButton && (
 						<RunButton
 							handleRunButtonClick={handleRunButtonClick}
 							isEditing={isEditing}
@@ -291,20 +295,21 @@ export default function SqlQueryCodeBlock(props: {
 					)}
 
 					{!isEditing && <CopyButton copied={copied} handleCopy={handleCopy} />}
-					{isEditing && !isStale && (
+					{displayCancelButton && (
 						<CancelButton
 							handleCancel={handleCancelDraftMode}
 							handleCancelQuery={handleCancelQuery}
 							isRunningg={isRunning}
 						/>
 					)}
-					{(!isStale || isEditing) && !isError && (
+					{
 						<EditButton
+							disabled={displayError}
 							handleSave={handleSave}
 							handleSetToDraftMode={handleSetToDraftMode}
 							isEditing={isEditing}
 						/>
-					)}
+					}
 				</div>
 			</div>
 			{isEditing ? (

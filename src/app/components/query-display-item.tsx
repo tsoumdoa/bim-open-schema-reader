@@ -126,7 +126,7 @@ export default function QueryDisplayItem(props: {
 		useState<QueryDisplayState>("hidden");
 	const [queryState, setQueryState] = useState<QueryState>("original");
 	const [queryEditorState, setQueryEditorState] =
-		useState<QueryEditorState>("rerun");
+		useState<QueryEditorState>("initial");
 
 	const handleCancelQueryRef = useRef<{ cancelQuery: () => void }>(null);
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);

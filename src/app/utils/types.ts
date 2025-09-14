@@ -19,6 +19,7 @@ export const validFileNames = [
 export type QueryDisplayState = "hidden" | "viewer" | "editor";
 export type QueryState = "original" | "edited";
 export type QueryEditorState =
+	| "initial"
 	| "stale"
 	| "running"
 	| "rerun"
