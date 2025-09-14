@@ -126,7 +126,7 @@ export default function QueryDisplayItem(props: {
 		useState<QueryDisplayState>("hidden");
 	const [queryState, setQueryState] = useState<QueryState>("original");
 	const [queryEditorState, setQueryEditorState] =
-		useState<QueryEditorState>("rerun");
+		useState<QueryEditorState>("initial");
 
 	const handleCancelQueryRef = useRef<{ cancelQuery: () => void }>(null);
 	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
@@ -196,7 +196,7 @@ export default function QueryDisplayItem(props: {
 
 			<div className="w-full min-w-0 overflow-auto">
 				<QueryResultDisplayTable
-					query={sqlQuery}
+					query={formatedQuery}
 					newQuery={newSqlQuery}
 					index={props.index}
 					displayExpanded={props.displayExpanded}
