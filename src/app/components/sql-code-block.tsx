@@ -253,6 +253,8 @@ export default function SqlQueryCodeBlock(props: {
 	const displayCanceled = props.queryEditorState === "canceled";
 	const displayRunButton = isStale || displayError;
 	const displayCancelButton = isRunning || isEditing;
+	const disableEditButton =
+		(props.queryEditorState === "error" && isEditing) || isRunning;
 
 	return (
 		<div
@@ -304,7 +306,7 @@ export default function SqlQueryCodeBlock(props: {
 					)}
 					{
 						<EditButton
-							disabled={displayError}
+							disabled={disableEditButton}
 							handleSave={handleSave}
 							handleSetToDraftMode={handleSetToDraftMode}
 							isEditing={isEditing}
