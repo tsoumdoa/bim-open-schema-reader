@@ -16,6 +16,8 @@ import {
 import { useState } from "react";
 import { Shield, Zap, Eye, Lock } from "lucide-react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import useSampleFile from "../hooks/use-sample-file";
 
 function FeatureGrid() {
 	return (
@@ -129,6 +131,12 @@ export default function InitialDisplay(props: {
 	const handleDrop = async (files: File[]) => {
 		props.setFiles(files);
 	};
+	const { refetch } = useSampleFile(props.setFiles);
+
+	const handleStartWithSample = () => {
+		// TODO: think about how to handle err better for user
+		refetch();
+	};
 
 	return (
 		<div className="mx-auto w-full max-w-4xl">
@@ -144,6 +152,9 @@ export default function InitialDisplay(props: {
 					Upload your BIM data files and explore them with our powerful,
 					privacy-first visualization tool.
 				</p>
+				<Button onClick={handleStartWithSample}>
+					Try with a sample BIM file
+				</Button>
 			</div>
 
 			<div className="flex flex-col gap-y-8">
