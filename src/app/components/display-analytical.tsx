@@ -1,6 +1,5 @@
 import { useDuckDB } from "../hooks/use-duckdb";
 import { ParquetBlob, QueryObject, QueryObjects } from "../utils/types";
-import * as duckdb from "@duckdb/duckdb-wasm";
 import { useImportParquet } from "../hooks/use-import-parquet";
 import { SimpleErrMessage } from "./simple-err-message";
 import {
@@ -9,7 +8,6 @@ import {
 	SidebarTrigger,
 } from "@/components/ui/sidebar";
 import SideBarContent from "./side-bar-content";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AddQuery } from "./add-query-button";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import QueryDisplayItem from "./query-display-item";
@@ -157,7 +155,6 @@ export default function AnalyticalDisplay(props: {
 	parquetFileEntries: ParquetBlob[];
 }) {
 	const { dbRef, connectionRef, error, loading } = useDuckDB();
-	const queryClient = new QueryClient();
 
 	if (!error && loading) {
 		return <div>Initializing...</div>;
@@ -165,14 +162,12 @@ export default function AnalyticalDisplay(props: {
 
 	if (dbRef.current && connectionRef.current) {
 		return (
-			<QueryClientProvider client={queryClient}>
-				<DuckDbProvider db={dbRef.current} c={connectionRef.current}>
-					<DbDisplay
-						parquetFileEntries={props.parquetFileEntries}
-						fileName={props.fileName}
-					/>
-				</DuckDbProvider>
-			</QueryClientProvider>
+			<DuckDbProvider db={dbRef.current} c={connectionRef.current}>
+				<DbDisplay
+					parquetFileEntries={props.parquetFileEntries}
+					fileName={props.fileName}
+				/>
+			</DuckDbProvider>
 		);
 	}
 
