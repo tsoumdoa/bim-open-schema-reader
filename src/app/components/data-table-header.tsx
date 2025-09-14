@@ -1,3 +1,4 @@
+"use no memo";
 import { Table as TableType } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";

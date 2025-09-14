@@ -1,3 +1,4 @@
+"use no memo";
 import { Button } from "@/components/ui/button";
 import { Table as TableType } from "@tanstack/react-table";
 import { ChevronsDownUp, ChevronsUpDown } from "lucide-react";
