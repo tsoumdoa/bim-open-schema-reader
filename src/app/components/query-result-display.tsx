@@ -19,7 +19,7 @@ export default function QueryResultDisplayTable(props: {
 	setQueryState: (b: QueryState) => void;
 }) {
 	const { conn } = useDuckDb();
-	const runDuckDbQuery = useRunDuckDbQuery(conn, props.newQuery);
+	const runDuckDbQuery = useRunDuckDbQuery(conn, props.query);
 	const { cancelQuery, isLoading, isSuccess, error, run, rows } =
 		runDuckDbQuery;
 	props.handleCancelQueryRef.current = { cancelQuery };

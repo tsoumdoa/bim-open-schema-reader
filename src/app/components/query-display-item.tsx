@@ -196,7 +196,7 @@ export default function QueryDisplayItem(props: {
 
 			<div className="w-full min-w-0 overflow-auto">
 				<QueryResultDisplayTable
-					query={sqlQuery}
+					query={formatedQuery}
 					newQuery={newSqlQuery}
 					index={props.index}
 					displayExpanded={props.displayExpanded}

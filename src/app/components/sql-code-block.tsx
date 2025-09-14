@@ -42,7 +42,7 @@ function ShikiNodeFormatter(props: { children: JSX.Element }) {
 	return (
 		<div
 			ref={containerRef}
-			className="relative flex max-h-96 w-full min-w-full flex-col overflow-x-auto overflow-y-auto text-xs [&>pre]:p-1"
+			className="relative flex max-h-[500px] w-full min-w-full flex-col overflow-x-auto overflow-y-auto text-xs [&>pre]:p-1"
 		>
 			{props.children}
 			{isOverflowing && (
@@ -222,7 +222,8 @@ export default function SqlQueryCodeBlock(props: {
 
 	const handleSave = () => {
 		if (props.draftSql !== props.sqlQuery) {
-			props.setSqlQuery(props.draftSql); // update code display
+			const formatedQuery = runFormat(props.draftSql);
+			props.setSqlQuery(formatedQuery);
 		}
 		props.setQueryDisplayState("viewer");
 		props.setQueryEditorState("initial");
@@ -254,11 +255,11 @@ export default function SqlQueryCodeBlock(props: {
 	const displayRunButton = isStale || displayError;
 	const displayCancelButton = isRunning || isEditing;
 	const disableEditButton =
-		(props.queryEditorState === "error" && isEditing) || isRunning;
+		(props.queryEditorState === "error" && isEditing) || isRunning || isStale;
 
 	return (
 		<div
-			className={`mb-2 flex min-w-full flex-col rounded-t-xs ring-2 ${isEditing ? "bg-[#282A36]" : "ring-neutral-200"}`}
+			className={`mb-2 flex min-w-full flex-col rounded-t-xs ring-2 ${isEditing ? "ring-[#282A36]" : "ring-neutral-200"}`}
 		>
 			<div
 				className={`flex items-center justify-between rounded-t-xs ${isEditing ? "bg-[#282A36]" : "bg-neutral-200"}`}
@@ -318,7 +319,7 @@ export default function SqlQueryCodeBlock(props: {
 				<CodeMirror
 					editable={!isRunning}
 					value={props.draftSql}
-					height="400px"
+					height="500px"
 					extensions={[sql({})]}
 					onChange={onChange}
 					theme={dracula}
