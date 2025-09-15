@@ -34,3 +34,11 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 
 - Open an issue to discuss ideas
 - Keep PRs focused and include a brief description and screenshots if UI-related
+
+## TODO
+
+- [ ] add a way to jump to query from the sidebar (maybe show only one or various
+      queries options...? scrolling issue is still very annoying)
+- [x] make edited query more obvious after edited...
+- [ ] click on category to generate a query...? (or add it to addible list...?)
+- [ ] Categorize categories (e.g. model, m&E , arch, struct, draft, material, unsorted, etc...), can be similar to how Revit ribbon is categorized

@@ -1,6 +1,5 @@
 import React from "react";
 import { Separator } from "@/components/ui/separator";
-import * as duckdb from "@duckdb/duckdb-wasm";
 import { listAllTableInfoWithColumnInfo } from "../utils/queries";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { useDuckDb } from "./use-db";

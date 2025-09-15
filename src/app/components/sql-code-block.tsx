@@ -223,6 +223,7 @@ export default function SqlQueryCodeBlock(props: {
 	const handleSave = () => {
 		if (props.draftSql !== props.sqlQuery) {
 			const formatedQuery = runFormat(props.draftSql);
+			props.setQueryState("edited");
 			props.setSqlQuery(formatedQuery);
 		}
 		props.setQueryDisplayState("viewer");
