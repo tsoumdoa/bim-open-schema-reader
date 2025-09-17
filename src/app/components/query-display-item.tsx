@@ -9,6 +9,7 @@ import {
 	QueryObject,
 	QueryState,
 	QueryTitleState,
+	UseExpandDisplay,
 } from "../utils/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -135,9 +136,7 @@ export default function QueryDisplayItem(props: {
 	removeObject: (queryObject: QueryObject) => void;
 	isDuplicated: boolean;
 	index: number;
-	displayExpanded: number;
-	setDisplayExpanded: (b: number) => void;
-	handleScrollBack: () => void;
+	useExpandDisplay: UseExpandDisplay;
 }) {
 	const {
 		handleCancelQueryRef,
@@ -157,6 +156,7 @@ export default function QueryDisplayItem(props: {
 		queryTitleState,
 		setQueryTitleState,
 	} = useQueryViewerAndEditor(props.queryObject.sqlQuery);
+	const { displayExpanded, setDisplayExpanded } = props.useExpandDisplay;
 
 	const [titleInputValue, setTitleInputValue] = useState("");
 	const titleInputRef = useRef<HTMLInputElement | null>(null);
@@ -186,10 +186,10 @@ export default function QueryDisplayItem(props: {
 	);
 
 	const isFocused = () => {
-		if (props.displayExpanded === -1) {
+		if (displayExpanded === -1) {
 			return true;
 		}
-		return props.displayExpanded === props.index;
+		return displayExpanded === props.index;
 	};
 
 	const handleShowSqlQuery = () => {
@@ -200,14 +200,14 @@ export default function QueryDisplayItem(props: {
 			setQueryDisplayState("hidden");
 		}
 
-		props.setDisplayExpanded(-1);
+		setDisplayExpanded(-1);
 	};
 
 	useEffect(() => {
-		if (props.displayExpanded !== -1) {
+		if (displayExpanded !== -1) {
 			setQueryDisplayState("hidden");
 		}
-	}, [props.displayExpanded]);
+	}, [displayExpanded]);
 
 	const showNormalTitle =
 		queryDisplayState === "viewer" || queryDisplayState === "hidden";
@@ -260,8 +260,8 @@ export default function QueryDisplayItem(props: {
 					query={formatedQuery}
 					newQuery={newSqlQuery}
 					index={props.index}
-					displayExpanded={props.displayExpanded}
-					setDisplayExpanded={props.setDisplayExpanded}
+					displayExpanded={displayExpanded}
+					setDisplayExpanded={setDisplayExpanded}
 					lockScroll={!isFocused()}
 					fileDownloadName={fileDownloadName}
 					handleCancelQueryRef={handleCancelQueryRef}

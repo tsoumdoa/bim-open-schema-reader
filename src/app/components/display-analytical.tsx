@@ -1,5 +1,11 @@
 import { useDuckDB } from "../hooks/use-duckdb";
-import { ParquetBlob, QueryObject, QueryObjects } from "../utils/types";
+import {
+	ParquetBlob,
+	QueryObject,
+	QueryObjects,
+	UseExpandDisplay,
+	UseQueryObjects,
+} from "../utils/types";
 import { useImportParquet } from "../hooks/use-import-parquet";
 import { SimpleErrMessage } from "./simple-err-message";
 import {
@@ -12,8 +18,8 @@ import { AddQuery } from "./add-query-button";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import QueryDisplayItem from "./query-display-item";
 import GoBackToTop from "./go-back-to-top";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DuckDbProvider, useDuckDb } from "./use-db";
+import { useExpandDisplay } from "../hooks/use-expand-display";
 
 function DashboardHeader(props: { fileName: string }) {
 	return (
@@ -33,46 +39,13 @@ function checkDuplicated(queryObjects: QueryObjects, queryObject: QueryObject) {
 	return duplicated.length > 1;
 }
 
-function DashboardMain() {
-	const [displayExpanded, setDisplayExpanded] = useState(-1);
-	const { queryObjects, addQuery, removeQuery } = useQueryObjects();
-	const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-	useEffect(() => {
-		const escListener = (e: KeyboardEvent) => {
-			if (e.key === "Escape") {
-				setDisplayExpanded(-1);
-			}
-		};
-		document.addEventListener("keydown", escListener);
-
-		return () => {
-			document.removeEventListener("keydown", escListener);
-		};
-	}, []);
-
-	const handleScrollBack = () => {
-		if (displayExpanded !== -1 && itemRefs.current[displayExpanded]) {
-			const headerOffset = 84; // height of fixed header + some offset in px
-			const elementPosition =
-				itemRefs.current[displayExpanded].getBoundingClientRect().top +
-				window.scrollY;
-			const offsetPosition = elementPosition - headerOffset;
-
-			window.scrollTo({
-				top: offsetPosition,
-				behavior: "smooth",
-			});
-
-			document.body.style.overflow = "hidden";
-		} else {
-			document.body.style.overflow = "";
-		}
-	};
-
-	useLayoutEffect(() => {
-		handleScrollBack();
-	}, [displayExpanded]);
+function DashboardMain(props: {
+	useQueryObjects: UseQueryObjects;
+	useExpandDisplay: UseExpandDisplay;
+}) {
+	const { queryObjects, addQuery, removeQuery } = props.useQueryObjects;
+	const useExpDis = props.useExpandDisplay;
+	const { queryItemRefs, displayExpanded, setDisplayExpanded } = useExpDis;
 
 	return (
 		<div className="flex h-full min-h-0 max-w-full flex-1 flex-col gap-y-2">
@@ -81,7 +54,7 @@ function DashboardMain() {
 					return (
 						<div
 							ref={(el) => {
-								itemRefs.current[i] = el;
+								queryItemRefs.current[i] = el;
 							}}
 							key={q.id}
 						>
@@ -90,9 +63,7 @@ function DashboardMain() {
 								removeObject={removeQuery}
 								isDuplicated={checkDuplicated(queryObjects, q)}
 								index={i}
-								displayExpanded={displayExpanded}
-								setDisplayExpanded={setDisplayExpanded}
-								handleScrollBack={handleScrollBack}
+								useExpandDisplay={useExpDis}
 							/>
 						</div>
 					);
@@ -104,23 +75,34 @@ function DashboardMain() {
 	);
 }
 
-function SideBar() {
+function SideBar(props: {
+	useQueryObjects: UseQueryObjects;
+	useExpandDisplay: UseExpandDisplay;
+}) {
 	return (
 		<Sidebar className="h-full pt-11">
 			<div className="overflow-auto p-2">
-				<SideBarContent />
+				<SideBarContent
+					useQueryObjects={props.useQueryObjects}
+					useExpandDisplay={props.useExpandDisplay}
+				/>
 			</div>
 		</Sidebar>
 	);
 }
 
 function DashboardContainer(props: { fileName: string }) {
+	const useQueryObj = useQueryObjects();
+	const useExpDis = useExpandDisplay();
 	return (
 		<SidebarProvider className="h-full min-h-0 w-full">
-			<SideBar />
+			<SideBar useQueryObjects={useQueryObj} useExpandDisplay={useExpDis} />
 			<main className="relative w-full min-w-0">
 				<DashboardHeader fileName={props.fileName} />
-				<DashboardMain />
+				<DashboardMain
+					useQueryObjects={useQueryObj}
+					useExpandDisplay={useExpDis}
+				/>
 			</main>
 		</SidebarProvider>
 	);
