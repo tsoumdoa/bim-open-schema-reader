@@ -12,6 +12,7 @@ export function useExpandDisplay() {
 
 		return () => {
 			document.removeEventListener("keydown", escListener);
+			document.body.style.overflow = "";
 		};
 	}, []);
 

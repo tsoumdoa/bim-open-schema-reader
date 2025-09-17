@@ -33,20 +33,28 @@ export function AddQuery(props: {
 	const [isOpen, setIsOpen] = useState(false);
 
 	useEffect(() => {
-		// Open the dialog with Cmd+K (macOS) or Ctrl+K (others)
+		// Open the dialog with Cmd+K (macOS) or Ctrl+K (others),
+		// but don't trigger while typing or when already open.
 		const onKeyDown = (e: KeyboardEvent) => {
+			const target = e.target as HTMLElement | null;
+			if (target && target.closest('input, textarea, [contenteditable="true"]'))
+				return;
 			const key = e.key.toLowerCase();
-			const isMod = e.metaKey || e.ctrlKey;
+			const isMac = navigator.platform.toLowerCase().includes("mac");
+			const isShortcut =
+				(isMac ? e.metaKey && !e.ctrlKey : e.ctrlKey) && key === "k";
 
-			if (isMod && key === "k") {
+			if (isShortcut) {
 				e.preventDefault();
-				setIsOpen(true);
-				props.setDisplayExpanded(-1);
+				if (!isOpen) {
+					setIsOpen(true);
+					props.setDisplayExpanded(-1);
+				}
 			}
 		};
 		document.addEventListener("keydown", onKeyDown);
 		return () => document.removeEventListener("keydown", onKeyDown);
-	}, []);
+	}, [isOpen, props.setDisplayExpanded]);
 
 	const handleSelectCommand = (
 		queryCategory: string,

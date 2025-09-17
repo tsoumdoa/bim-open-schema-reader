@@ -15,7 +15,7 @@ import { QueriesSelector } from "./types";
 
 export const queriesSelectorList: QueriesSelector[] = [
 	{
-		queryCategory: "Level and Grid",
+		queryCategory: "Levels",
 		queryObjects: [
 			{
 				queryTitle: "List all levels",
@@ -23,15 +23,20 @@ export const queriesSelectorList: QueriesSelector[] = [
 				explaination: "List all levels along with their coordinates",
 			},
 			{
-				queryTitle: "List all grids",
-				sqlQuery: listGrids,
-				explaination: "List all grids along with their coordinates",
-			},
-			{
 				queryTitle: "Levels cordination view",
 				sqlQuery: listLevelWithCoredStatus,
 				explaination:
 					"Compare levels with the linked models to check if they are in the same location",
+			},
+		],
+	},
+	{
+		queryCategory: "Grids",
+		queryObjects: [
+			{
+				queryTitle: "List all grids",
+				sqlQuery: listGrids,
+				explaination: "List all grids along with their coordinates",
 			},
 			{
 				queryTitle: "Grids cordination view",
@@ -42,7 +47,7 @@ export const queriesSelectorList: QueriesSelector[] = [
 		],
 	},
 	{
-		queryCategory: "Wall",
+		queryCategory: "Walls",
 		queryObjects: [
 			{
 				queryTitle: "Wall double and point parameters",

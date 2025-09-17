@@ -137,6 +137,7 @@ export default function QueryDisplayItem(props: {
 	isDuplicated: boolean;
 	index: number;
 	useExpandDisplay: UseExpandDisplay;
+	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
 }) {
 	const {
 		handleCancelQueryRef,
@@ -158,7 +159,9 @@ export default function QueryDisplayItem(props: {
 	} = useQueryViewerAndEditor(props.queryObject.sqlQuery);
 	const { displayExpanded, setDisplayExpanded } = props.useExpandDisplay;
 
-	const [titleInputValue, setTitleInputValue] = useState("");
+	const [titleInputValue, setTitleInputValue] = useState(
+		props.queryObject.queryTitle
+	);
 	const titleInputRef = useRef<HTMLInputElement | null>(null);
 
 	const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,6 +169,7 @@ export default function QueryDisplayItem(props: {
 		setTitleInputValue(v);
 		if (v !== props.queryObject.queryTitle) {
 			setQueryTitleState("edited");
+			props.updateQueryTitle(props.queryObject, v);
 		} else {
 			setQueryTitleState("original");
 		}

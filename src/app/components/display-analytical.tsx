@@ -43,7 +43,8 @@ function DashboardMain(props: {
 	useQueryObjects: UseQueryObjects;
 	useExpandDisplay: UseExpandDisplay;
 }) {
-	const { queryObjects, addQuery, removeQuery } = props.useQueryObjects;
+	const { queryObjects, addQuery, removeQuery, updateQueryTitle } =
+		props.useQueryObjects;
 	const useExpDis = props.useExpandDisplay;
 	const { queryItemRefs, displayExpanded, setDisplayExpanded } = useExpDis;
 
@@ -64,6 +65,7 @@ function DashboardMain(props: {
 								isDuplicated={checkDuplicated(queryObjects, q)}
 								index={i}
 								useExpandDisplay={useExpDis}
+								updateQueryTitle={updateQueryTitle}
 							/>
 						</div>
 					);
