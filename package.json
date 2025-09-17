@@ -11,7 +11,9 @@
 		"format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache"
 	},
 	"dependencies": {
+		"@codemirror/commands": "^6.8.1",
 		"@codemirror/lang-sql": "^6.9.1",
+		"@codemirror/view": "^6.38.2",
 		"@duckdb/duckdb-wasm": "1.29.1-dev132.0",
 		"@radix-ui/react-accordion": "^1.2.12",
 		"@radix-ui/react-alert-dialog": "^1.1.15",

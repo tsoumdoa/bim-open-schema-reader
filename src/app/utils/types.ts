@@ -1,3 +1,4 @@
+import { useExpandDisplay } from "../hooks/use-expand-display";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import * as duckdb from "@duckdb/duckdb-wasm";
@@ -18,6 +19,7 @@ export const validFileNames = [
 
 export type QueryDisplayState = "hidden" | "viewer" | "editor";
 export type QueryState = "original" | "edited";
+export type QueryTitleState = "original" | "edited";
 export type QueryEditorState =
 	| "initial"
 	| "stale"
@@ -42,14 +44,16 @@ export type QueryObject = {
 	queryTitle: string;
 	explaination: string;
 	sqlQuery: string;
+	isCustom?: boolean;
 };
 
 const exportFileTypes = ["csv", "tsv", "json"] as const;
 export type ExportFileType = (typeof exportFileTypes)[number];
-export type QueryObjects = QueryObject[];
 export type UseRunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type RunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
-export type UseQueryObject = ReturnType<typeof useQueryObjects>;
+export type QueryObjects = QueryObject[];
+export type UseQueryObjects = ReturnType<typeof useQueryObjects>;
+export type UseExpandDisplay = ReturnType<typeof useExpandDisplay>;
 export type DuckDBCtx = {
 	db: duckdb.AsyncDuckDB;
 	conn: duckdb.AsyncDuckDBConnection;

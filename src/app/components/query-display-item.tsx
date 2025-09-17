@@ -6,9 +6,10 @@ import {
 } from "@/components/ui/tooltip";
 import {
 	QueryDisplayState,
-	QueryEditorState,
 	QueryObject,
 	QueryState,
+	QueryTitleState,
+	UseExpandDisplay,
 } from "../utils/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +24,8 @@ import { useEffect, useRef, useState } from "react";
 import SqlQueryCodeBlock from "./sql-code-block";
 import QueryResultDisplayTable from "./query-result-display";
 import { formatForFileDownload } from "../utils/format";
-import { runFormat } from "../utils/shared";
+import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
+import { Input } from "@/components/ui/input";
 
 function AboutMenuItem(props: { queryObject: QueryObject }) {
 	return (
@@ -96,16 +98,37 @@ function DropDownMenu(props: {
 	);
 }
 
-const formatQueryName = (queryObject: QueryObject, duplicated: boolean) => {
-	return (
-		<span>
-			{`${queryObject.queryTitle} `}{" "}
-			<span className="text-xs text-neutral-500">{`<${queryObject.queryCategory || "n/a"}>`}</span>
-			{duplicated && (
-				<span className="text-xs text-neutral-500">{` [${queryObject.id}]`}</span>
-			)}
-		</span>
-	);
+const formatQueryName = (
+	queryObject: QueryObject,
+	duplicated: boolean,
+	queryState: QueryState,
+	qureyTitleState: QueryTitleState,
+	newTitle: string
+) => {
+	switch (queryState) {
+		case "original":
+			return (
+				<span>
+					{`${queryObject.queryTitle} `}{" "}
+					<span className="text-xs text-neutral-500">{`<${queryObject.queryCategory || "n/a"}>`}</span>
+					{duplicated && (
+						<span className="text-xs text-neutral-500">{` [${queryObject.id}]`}</span>
+					)}
+				</span>
+			);
+		case "edited":
+			if (qureyTitleState === "edited") {
+				return <span>{newTitle}</span>;
+			}
+			return (
+				<span>
+					{queryObject.queryTitle}{" "}
+					<span className="text-cs text-amber-500">{`<edited>`}</span>
+				</span>
+			);
+		default:
+			return <span>{queryObject.queryTitle}</span>;
+	}
 };
 
 export default function QueryDisplayItem(props: {
@@ -113,30 +136,64 @@ export default function QueryDisplayItem(props: {
 	removeObject: (queryObject: QueryObject) => void;
 	isDuplicated: boolean;
 	index: number;
-	displayExpanded: number;
-	setDisplayExpanded: (b: number) => void;
-	handleScrollBack: () => void;
+	useExpandDisplay: UseExpandDisplay;
+	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
 }) {
-	const formatedQuery = runFormat(props.queryObject.sqlQuery);
-	const [sqlQuery, setSqlQuery] = useState<string>(formatedQuery); //default query
-	const [draftSql, setDraftSql] = useState<string>(formatedQuery); //for edit
-	const [newSqlQuery, setNewSqlQuery] = useState<string>(formatedQuery); //to rerun query
+	const {
+		handleCancelQueryRef,
+		formatedQuery,
+		sqlQuery,
+		draftSql,
+		newSqlQuery,
+		queryDisplayState,
+		queryState,
+		queryEditorState,
+		setSqlQuery,
+		setDraftSql,
+		setNewSqlQuery,
+		setQueryDisplayState,
+		setQueryState,
+		setQueryEditorState,
+		queryTitleState,
+		setQueryTitleState,
+	} = useQueryViewerAndEditor(props.queryObject.sqlQuery);
+	const { displayExpanded, setDisplayExpanded } = props.useExpandDisplay;
 
-	const [queryDisplayState, setQueryDisplayState] =
-		useState<QueryDisplayState>("hidden");
-	const [queryState, setQueryState] = useState<QueryState>("original");
-	const [queryEditorState, setQueryEditorState] =
-		useState<QueryEditorState>("initial");
+	const [titleInputValue, setTitleInputValue] = useState(
+		props.queryObject.queryTitle
+	);
+	const titleInputRef = useRef<HTMLInputElement | null>(null);
 
-	const handleCancelQueryRef = useRef<{ cancelQuery: () => void }>(null);
-	const queryName = formatQueryName(props.queryObject, props.isDuplicated);
-	const fileDownloadName = formatForFileDownload(props.queryObject.queryTitle);
+	const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const v = e.target.value;
+		setTitleInputValue(v);
+		if (v !== props.queryObject.queryTitle) {
+			setQueryTitleState("edited");
+			props.updateQueryTitle(props.queryObject, v);
+		} else {
+			setQueryTitleState("original");
+		}
+	};
+
+	const queryName = formatQueryName(
+		props.queryObject,
+		props.isDuplicated,
+		queryState,
+		queryTitleState,
+		titleInputValue
+	);
+
+	const fileDownloadName = formatForFileDownload(
+		queryState === "edited"
+			? `edited-${props.queryObject.queryTitle}`
+			: props.queryObject.queryTitle
+	);
 
 	const isFocused = () => {
-		if (props.displayExpanded === -1) {
+		if (displayExpanded === -1) {
 			return true;
 		}
-		return props.displayExpanded === props.index;
+		return displayExpanded === props.index;
 	};
 
 	const handleShowSqlQuery = () => {
@@ -147,28 +204,36 @@ export default function QueryDisplayItem(props: {
 			setQueryDisplayState("hidden");
 		}
 
-		props.setDisplayExpanded(-1);
+		setDisplayExpanded(-1);
 	};
 
 	useEffect(() => {
-		if (props.displayExpanded !== -1) {
+		if (displayExpanded !== -1) {
 			setQueryDisplayState("hidden");
 		}
-	}, [props.displayExpanded]);
+	}, [displayExpanded]);
+
+	const showNormalTitle =
+		queryDisplayState === "viewer" || queryDisplayState === "hidden";
 
 	return (
 		<div
 			className={`${!isFocused() ? "opacity-35" : ""} flex w-full flex-col gap-y-2`}
-			key={`${props.index}-${queryName}`}
+			key={`${props.index}-${props.queryObject.id}`}
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
-				<span>
-					{`${props.queryObject.queryTitle} `}{" "}
-					<span className="text-xs text-neutral-500">{`<${props.queryObject.queryCategory || "n/a"}>`}</span>
-					{props.isDuplicated && (
-						<span className="text-xs text-neutral-500">{` [${props.queryObject.id}]`}</span>
-					)}
-				</span>
+				{showNormalTitle ? (
+					queryName
+				) : (
+					<Input
+						type="title"
+						placeholder={props.queryObject.queryTitle}
+						ref={titleInputRef}
+						value={titleInputValue}
+						onChange={handleTitleInputChange}
+						disabled={queryState === "original"}
+					/>
+				)}
 				<DropDownMenu
 					queryObject={props.queryObject}
 					queryDisplayState={queryDisplayState}
@@ -199,8 +264,8 @@ export default function QueryDisplayItem(props: {
 					query={formatedQuery}
 					newQuery={newSqlQuery}
 					index={props.index}
-					displayExpanded={props.displayExpanded}
-					setDisplayExpanded={props.setDisplayExpanded}
+					displayExpanded={displayExpanded}
+					setDisplayExpanded={setDisplayExpanded}
 					lockScroll={!isFocused()}
 					fileDownloadName={fileDownloadName}
 					handleCancelQueryRef={handleCancelQueryRef}

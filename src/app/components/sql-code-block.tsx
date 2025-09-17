@@ -1,3 +1,4 @@
+"use no memo";
 import { Check, Copy, Play, Save, SquarePen, X } from "lucide-react";
 import {
 	JSX,
@@ -18,6 +19,7 @@ import {
 	QueryEditorState,
 	QueryState,
 } from "../utils/types";
+import { makeKeymap } from "../utils/code-mirror-keymaps";
 
 function ShikiNodeFormatter(props: { children: JSX.Element }) {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -223,6 +225,7 @@ export default function SqlQueryCodeBlock(props: {
 	const handleSave = () => {
 		if (props.draftSql !== props.sqlQuery) {
 			const formatedQuery = runFormat(props.draftSql);
+			props.setQueryState("edited");
 			props.setSqlQuery(formatedQuery);
 		}
 		props.setQueryDisplayState("viewer");
@@ -320,7 +323,18 @@ export default function SqlQueryCodeBlock(props: {
 					editable={!isRunning}
 					value={props.draftSql}
 					height="500px"
-					extensions={[sql({})]}
+					extensions={[
+						sql({}),
+						makeKeymap({
+							onRun: handleRunButtonClick,
+							onFormat: () => {
+								if (!isRunning) {
+									const formatted = runFormat(props.draftSql);
+									props.setDraftSql(formatted);
+								}
+							},
+						}),
+					]}
 					onChange={onChange}
 					theme={dracula}
 					className="rounded-b-xs text-xs"

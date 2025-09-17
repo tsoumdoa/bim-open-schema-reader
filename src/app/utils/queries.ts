@@ -167,7 +167,7 @@ export const listCountByCategory = sql`
   GROUP BY
     e.category
   ORDER BY
-    count DESC;
+    paramname ASC;
 `;
 
 // exmaple with string literal
