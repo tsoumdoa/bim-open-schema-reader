@@ -92,3 +92,11 @@ export const queriesSelectorList: QueriesSelector[] = [
 		],
 	},
 ] as const;
+
+export const denormParamQueryBuilder = [
+	{ tableName: "denorm_double_params", displayName: "Double Parameters" },
+	{ tableName: "denorm_entity_params", displayName: "Entity Parameters" },
+	{ tableName: "denorm_integer_params", displayName: "Integer Parameters" },
+	{ tableName: "denorm_points_params", displayName: "Point Parameters" },
+	{ tableName: "denorm_string_params", displayName: "String Parameters" },
+] as const;
