@@ -51,6 +51,7 @@ export type QueryObject = {
 	explaination: string;
 	sqlQuery: string;
 	isCustom?: boolean;
+	returnedRowsNumber?: number;
 };
 
 const exportFileTypes = ["csv", "tsv", "json"] as const;
