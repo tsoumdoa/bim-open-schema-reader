@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/accordion";
 import { DisplayTableInfo } from "./display-table-info";
 import ListDataByCategories from "./list-data-by-cagories";
-import { UseExpandDisplay, UseQueryObjects } from "../utils/types";
+import { UseExpandDisplay } from "../utils/types";
 import ListQueriesInSidebar from "./list-queries-in-sidebar";
 
 function AccordionDisplay(props: {
@@ -25,22 +25,18 @@ function AccordionDisplay(props: {
 	);
 }
 export default function SideBarContent(props: {
-	useQueryObjects: UseQueryObjects;
 	useExpandDisplay: UseExpandDisplay;
 }) {
 	return (
 		<div className="space-y-1">
-			<AccordionDisplay accordionTitle="Analytical">
+			<AccordionDisplay accordionTitle="Table Schema">
 				<DisplayTableInfo />
 			</AccordionDisplay>
-			<AccordionDisplay accordionTitle="Category">
-				<ListDataByCategories />
+			<AccordionDisplay accordionTitle="Category Stats">
+				<ListDataByCategories useExpandDisplay={props.useExpandDisplay} />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Query">
-				<ListQueriesInSidebar
-					useQueryObjects={props.useQueryObjects}
-					useExpandDisplay={props.useExpandDisplay}
-				/>
+				<ListQueriesInSidebar useExpandDisplay={props.useExpandDisplay} />
 			</AccordionDisplay>
 		</div>
 	);

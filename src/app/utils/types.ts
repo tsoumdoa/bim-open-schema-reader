@@ -27,6 +27,12 @@ export type QueryEditorState =
 	| "rerun"
 	| "error"
 	| "canceled";
+export type DenormTableName =
+	| "denorm_double_params"
+	| "denorm_entity_params"
+	| "denorm_integer_params"
+	| "denorm_points_params"
+	| "denorm_string_params";
 
 export type ParquetBlob = {
 	filename: string;
@@ -45,6 +51,7 @@ export type QueryObject = {
 	explaination: string;
 	sqlQuery: string;
 	isCustom?: boolean;
+	returnedRowsNumber?: number;
 };
 
 const exportFileTypes = ["csv", "tsv", "json"] as const;
@@ -57,4 +64,7 @@ export type UseExpandDisplay = ReturnType<typeof useExpandDisplay>;
 export type DuckDBCtx = {
 	db: duckdb.AsyncDuckDB;
 	conn: duckdb.AsyncDuckDBConnection;
+};
+export type QueryObjectCtx = {
+	useQueryObjects: UseQueryObjects;
 };

@@ -5,13 +5,8 @@ import {
 } from "../sql/level-and-grid-codrination-status";
 import { listWallBuildUps } from "../sql/wall-build-ups";
 import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
-import { wallDoubleParams } from "../sql/wall-double-params";
 import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
-import { wallEntityParams } from "../sql/wall-entity-params";
-import { wallIntParams } from "../sql/wall-int-params";
-import { wallPtParams } from "../sql/wall-pt-params";
-import { wallStrParams } from "../sql/wall-str-params";
-import { QueriesSelector } from "./types";
+import { DenormTableName, QueriesSelector } from "./types";
 
 export const queriesSelectorList: QueriesSelector[] = [
 	{
@@ -64,31 +59,17 @@ export const queriesSelectorList: QueriesSelector[] = [
 				sqlQuery: listWallBuildUps,
 				explaination: "Wall build up schedule",
 			},
-			{
-				queryTitle: "int params",
-				sqlQuery: wallIntParams,
-				explaination: "int params",
-			},
-			{
-				queryTitle: "double params",
-				sqlQuery: wallDoubleParams,
-				explaination: "double params",
-			},
-			{
-				queryTitle: "pt params",
-				sqlQuery: wallPtParams,
-				explaination: "pt params",
-			},
-			{
-				queryTitle: "str params",
-				sqlQuery: wallStrParams,
-				explaination: "str params",
-			},
-			{
-				queryTitle: "entity params",
-				sqlQuery: wallEntityParams,
-				explaination: "entity params",
-			},
 		],
 	},
+] as const;
+
+export const denormParamQueryBuilderName: {
+	tableName: DenormTableName;
+	displayName: string;
+}[] = [
+	{ tableName: "denorm_double_params", displayName: "Double Parameters" },
+	{ tableName: "denorm_entity_params", displayName: "Entity Parameters" },
+	{ tableName: "denorm_integer_params", displayName: "Integer Parameters" },
+	{ tableName: "denorm_points_params", displayName: "Point Parameters" },
+	{ tableName: "denorm_string_params", displayName: "String Parameters" },
 ] as const;
