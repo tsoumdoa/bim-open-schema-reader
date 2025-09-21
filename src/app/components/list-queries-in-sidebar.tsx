@@ -1,10 +1,12 @@
-import { UseExpandDisplay, UseQueryObjects } from "../utils/types";
+import { UseExpandDisplay } from "../utils/types";
+import { useQueryObjCtx } from "./query-obj-provider";
 
 export default function ListQueriesInSidebar(props: {
-	useQueryObjects: UseQueryObjects;
 	useExpandDisplay: UseExpandDisplay;
 }) {
-	const queryObjs = props.useQueryObjects.queryObjects;
+	const { useQueryObjects } = useQueryObjCtx();
+	const queryObjs = useQueryObjects.queryObjects;
+
 	const { setDisplayExpanded } = props.useExpandDisplay;
 	const handleClick = (id: number) => {
 		setDisplayExpanded(id);
@@ -27,10 +29,10 @@ export default function ListQueriesInSidebar(props: {
 						.filter((q) => q.queryCategory === category)
 						.map((queryObject, i) => (
 							<ul key={queryObject.id ?? `query-object-${i}`}>
-								<li className="pl-2 text-sm leading-tight">
+								<li className="w-full truncate pl-2 text-sm leading-tight">
 									<button
 										type="button"
-										className="hover:cursor-pointer hover:underline"
+										className="text-xs hover:cursor-pointer hover:underline"
 										onClick={() => {
 											handleClick(indexMap.get(queryObject.id ?? "") ?? -1);
 										}}

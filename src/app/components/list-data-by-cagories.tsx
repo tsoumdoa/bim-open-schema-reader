@@ -7,14 +7,27 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { denormParamQueryBuilder } from "../utils/queries-selector-list";
+import { denormParamQueryBuilderName } from "../utils/queries-selector-list";
 import { Separator } from "@/components/ui/separator";
+import { useQueryObjCtx } from "./query-obj-provider";
+import { denormParamQueryBuilder } from "../utils/denorm-param-query-builder";
+import { DenormTableName } from "../utils/types";
 
 function DropDownMenu(props: { categoryName: string }) {
-	const handleClick = (tableName: string) => {
-		console.log(tableName);
-		// NOTE: this is where i left off..
+	const { useQueryObjects } = useQueryObjCtx();
+	const { addQueries, addQuery } = useQueryObjects;
+	const handleClick = (tableName: DenormTableName) => {
+		const queryObj = denormParamQueryBuilder(tableName, props.categoryName);
+		addQuery(queryObj);
 	};
+
+	const addAll = () => {
+		const d = denormParamQueryBuilderName.map((item) => {
+			return denormParamQueryBuilder(item.tableName, props.categoryName);
+		});
+		addQueries(d);
+	};
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -23,7 +36,7 @@ function DropDownMenu(props: { categoryName: string }) {
 				</span>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" side="bottom" className="text-xs">
-				{denormParamQueryBuilder.map((item, index) => (
+				{denormParamQueryBuilderName.map((item, index) => (
 					<DropdownMenuItem
 						key={`item-${index}`}
 						className="text-xs"
@@ -35,7 +48,7 @@ function DropDownMenu(props: { categoryName: string }) {
 				<Separator className="" />
 				<DropdownMenuItem
 					className="text-xs font-bold"
-					onClick={() => handleClick("all")}
+					onClick={() => addAll()}
 				>
 					All
 				</DropdownMenuItem>

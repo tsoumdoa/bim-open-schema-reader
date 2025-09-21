@@ -4,7 +4,6 @@ import {
 	QueryObject,
 	QueryObjects,
 	UseExpandDisplay,
-	UseQueryObjects,
 } from "../utils/types";
 import { useImportParquet } from "../hooks/use-import-parquet";
 import { SimpleErrMessage } from "./simple-err-message";
@@ -20,6 +19,7 @@ import QueryDisplayItem from "./query-display-item";
 import GoBackToTop from "./go-back-to-top";
 import { DuckDbProvider, useDuckDb } from "./use-db";
 import { useExpandDisplay } from "../hooks/use-expand-display";
+import QueryObjProvider, { useQueryObjCtx } from "./query-obj-provider";
 
 function DashboardHeader(props: { fileName: string }) {
 	return (
@@ -39,12 +39,11 @@ function checkDuplicated(queryObjects: QueryObjects, queryObject: QueryObject) {
 	return duplicated.length > 1;
 }
 
-function DashboardMain(props: {
-	useQueryObjects: UseQueryObjects;
-	useExpandDisplay: UseExpandDisplay;
-}) {
+function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
+	const { useQueryObjects } = useQueryObjCtx();
+
 	const { queryObjects, addQuery, removeQuery, updateQueryTitle } =
-		props.useQueryObjects;
+		useQueryObjects;
 	const useExpDis = props.useExpandDisplay;
 	const { queryItemRefs, displayExpanded, setDisplayExpanded } = useExpDis;
 
@@ -77,34 +76,24 @@ function DashboardMain(props: {
 	);
 }
 
-function SideBar(props: {
-	useQueryObjects: UseQueryObjects;
-	useExpandDisplay: UseExpandDisplay;
-}) {
+function SideBar(props: { useExpandDisplay: UseExpandDisplay }) {
 	return (
 		<Sidebar className="h-full pt-11">
 			<div className="overflow-auto p-2">
-				<SideBarContent
-					useQueryObjects={props.useQueryObjects}
-					useExpandDisplay={props.useExpandDisplay}
-				/>
+				<SideBarContent useExpandDisplay={props.useExpandDisplay} />
 			</div>
 		</Sidebar>
 	);
 }
 
 function DashboardContainer(props: { fileName: string }) {
-	const useQueryObj = useQueryObjects();
 	const useExpDis = useExpandDisplay();
 	return (
 		<SidebarProvider className="h-full min-h-0 w-full">
-			<SideBar useQueryObjects={useQueryObj} useExpandDisplay={useExpDis} />
+			<SideBar useExpandDisplay={useExpDis} />
 			<main className="relative w-full min-w-0">
 				<DashboardHeader fileName={props.fileName} />
-				<DashboardMain
-					useQueryObjects={useQueryObj}
-					useExpandDisplay={useExpDis}
-				/>
+				<DashboardMain useExpandDisplay={useExpDis} />
 			</main>
 		</SidebarProvider>
 	);
@@ -139,6 +128,7 @@ export default function AnalyticalDisplay(props: {
 	parquetFileEntries: ParquetBlob[];
 }) {
 	const { dbRef, connectionRef, error, loading } = useDuckDB();
+	const useQueryObj = useQueryObjects();
 
 	if (!error && loading) {
 		return <div>Initializing...</div>;
@@ -146,11 +136,17 @@ export default function AnalyticalDisplay(props: {
 
 	if (dbRef.current && connectionRef.current) {
 		return (
-			<DuckDbProvider db={dbRef.current} c={connectionRef.current}>
-				<DbDisplay
-					parquetFileEntries={props.parquetFileEntries}
-					fileName={props.fileName}
-				/>
+			<DuckDbProvider
+				db={dbRef.current}
+				c={connectionRef.current}
+				useQueryObjects={useQueryObj}
+			>
+				<QueryObjProvider useQueryObjects={useQueryObj}>
+					<DbDisplay
+						parquetFileEntries={props.parquetFileEntries}
+						fileName={props.fileName}
+					/>
+				</QueryObjProvider>
 			</DuckDbProvider>
 		);
 	}
