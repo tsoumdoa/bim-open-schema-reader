@@ -17,7 +17,7 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QueryObject } from "../utils/types";
 import {
 	Tooltip,
@@ -31,6 +31,30 @@ export function AddQuery(props: {
 	setDisplayExpanded: (b: number) => void;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
+
+	useEffect(() => {
+		// Open the dialog with Cmd+K (macOS) or Ctrl+K (others),
+		// but don't trigger while typing or when already open.
+		const onKeyDown = (e: KeyboardEvent) => {
+			const target = e.target as HTMLElement | null;
+			if (target && target.closest('input, textarea, [contenteditable="true"]'))
+				return;
+			const key = e.key.toLowerCase();
+			const isMac = navigator.platform.toLowerCase().includes("mac");
+			const isShortcut =
+				(isMac ? e.metaKey && !e.ctrlKey : e.ctrlKey) && key === "k";
+
+			if (isShortcut) {
+				e.preventDefault();
+				if (!isOpen) {
+					setIsOpen(true);
+					props.setDisplayExpanded(-1);
+				}
+			}
+		};
+		document.addEventListener("keydown", onKeyDown);
+		return () => document.removeEventListener("keydown", onKeyDown);
+	}, [isOpen, props.setDisplayExpanded]);
 
 	const handleSelectCommand = (
 		queryCategory: string,
