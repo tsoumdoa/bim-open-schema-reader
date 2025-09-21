@@ -29,11 +29,11 @@ export default function SideBarContent(props: {
 }) {
 	return (
 		<div className="space-y-1">
-			<AccordionDisplay accordionTitle="Analytical">
+			<AccordionDisplay accordionTitle="Table Schema">
 				<DisplayTableInfo />
 			</AccordionDisplay>
-			<AccordionDisplay accordionTitle="Category">
-				<ListDataByCategories />
+			<AccordionDisplay accordionTitle="Category Stats">
+				<ListDataByCategories useExpandDisplay={props.useExpandDisplay} />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Query">
 				<ListQueriesInSidebar useExpandDisplay={props.useExpandDisplay} />

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 
 export function useExpandDisplay() {
+	const [displayExpanded, setDisplayExpanded] = useState(-1);
 	const queryItemRefs = useRef<(HTMLDivElement | null)[]>([]);
 	useEffect(() => {
 		const escListener = (e: KeyboardEvent) => {
@@ -16,7 +17,6 @@ export function useExpandDisplay() {
 		};
 	}, []);
 
-	const [displayExpanded, setDisplayExpanded] = useState(-1);
 	const handleScrollBack = () => {
 		if (displayExpanded !== -1 && queryItemRefs.current[displayExpanded]) {
 			const headerOffset = 84; // height of fixed header + some offset in px

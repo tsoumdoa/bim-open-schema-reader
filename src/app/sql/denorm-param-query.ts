@@ -99,7 +99,7 @@ export const denormPointsParams = (categoryName: string) => sql`
   SELECT
     LocalId,
     name,
-    VALUE,
+    name_1,
     X,
     Y,
     Z,
