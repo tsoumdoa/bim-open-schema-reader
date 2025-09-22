@@ -1,7 +1,7 @@
 import Link from "next/link";
 export default function Header() {
 	return (
-		<header className="border-foreground bg-background sticky top-0 z-50 w-full border-b-4">
+		<header className="border-foreground bg-background w-full border-b-4">
 			<div className="w-full p-1">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center space-x-3">

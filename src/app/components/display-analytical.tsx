@@ -23,7 +23,7 @@ import QueryObjProvider, { useQueryObjCtx } from "./query-obj-provider";
 
 function DashboardHeader(props: { fileName: string }) {
 	return (
-		<div className="flex flex-row items-center justify-start gap-x-1">
+		<div className="sticky top-0 z-50 flex flex-row items-center justify-start gap-x-1 bg-white px-2">
 			<SidebarTrigger className="" />
 			<p className="py-2 text-sm">
 				file name: <span className="font-bold">{props.fileName}</span>
@@ -48,7 +48,7 @@ function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 	const { queryItemRefs, displayExpanded, setDisplayExpanded } = useExpDis;
 
 	return (
-		<div className="flex h-full min-h-0 max-w-full flex-1 flex-col gap-y-2">
+		<div className="flex h-full min-h-0 max-w-full flex-1 flex-col gap-y-2 pr-2 pl-6">
 			{queryObjects.length > 0 &&
 				queryObjects.map((q, i) => {
 					return (
@@ -78,7 +78,7 @@ function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 
 function SideBar(props: { useExpandDisplay: UseExpandDisplay }) {
 	return (
-		<Sidebar className="h-full pt-11">
+		<Sidebar className="h-full">
 			<div className="overflow-auto p-2">
 				<SideBarContent useExpandDisplay={props.useExpandDisplay} />
 			</div>
