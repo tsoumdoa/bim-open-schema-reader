@@ -32,7 +32,7 @@ export default function SideBarContent(props: {
 			<AccordionDisplay accordionTitle="Table Schema">
 				<DisplayTableInfo />
 			</AccordionDisplay>
-			<AccordionDisplay accordionTitle="Category Stats">
+			<AccordionDisplay accordionTitle="Add Query by Category">
 				<ListDataByCategories useExpandDisplay={props.useExpandDisplay} />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Query">

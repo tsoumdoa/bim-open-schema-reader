@@ -12,7 +12,6 @@ export function makeKeymap({
 			key: "Mod-Shift-Enter",
 			preventDefault: true,
 			run: () => {
-				console.log("run");
 				onRun();
 				return true;
 			},

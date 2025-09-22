@@ -68,3 +68,25 @@ export type DuckDBCtx = {
 export type QueryObjectCtx = {
 	useQueryObjects: UseQueryObjects;
 };
+
+// for categorizing categories
+export const generalCategory = [
+	"Architecture",
+	"Level & Grid",
+	"Room & Area",
+	"Structure",
+	"M&E",
+	"Annotate",
+	"Massing & Site",
+	"View",
+	"Materials",
+	"Misc",
+] as const;
+export type GeneralCategory = (typeof generalCategory)[number];
+
+export type CategoryObj = {
+	generalCategory: GeneralCategory;
+	categoryNames: string[];
+};
+
+export type CategoryObjs = CategoryObj[];
