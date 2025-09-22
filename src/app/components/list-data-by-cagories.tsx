@@ -11,14 +11,19 @@ import { denormParamQueryBuilderName } from "../utils/queries-selector-list";
 import { Separator } from "@/components/ui/separator";
 import { useQueryObjCtx } from "./query-obj-provider";
 import { denormParamQueryBuilder } from "../utils/denorm-param-query-builder";
-import { DenormTableName, UseExpandDisplay } from "../utils/types";
+import {
+	DenormTableName,
+	generalCategory,
+	UseExpandDisplay,
+} from "../utils/types";
 import { useEffect, useState } from "react";
+import { findCategoryGroup } from "../utils/categorize-categories";
 
 function DropDownMenu(props: {
 	categoryName: string;
 	useExpandDisplay: UseExpandDisplay;
-	setFocused: (focused: number) => void;
-	index: number;
+	setFocused: (focused: string) => void;
+	indexKey: string;
 }) {
 	const { useQueryObjects } = useQueryObjCtx();
 	const { setDisplayExpanded } = props.useExpandDisplay;
@@ -50,9 +55,9 @@ function DropDownMenu(props: {
 		<DropdownMenu
 			onOpenChange={(open) => {
 				if (open) {
-					props.setFocused(props.index);
+					props.setFocused(props.indexKey);
 				} else {
-					props.setFocused(-1);
+					props.setFocused("");
 				}
 			}}
 		>
@@ -88,41 +93,67 @@ export default function ListDataByCategories(props: {
 }) {
 	const { conn } = useDuckDb();
 	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
-	const [focused, setFocused] = useState(-1);
-	useEffect(() => {
-		console.log(focused);
-	}, [focused]);
+	const [focused, setFocused] = useState("");
+
+	const categoryGorupMap = new Map<string, [string, number][]>();
+
+	for (const row of rows) {
+		const categoryName = findCategoryGroup(row[0] as string);
+		if (!categoryGorupMap.has(categoryName)) {
+			categoryGorupMap.set(categoryName, []);
+		}
+		categoryGorupMap
+			.get(categoryName)
+			?.push([row[0] as string, row[1] as number]);
+	}
 
 	return (
 		<div className="flex flex-col text-xs">
 			<div className="overflow-x-auto">
-				<table className="w-full table-auto">
-					<thead>
-						<tr className="tracking-tight">
-							<th className="text-left">Name</th>
-							<th className="text-left">Count</th>
-						</tr>
-					</thead>
-					<tbody>
-						{rows &&
-							rows.map((row, index) => (
-								<tr
-									key={`category-count-${index}`}
-									className={`transition-all hover:bg-neutral-200 ${focused !== -1 && focused !== index && "opacity-20"} `}
+				{generalCategory.map((categoryName, categoryIndex) => {
+					return (
+						<div key={`category-${categoryIndex}`}>
+							<div
+								className={`text-sm font-bold ${focused !== "" && focused.split("-")[0] !== `${categoryIndex}` && "opacity-20"} `}
+							>
+								{categoryName}
+							</div>
+							<table className="w-full table-auto">
+								<thead
+									className={`${focused !== "" && focused.split("-")[0] !== `${categoryIndex}` && "opacity-20"}`}
 								>
-									<td className="px-1 text-left tracking-tight">
-										<DropDownMenu
-											categoryName={(row[0] as string) || ""}
-											useExpandDisplay={props.useExpandDisplay}
-											setFocused={setFocused}
-											index={index}
-										/>
-									</td>
-									<td className="pr-1 text-right">{row[1].toLocaleString()}</td>
-								</tr>
-							))}
-					</tbody>
-				</table>
+									<tr className="tracking-tight text-neutral-800">
+										<th className="text-left">Name</th>
+										<th className="text-right">Count</th>
+									</tr>
+								</thead>
+								<tbody>
+									{categoryGorupMap
+										.get(categoryName)
+										?.map((row, groupIndex) => (
+											<tr
+												key={`category-count-${groupIndex}`}
+												className={`transition-all hover:bg-neutral-200 ${focused !== "" && focused !== `${categoryIndex}-${groupIndex}` && "opacity-20"} `}
+											>
+												<td className="px-1 text-left tracking-tight">
+													<DropDownMenu
+														categoryName={(row[0] as string) || ""}
+														useExpandDisplay={props.useExpandDisplay}
+														setFocused={setFocused}
+														indexKey={`${categoryIndex}-${groupIndex}`}
+													/>
+												</td>
+												<td className="pr-1 text-right">
+													{row[1].toLocaleString()}
+												</td>
+											</tr>
+										))}
+								</tbody>
+							</table>
+							<Separator className="my-2" />
+						</div>
+					);
+				})}
 			</div>
 		</div>
 	);

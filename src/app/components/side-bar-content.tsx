@@ -29,10 +29,13 @@ export default function SideBarContent(props: {
 }) {
 	return (
 		<div className="space-y-1">
+			<div className="text-sm font-bold text-gray-900">
+				Open BIM Schema Reader
+			</div>
 			<AccordionDisplay accordionTitle="Table Schema">
 				<DisplayTableInfo />
 			</AccordionDisplay>
-			<AccordionDisplay accordionTitle="Category Stats">
+			<AccordionDisplay accordionTitle="Add Query by Category">
 				<ListDataByCategories useExpandDisplay={props.useExpandDisplay} />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Query">
