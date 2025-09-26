@@ -5,6 +5,9 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { denormParamQueryBuilderName } from "../utils/queries-selector-list";
@@ -39,8 +42,15 @@ function DropDownMenu(props: {
 		});
 	}, [queryObjects]);
 
-	const handleClick = (tableName: DenormTableName) => {
-		const queryObj = denormParamQueryBuilder(tableName, props.categoryName);
+	const handleClick = (
+		tableName: DenormTableName,
+		usePivot: boolean = false
+	) => {
+		const queryObj = denormParamQueryBuilder(
+			tableName,
+			props.categoryName,
+			usePivot
+		);
 		addQuery(queryObj);
 	};
 
@@ -67,15 +77,37 @@ function DropDownMenu(props: {
 				</span>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" side="bottom" className="text-xs">
-				{denormParamQueryBuilderName.map((item, index) => (
-					<DropdownMenuItem
-						key={`item-${index}`}
-						className="text-xs"
-						onClick={() => handleClick(item.tableName)}
-					>
-						{item.displayName}
-					</DropdownMenuItem>
-				))}
+				{denormParamQueryBuilderName.map((item, index) =>
+					item.hasPivot ? (
+						<DropdownMenuSub key={`query-builder-dropdown-item-${index}`}>
+							<DropdownMenuSubTrigger className="text-xs">
+								{item.displayName}
+							</DropdownMenuSubTrigger>
+							<DropdownMenuSubContent className="w-fit">
+								<DropdownMenuItem
+									className="w-fit text-xs font-medium hover:cursor-pointer"
+									onClick={() => handleClick(item.tableName)}
+								>
+									Flatten
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									className="w-fit text-xs font-medium hover:cursor-pointer"
+									onClick={() => handleClick(item.tableName, true)}
+								>
+									Pivot
+								</DropdownMenuItem>
+							</DropdownMenuSubContent>
+						</DropdownMenuSub>
+					) : (
+						<DropdownMenuItem
+							key={`item-${index}`}
+							className="text-xs hover:cursor-pointer"
+							onClick={() => handleClick(item.tableName)}
+						>
+							{item.displayName}
+						</DropdownMenuItem>
+					)
+				)}
 				<Separator className="" />
 				<DropdownMenuItem
 					className="text-xs font-bold"

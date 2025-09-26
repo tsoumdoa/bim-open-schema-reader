@@ -112,6 +112,105 @@ export const denormPointsParams = (categoryName: string) => sql`
     index
 `;
 
+export const denormPointsParamsPivot = (categoryName: string) => sql`
+  WITH
+    pt_data AS (
+      SELECT
+        *
+      FROM
+        denorm_entities AS e
+        INNER JOIN denorm_points_params AS p ON e.index = p.entity
+        INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+      WHERE
+        e.category = '${categoryName}'
+    )
+  SELECT
+    localid,
+    name,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Bounds.Min' THEN x
+      END
+    ) AS bounds_min_x,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Bounds.Min' THEN y
+      END
+    ) AS bounds_min_y,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Bounds.Min' THEN z
+      END
+    ) AS bounds_min_z,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Bounds.Max' THEN x
+      END
+    ) AS bounds_max_x,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Bounds.Max' THEN y
+      END
+    ) AS bounds_max_y,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Bounds.Max' THEN z
+      END
+    ) AS bounds_max_z,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.Point' THEN x
+      END
+    ) AS location_pt_x,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.Point' THEN y
+      END
+    ) AS location_pt_y,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.Point' THEN z
+      END
+    ) AS location_pt_z,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.StartPoint' THEN x
+      END
+    ) AS location_start_pt_x,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.StartPoint' THEN y
+      END
+    ) AS location_start_pt_y,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.StartPoint' THEN z
+      END
+    ) AS location_start_pt_z,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.EndPoint' THEN x
+      END
+    ) AS location_end_pt_x,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.EndPoint' THEN y
+      END
+    ) AS location_end_pt_y,
+    MAX(
+      CASE
+        WHEN name_1 = 'rvt:Element:Location.EndPoint' THEN z
+      END
+    ) AS location_end_pt_z
+  FROM
+    pt_data
+  GROUP BY
+    localid,
+    name
+  ORDER BY
+    localid;
+`;
+
 export const denormStringParams = (categoryName: string) => sql`
   WITH
     str_data AS (
