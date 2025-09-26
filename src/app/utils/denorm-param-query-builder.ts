@@ -3,6 +3,7 @@ import {
 	denormEntityParams,
 	denormIntegerParams,
 	denormPointsParams,
+	denormPointsParamsPivot,
 	denormStringParams,
 } from "../sql/denorm-param-query";
 import { DenormTableName, QueryObject } from "./types";
@@ -10,7 +11,8 @@ import { denormParamQueryBuilderName } from "./queries-selector-list";
 
 export function denormParamQueryBuilder(
 	paramType: DenormTableName,
-	categoryName: string
+	categoryName: string,
+	usePivot: boolean = false
 ): QueryObject {
 	const title = denormParamQueryBuilderName.find(
 		(q) => q.tableName === paramType
@@ -36,7 +38,9 @@ export function denormParamQueryBuilder(
 			break;
 
 		case "denorm_points_params":
-			queryObj.sqlQuery = denormPointsParams(categoryName);
+			queryObj.sqlQuery = usePivot
+				? denormPointsParamsPivot(categoryName)
+				: denormPointsParams(categoryName);
 			break;
 
 		case "denorm_string_params":
