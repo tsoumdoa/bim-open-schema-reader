@@ -71,15 +71,21 @@ export type QueryObjectCtx = {
 
 // for categorizing categories
 export const generalCategory = [
+	"Project Setting",
 	"Architecture",
+	"Curtain Wall System",
 	"Level & Grid",
 	"Room & Area",
 	"Structure",
 	"M&E",
-	"Annotate",
-	"Massing & Site",
-	"View",
+	"Massing, Site & Landscape",
 	"Materials",
+	"Wall Assembly",
+	"Model Elements",
+	"View",
+	"RVT & CAD Links",
+	"Analytical",
+	"Annotate",
 	"Misc",
 ] as const;
 export type GeneralCategory = (typeof generalCategory)[number];
