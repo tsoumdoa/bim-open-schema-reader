@@ -98,39 +98,6 @@ function DropDownMenu(props: {
 	);
 }
 
-const formatQueryName = (
-	queryObject: QueryObject,
-	duplicated: boolean,
-	queryState: QueryState,
-	qureyTitleState: QueryTitleState,
-	newTitle: string
-) => {
-	switch (queryState) {
-		case "original":
-			return (
-				<span>
-					{`${queryObject.queryTitle} `}{" "}
-					<span className="text-xs text-neutral-500">{`<${queryObject.queryCategory || "n/a"}>`}</span>
-					{duplicated && (
-						<span className="text-xs text-neutral-500">{` [${queryObject.id}]`}</span>
-					)}
-				</span>
-			);
-		case "edited":
-			if (qureyTitleState === "edited") {
-				return <span>{newTitle}</span>;
-			}
-			return (
-				<span>
-					{queryObject.queryTitle}{" "}
-					<span className="text-cs text-amber-500">{`<edited>`}</span>
-				</span>
-			);
-		default:
-			return <span>{queryObject.queryTitle}</span>;
-	}
-};
-
 export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
@@ -165,23 +132,15 @@ export default function QueryDisplayItem(props: {
 	const titleInputRef = useRef<HTMLInputElement | null>(null);
 
 	const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const v = e.target.value;
-		setTitleInputValue(v);
-		if (v !== props.queryObject.queryTitle) {
+		const newTitle = e.target.value;
+		setTitleInputValue(newTitle);
+		if (newTitle !== props.queryObject.queryTitle) {
 			setQueryTitleState("edited");
-			props.updateQueryTitle(props.queryObject, v);
+			props.updateQueryTitle(props.queryObject, newTitle);
 		} else {
 			setQueryTitleState("original");
 		}
 	};
-
-	const queryName = formatQueryName(
-		props.queryObject,
-		props.isDuplicated,
-		queryState,
-		queryTitleState,
-		titleInputValue
-	);
 
 	const fileDownloadName = formatForFileDownload(
 		queryState === "edited"
@@ -223,7 +182,10 @@ export default function QueryDisplayItem(props: {
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
 				{showNormalTitle ? (
-					queryName
+					<span>
+						<span className="pr-2 text-base font-semibold">{`Query ${props.index + 1}`}</span>
+						{props.queryObject.queryTitle}
+					</span>
 				) : (
 					<Input
 						type="title"
@@ -256,6 +218,10 @@ export default function QueryDisplayItem(props: {
 					setQueryState={setQueryState}
 					queryDisplayState={queryDisplayState}
 					setQueryDisplayState={setQueryDisplayState}
+					titleInputValue={titleInputValue}
+					queryTitleState={queryTitleState}
+					updateQueryTitle={props.updateQueryTitle}
+					queryObject={props.queryObject}
 				/>
 			)}
 
