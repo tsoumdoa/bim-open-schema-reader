@@ -17,7 +17,9 @@ import { dracula } from "@uiw/codemirror-theme-dracula";
 import {
 	QueryDisplayState,
 	QueryEditorState,
+	QueryObject,
 	QueryState,
+	QueryTitleState,
 } from "../utils/types";
 import { makeKeymap } from "../utils/code-mirror-keymaps";
 
@@ -173,12 +175,15 @@ export default function SqlQueryCodeBlock(props: {
 	queryDisplayState: QueryDisplayState;
 	queryEditorState: QueryEditorState;
 	queryState: QueryState;
+	queryTitleState: QueryTitleState;
+	queryObject: QueryObject;
 	setSqlQuery: (b: string) => void;
 	setNewSqlQuery: (b: string) => void;
 	setDraftSql: (b: string) => void;
 	setQueryDisplayState: (b: QueryDisplayState) => void;
 	setQueryEditorState: (b: QueryEditorState) => void;
 	setQueryState: (b: QueryState) => void;
+	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [nodes, setNodes] = useState<JSX.Element>();
@@ -227,6 +232,13 @@ export default function SqlQueryCodeBlock(props: {
 			const formatedQuery = runFormat(props.draftSql);
 			props.setQueryState("edited");
 			props.setSqlQuery(formatedQuery);
+		}
+		//add * if the query is edited but the title is not edited
+		if (props.queryTitleState === "original" && props.queryState === "edited") {
+			props.updateQueryTitle(
+				props.queryObject,
+				props.queryObject.queryTitle + "*"
+			);
 		}
 		props.setQueryDisplayState("viewer");
 		props.setQueryEditorState("initial");
