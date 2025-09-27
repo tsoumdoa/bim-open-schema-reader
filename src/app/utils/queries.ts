@@ -157,7 +157,7 @@ export const listAllTableInfoWithColumnInfo = sql`
 export const listCountByCategory = sql`
   SELECT
     e.category AS paramname,
-    COUNT(*) AS count
+    COUNT(DISTINCT e.index) AS count
   FROM
     denorm_entities AS e
     LEFT OUTER JOIN entityparameters AS ep ON e.index = ep.entity

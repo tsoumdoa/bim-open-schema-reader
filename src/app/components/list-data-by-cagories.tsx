@@ -138,7 +138,6 @@ export default function ListDataByCategories(props: {
 			.get(categoryName)
 			?.push([row[0] as string, row[1] as number]);
 	}
-	// TODO: think about hot add menu bar...
 
 	return (
 		<div className="flex flex-col text-xs">
