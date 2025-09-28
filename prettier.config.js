@@ -9,11 +9,7 @@ const config = {
   tabWidth: 2,
   semi: true,
   singleQuote: false,
-  plugins: [
-    "prettier-plugin-sql",
-    "prettier-plugin-embed",
-    "prettier-plugin-tailwindcss",
-  ],
+  plugins: ["prettier-plugin-sql", "prettier-plugin-embed", "prettier-plugin-tailwindcss"],
   embeddedSqlTags: ["sql"],
   language: "sql",
   keywordCase: "upper",
