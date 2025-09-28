@@ -1,6 +1,6 @@
 import { sql } from "../utils/queries";
 
-export const viewCountUnplacedViews = sql`
+export const countUnplacedViews = sql`
   WITH
     str_data AS (
       SELECT

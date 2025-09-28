@@ -3,7 +3,11 @@ import {
 	listGridWithCoredStatus,
 	listLevelWithCoredStatus,
 } from "../sql/level-and-grid-codrination-status";
-import { viewCountUnplacedViews } from "../sql/view-count-unplaced-views";
+import { basicViewInfo } from "../sql/view-basic-info";
+import { countByViewFamily } from "../sql/view-count-by-view-family";
+import { countViewByFamilyAndType } from "../sql/view-count-by-view-family-and-type";
+import { countByViewType } from "../sql/view-count-by-view-type";
+import { countUnplacedViews } from "../sql/view-count-unplaced-views";
 import { listWallBuildUps } from "../sql/wall-build-ups";
 import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
 import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
@@ -67,10 +71,30 @@ const walls: QueriesSelector = {
 const views: QueriesSelector = {
 	queryCategory: "Views",
 	queryObjects: [
+		// {
+		// 	queryTitle: "Basic view info",
+		// 	sqlQuery: basicViewInfo,
+		// 	explaination: "Basic info for each view",
+		// },
 		{
-			queryTitle: "View count unplaced views",
-			sqlQuery: viewCountUnplacedViews,
-			explaination: "View count unplaced views",
+			queryTitle: "Count unplaced views",
+			sqlQuery: countUnplacedViews,
+			explaination: "Count number of placed and unplaced views",
+		},
+		{
+			queryTitle: "Count by view family",
+			sqlQuery: countByViewFamily,
+			explaination: "Count number of views by view family",
+		},
+		{
+			queryTitle: "Count by view type",
+			sqlQuery: countByViewType,
+			explaination: "Count number of views by view type",
+		},
+		{
+			queryTitle: "Count by view family and type",
+			sqlQuery: countViewByFamilyAndType,
+			explaination: "Count number of views by view family and type",
 		},
 	],
 };
