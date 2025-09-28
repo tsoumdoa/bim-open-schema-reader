@@ -3,65 +3,84 @@ import {
 	listGridWithCoredStatus,
 	listLevelWithCoredStatus,
 } from "../sql/level-and-grid-codrination-status";
+import { viewCountUnplacedViews } from "../sql/view-count-unplaced-views";
 import { listWallBuildUps } from "../sql/wall-build-ups";
 import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
 import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
 import { DenormTableName, QueriesSelector } from "./types";
 
+const levels: QueriesSelector = {
+	queryCategory: "Levels",
+	queryObjects: [
+		{
+			queryTitle: "List all levels",
+			sqlQuery: listLevels,
+			explaination: "List all levels along with their coordinates",
+		},
+		{
+			queryTitle: "Levels cordination view",
+			sqlQuery: listLevelWithCoredStatus,
+			explaination:
+				"Compare levels with the linked models to check if they are in the same location",
+		},
+	],
+};
+
+const grids: QueriesSelector = {
+	queryCategory: "Grids",
+	queryObjects: [
+		{
+			queryTitle: "List all grids",
+			sqlQuery: listGrids,
+			explaination: "List all grids along with their coordinates",
+		},
+		{
+			queryTitle: "Grids cordination view",
+			sqlQuery: listGridWithCoredStatus,
+			explaination:
+				"Compare grids with the linked models to check if they are in the same location",
+		},
+	],
+};
+
+const walls: QueriesSelector = {
+	queryCategory: "Walls",
+	queryObjects: [
+		{
+			queryTitle: "Wall double and point parameters",
+			sqlQuery: wallDoubleAndPointParameters,
+			explaination: "Wall double and point parameters",
+		},
+		{
+			queryTitle: "Wall element basic info",
+			sqlQuery: wallElementBasicInfo,
+			explaination: "Wall element basic info",
+		},
+		{
+			queryTitle: "Wall build up schedule",
+			sqlQuery: listWallBuildUps,
+			explaination: "Wall build up schedule",
+		},
+	],
+};
+
+const views: QueriesSelector = {
+	queryCategory: "Views",
+	queryObjects: [
+		{
+			queryTitle: "View count unplaced views",
+			sqlQuery: viewCountUnplacedViews,
+			explaination: "View count unplaced views",
+		},
+	],
+};
+
 export const queriesSelectorList: QueriesSelector[] = [
-	{
-		queryCategory: "Levels",
-		queryObjects: [
-			{
-				queryTitle: "List all levels",
-				sqlQuery: listLevels,
-				explaination: "List all levels along with their coordinates",
-			},
-			{
-				queryTitle: "Levels cordination view",
-				sqlQuery: listLevelWithCoredStatus,
-				explaination:
-					"Compare levels with the linked models to check if they are in the same location",
-			},
-		],
-	},
-	{
-		queryCategory: "Grids",
-		queryObjects: [
-			{
-				queryTitle: "List all grids",
-				sqlQuery: listGrids,
-				explaination: "List all grids along with their coordinates",
-			},
-			{
-				queryTitle: "Grids cordination view",
-				sqlQuery: listGridWithCoredStatus,
-				explaination:
-					"Compare grids with the linked models to check if they are in the same location",
-			},
-		],
-	},
-	{
-		queryCategory: "Walls",
-		queryObjects: [
-			{
-				queryTitle: "Wall double and point parameters",
-				sqlQuery: wallDoubleAndPointParameters,
-				explaination: "Wall double and point parameters",
-			},
-			{
-				queryTitle: "Wall element basic info",
-				sqlQuery: wallElementBasicInfo,
-				explaination: "Wall element basic info",
-			},
-			{
-				queryTitle: "Wall build up schedule",
-				sqlQuery: listWallBuildUps,
-				explaination: "Wall build up schedule",
-			},
-		],
-	},
-] as const;
+	levels,
+	grids,
+	walls,
+	views,
+];
 
 export const denormParamQueryBuilderName: {
 	tableName: DenormTableName;

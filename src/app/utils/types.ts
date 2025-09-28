@@ -39,8 +39,11 @@ export type ParquetBlob = {
 	parquet: Uint8Array;
 };
 
+export const queryCategories = ["Levels", "Grids", "Walls", "Views"] as const;
+export type QueryCategory = (typeof queryCategories)[number];
+
 export type QueriesSelector = {
-	queryCategory: string;
+	queryCategory: QueryCategory;
 	queryObjects: QueryObject[];
 };
 

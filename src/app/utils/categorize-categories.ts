@@ -32,6 +32,7 @@ export const archCategory: CategoryObj = {
 		"Floors",
 		"Furniture",
 		"Handrails",
+		"Landings",
 		"Railings",
 		"Ramps",
 		"Roofs",
