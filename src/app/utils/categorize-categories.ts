@@ -29,8 +29,11 @@ export const archCategory: CategoryObj = {
 		"Ceilings",
 		"Columns",
 		"Doors",
+		"Fascias",
 		"Floors",
+		"Furniture Systems",
 		"Furniture",
+		"Gutters",
 		"Handrails",
 		"Landings",
 		"Railings",
@@ -51,10 +54,11 @@ export const curtainWallSystemCategory: CategoryObj = {
 	generalCategory: "Curtain Wall System",
 	categoryNames: [
 		"Curtain Panels",
+		"Curtain Roof Grids",
+		"Curtain System Grid Layout",
+		"Curtain Systems",
 		"Curtain Wall Grids",
 		"Curtain Wall Mullions",
-		"Curtain Systems",
-		"Curtain System Grid Layout",
 	],
 };
 
@@ -336,9 +340,6 @@ export const categoriesCategory: CategoryObjs = [
 ];
 
 export function findCategoryGroup(categoryName: string): GeneralCategory {
-	if (categoryName.endsWith(".dwg")) {
-		return "RVT & CAD Links";
-	}
 	if (categoryName === "RVT Links") {
 		return "RVT & CAD Links";
 	}
@@ -347,6 +348,10 @@ export function findCategoryGroup(categoryName: string): GeneralCategory {
 		if (group.categoryNames.includes(categoryName)) {
 			return group.generalCategory;
 		}
+	}
+
+	if (/\.(dwg)(\s*[\(\[].*[\)\]])?$/i.test(categoryName)) {
+		return "RVT & CAD Links";
 	}
 	return "Misc"; // nothing found
 }
