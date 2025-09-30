@@ -1,6 +1,6 @@
 import { CategoryObj, CategoryObjs, GeneralCategory } from "./types";
 
-export const projectSettingCategory: CategoryObj = {
+const projectSettingCategory: CategoryObj = {
 	generalCategory: "Project Setting",
 	categoryNames: [
 		"Design Option Sets",
@@ -16,7 +16,7 @@ export const projectSettingCategory: CategoryObj = {
 	],
 };
 
-export const archCategory: CategoryObj = {
+const archCategory: CategoryObj = {
 	generalCategory: "Architecture",
 	categoryNames: [
 		"<Stair/Ramp Sketch: Boundary>",
@@ -24,6 +24,7 @@ export const archCategory: CategoryObj = {
 		"<Stair/Ramp Sketch: Riser>",
 		"<Stair/Ramp Sketch: Run>",
 		"<Stair/Ramp Sketch: Stair Path>",
+		"<Path of Travel Lines>",
 		"Balusters",
 		"Casework",
 		"Ceilings",
@@ -44,10 +45,11 @@ export const archCategory: CategoryObj = {
 		"Vertical Circulation",
 		"Walls",
 		"Windows",
+		"Wall Sweeps",
 	],
 };
 
-export const curtainWallSystemCategory: CategoryObj = {
+const curtainWallSystemCategory: CategoryObj = {
 	generalCategory: "Curtain Wall System",
 	categoryNames: [
 		"Curtain Panels",
@@ -58,7 +60,7 @@ export const curtainWallSystemCategory: CategoryObj = {
 	],
 };
 
-export const levelGridCategory: CategoryObj = {
+const levelGridCategory: CategoryObj = {
 	generalCategory: "Level & Grid",
 	categoryNames: [
 		"Center Line",
@@ -73,7 +75,7 @@ export const levelGridCategory: CategoryObj = {
 	],
 };
 
-export const roomAreaCategory: CategoryObj = {
+const roomAreaCategory: CategoryObj = {
 	generalCategory: "Room & Area",
 	categoryNames: [
 		"<Area Based Load Boundary>",
@@ -85,13 +87,12 @@ export const roomAreaCategory: CategoryObj = {
 		"Area Schemes",
 		"Space Separation",
 		"Spaces",
-		"Space Tags",
 		"Space Type Settings",
 		"Analytical Spaces",
 	],
 };
 
-export const structureCategory: CategoryObj = {
+const structureCategory: CategoryObj = {
 	generalCategory: "Structure",
 	categoryNames: [
 		"Bearings",
@@ -99,14 +100,9 @@ export const structureCategory: CategoryObj = {
 		"Plates",
 		"Point Loads",
 		"Slab Edges",
-		"Structural Beam System Tags",
-		"Structural Beam Systems",
-		"Structural Column Tags",
 		"Structural Columns",
 		"Structural Connections",
-		"Structural Foundation Tags",
 		"Structural Foundations",
-		"Structural Framing Tags",
 		"Structural Framing",
 		"Structural Load Cases",
 		"Structural Loads",
@@ -118,43 +114,33 @@ export const structureCategory: CategoryObj = {
 	],
 };
 
-export const mepCategory: CategoryObj = {
+const mepCategory: CategoryObj = {
 	generalCategory: "M&E",
 	categoryNames: [
 		"Air Terminals",
 		"Mechanical Equipment",
-		"Mechanical Equipment Tags",
 		"Plumbing Fixtures",
 		"Plumbing Equipment",
-		"Plumbing Equipment Tags",
 		"Pipe Fittings",
 		"Pipe Accessories",
 		"Pipe Segments",
 		"Pipes",
-		"Pipe Tags",
 		"Piping Systems",
 		"Valves",
 		"Ducts",
-		"Duct Tags",
 		"Duct Fittings",
 		"Duct Systems",
 		"Flex Ducts",
-		"Flex Duct Tags",
 		"Conduits",
 		"Conduit Runs",
-		"Conduit Tags",
 		"Conduit Fittings",
 		"Electrical Fixtures",
-		"Electrical Fixture Tags",
 		"Lighting Fixtures",
-		"Lighting Fixture Tags",
 		"Lighting Devices",
 		"Electrical Equipment",
-		"Electrical Equipment Tags",
 		"Data Devices",
 		"Distribution Systems",
 		"Wires",
-		"Wire Tags",
 		"Wire Materials",
 		"Wire Insulations",
 		"Electrical Circuits",
@@ -173,12 +159,9 @@ export const mepCategory: CategoryObj = {
 	],
 };
 
-export const annotateCategory: CategoryObj = {
+const annotateCategory: CategoryObj = {
 	generalCategory: "Annotate",
 	categoryNames: [
-		"Room Tags",
-		"Area Tags",
-		"Area Based Load Tags",
 		"Callout Heads",
 		"Color Fill Legends",
 		"Color Fill Schema",
@@ -188,21 +171,16 @@ export const annotateCategory: CategoryObj = {
 		"Detail Item Tags",
 		"Detail Items",
 		"Dimensions",
-		"Door Tags",
 		"Elevation Marks",
 		"Generic Annotations",
 		"Keynote Tags",
 		"Legend Components",
 		"Material Tags",
 		"Multi-Category Tags",
-		"Parking Tags",
 		"Path of Travel Lines",
-		"Path of Travel Tags",
-		"Planting Tags",
 		"Revision Cloud Tags",
 		"Revision Clouds",
 		"Revision Numbering Sequences",
-		"Room Tags",
 		"Section Marks",
 		"Span Direction Symbol",
 		"Spot Coordinates",
@@ -211,21 +189,10 @@ export const annotateCategory: CategoryObj = {
 		"Spot Slopes",
 		"Text Notes",
 		"View Titles",
-		"Wall Tags",
-		"Window Tags",
-		"Roof Tags",
-		"Stair Tags",
-		"Railing Tags",
-		"Curtain Panel Tags",
-		"Ceiling Tags",
-		"Furniture Tags",
-		"Generic Model Tags",
-		"Wall Sweep Tags",
-		"Floor Tags",
 	],
 };
 
-export const massingSiteCategory: CategoryObj = {
+const massingSiteCategory: CategoryObj = {
 	generalCategory: "Massing, Site & Landscape",
 	categoryNames: [
 		"Mass",
@@ -238,7 +205,6 @@ export const massingSiteCategory: CategoryObj = {
 		"Site",
 		"Property Lines",
 		"Property Line Segments",
-		"Property Line Segment Tags",
 		"Primary Contours",
 		"Shared Site",
 		"Survey Point",
@@ -249,7 +215,7 @@ export const massingSiteCategory: CategoryObj = {
 	],
 };
 
-export const modelElementsCategory: CategoryObj = {
+const modelElementsCategory: CategoryObj = {
 	generalCategory: "Model Elements",
 	categoryNames: [
 		"Model Groups",
@@ -270,7 +236,7 @@ export const modelElementsCategory: CategoryObj = {
 	],
 };
 
-export const viewCategory: CategoryObj = {
+const viewCategory: CategoryObj = {
 	generalCategory: "View",
 	categoryNames: [
 		"Views",
@@ -292,7 +258,7 @@ export const viewCategory: CategoryObj = {
 	],
 };
 
-export const materialsCategory: CategoryObj = {
+const materialsCategory: CategoryObj = {
 	generalCategory: "Materials",
 	categoryNames: [
 		"Materials",
@@ -302,18 +268,71 @@ export const materialsCategory: CategoryObj = {
 	],
 };
 
-export const wallAssemblyCategory: CategoryObj = {
+const wallAssemblyCategory: CategoryObj = {
 	generalCategory: "Wall Assembly",
 	categoryNames: ["Substrate", "Membrane", "Finish1", "Finish2", "Insulation"],
 };
 
-export const analyticalCategory: CategoryObj = {
+const analyticalCategory: CategoryObj = {
 	generalCategory: "Analytical",
 	categoryNames: [
 		"Analytical Members",
 		"Analytical Nodes",
 		"Analytical Openings",
 		"Analytical Panels",
+	],
+};
+
+const architectureTagsCategory: CategoryObj = {
+	generalCategory: "Architecture Tags",
+	categoryNames: [
+		"Area Tags",
+		"Ceiling Tags",
+		"Curtain Panel Tags",
+		"Door Tags",
+		"Floor Tags",
+		"Furniture Tags",
+		"Generic Model Tags",
+		"Parking Tags",
+		"Path of Travel Tags",
+		"Planting Tags",
+		"Property Line Segment Tags",
+		"Railing Tags",
+		"Roof Tags",
+		"Room Tags",
+		"Space Tags",
+		"Stair Tags",
+		"Wall Sweep Tags",
+		"Wall Tags",
+		"Window Tags",
+	],
+};
+
+const structureTagsCategory: CategoryObj = {
+	generalCategory: "Structure Tags",
+	categoryNames: [
+		"Area Based Load Tags",
+		"Structural Beam System Tags",
+		"Structural Beam Systems",
+		"Structural Column Tags",
+		"Structural Foundation Tags",
+		"Structural Framing Tags",
+	],
+};
+
+const mepTagsCategory: CategoryObj = {
+	generalCategory: "M&E Tags",
+	categoryNames: [
+		"Conduit Tags",
+		"Duct Tags",
+		"Electrical Equipment Tags",
+		"Electrical Fixture Tags",
+		"Flex Duct Tags",
+		"Lighting Fixture Tags",
+		"Mechanical Equipment Tags",
+		"Pipe Tags",
+		"Plumbing Equipment Tags",
+		"Wire Tags",
 	],
 };
 
@@ -332,6 +351,9 @@ export const categoriesCategory: CategoryObjs = [
 	annotateCategory,
 	analyticalCategory,
 	modelElementsCategory,
+	architectureTagsCategory,
+	structureTagsCategory,
+	mepTagsCategory,
 	// miscCategory, // don't include Misc as whatever are not here should be in Misc
 ];
 

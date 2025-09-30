@@ -82,12 +82,11 @@ export function AddQuery(props: {
 					Add Query
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[500px]">
+			<DialogContent className="gap-1 px-6 pt-6 pb-2 sm:max-w-[500px]">
 				<DialogHeader>
 					<DialogTitle> Query Selector</DialogTitle>
 					<DialogDescription>
-						Select a query from the list below to add and run the query.
-						Alternatively, you can creat a custom query with the button below.
+						Select a query from the list below to.
 					</DialogDescription>
 				</DialogHeader>
 				<Command className="rounded-lg border shadow-md md:min-w-[450px]">

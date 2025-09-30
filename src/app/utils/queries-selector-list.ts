@@ -3,6 +3,7 @@ import {
 	listGridWithCoredStatus,
 	listLevelWithCoredStatus,
 } from "../sql/level-and-grid-codrination-status";
+import { basicMaterialsInfo } from "../sql/materials-basic-info";
 import { basicViewInfo } from "../sql/view-basic-info";
 import { countByViewFamily } from "../sql/view-count-by-view-family";
 import { countViewByFamilyAndType } from "../sql/view-count-by-view-family-and-type";
@@ -43,6 +44,18 @@ const grids: QueriesSelector = {
 			sqlQuery: listGridWithCoredStatus,
 			explaination:
 				"Compare grids with the linked models to check if they are in the same location",
+		},
+	],
+};
+
+const materials: QueriesSelector = {
+	queryCategory: "Materials",
+	queryObjects: [
+		{
+			queryTitle: "Materials basic info",
+			sqlQuery: basicMaterialsInfo,
+			explaination:
+				"List visual material properties: Color (hex RGB), Shine (0–128), Glow (0–100), Smoothness (0–100), Shininess (0–100).",
 		},
 	],
 };
@@ -102,6 +115,7 @@ const views: QueriesSelector = {
 export const queriesSelectorList: QueriesSelector[] = [
 	levels,
 	grids,
+	materials,
 	walls,
 	views,
 ];

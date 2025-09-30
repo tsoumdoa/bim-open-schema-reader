@@ -39,7 +39,13 @@ export type ParquetBlob = {
 	parquet: Uint8Array;
 };
 
-export const queryCategories = ["Levels", "Grids", "Walls", "Views"] as const;
+export const queryCategories = [
+	"Grids",
+	"Levels",
+	"Materials",
+	"Views",
+	"Walls",
+] as const;
 export type QueryCategory = (typeof queryCategories)[number];
 
 export type QueriesSelector = {
@@ -75,18 +81,21 @@ export type QueryObjectCtx = {
 // for categorizing categories
 export const generalCategory = [
 	"Project Setting",
+	"RVT & CAD Links",
+	"Level & Grid",
+	"Materials",
+	"Massing, Site & Landscape",
+	"Room & Area",
 	"Architecture",
 	"Curtain Wall System",
-	"Level & Grid",
-	"Room & Area",
-	"Structure",
-	"M&E",
-	"Massing, Site & Landscape",
-	"Materials",
 	"Wall Assembly",
 	"Model Elements",
+	"Structure",
+	"M&E",
 	"View",
-	"RVT & CAD Links",
+	"Architecture Tags",
+	"Structure Tags",
+	"M&E Tags",
 	"Analytical",
 	"Annotate",
 	"Misc",
