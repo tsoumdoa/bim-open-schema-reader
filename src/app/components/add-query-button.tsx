@@ -62,6 +62,7 @@ export function AddQuery(props: {
 				e.preventDefault();
 				props.setDisplayExpanded(-1);
 				handleCreateCustomQuery();
+				return;
 			}
 		};
 		document.addEventListener("keydown", onKeyDown);

@@ -17,7 +17,7 @@ export function makeKeymap({
 			},
 		},
 		{
-			key: "Mod-Shift-i",
+			key: "Mod-Shift-f",
 			preventDefault: true,
 			run: () => {
 				onFormat();
