@@ -46,3 +46,5 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 - [x] improve general UI/ UX... navigation still feels junky (general header,
       sidebara, body relation should be rethought and improved)
 - [ ] clear all button...?
+- [ ] yolo pivot mode (utilzie code gen)
+- [ ] explode mode for better presentationn...
