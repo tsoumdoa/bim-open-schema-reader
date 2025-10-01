@@ -6,15 +6,16 @@ import {
 	QueryState,
 	QueryTitleState,
 } from "../utils/types";
-export default function useQueryViewerAndEditor(query: string) {
+export default function useQueryViewerAndEditor(title: string, query: string) {
 	const handleCancelQueryRef = useRef<{ cancelQuery: () => void }>(null);
 	const formatedQuery = runFormat(query);
 	const [sqlQuery, setSqlQuery] = useState<string>(formatedQuery); //default query
 	const [draftSql, setDraftSql] = useState<string>(formatedQuery); //for edit
 	const [newSqlQuery, setNewSqlQuery] = useState<string>(formatedQuery); //to rerun query
 
-	const [queryDisplayState, setQueryDisplayState] =
-		useState<QueryDisplayState>("hidden");
+	const [queryDisplayState, setQueryDisplayState] = useState<QueryDisplayState>(
+		title === "New Custom Query" ? "editor" : "hidden"
+	);
 	const [queryState, setQueryState] = useState<QueryState>("original");
 	const [queryEditorState, setQueryEditorState] =
 		useState<QueryEditorState>("initial");
