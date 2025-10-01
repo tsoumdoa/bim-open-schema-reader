@@ -43,7 +43,6 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 - [x] cmd+k or ctrl+k to open a dialog to create a new query
 - [x] click on category to generate a query...? (or add it to addible list...?)
 - [x] Categorize categories (e.g. model, m&E , arch, struct, draft, material, unsorted, etc...), can be similar to how Revit ribbon is categorized
-- [ ] improve general UI/ UX... navigation still feels junky (general header,
+- [x] improve general UI/ UX... navigation still feels junky (general header,
       sidebara, body relation should be rethought and improved)
 - [ ] clear all button...?
-- [ ] add number of row returned to the query result object for simpler UI
