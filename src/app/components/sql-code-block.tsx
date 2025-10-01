@@ -22,6 +22,8 @@ import {
 	QueryTitleState,
 } from "../utils/types";
 import { makeKeymap } from "../utils/code-mirror-keymaps";
+import { autocompletion } from "@codemirror/autocomplete";
+import { sqlSchemaCompletions } from "../utils/code-mirror-autocompletion";
 
 function ShikiNodeFormatter(props: { children: JSX.Element }) {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -345,6 +347,10 @@ export default function SqlQueryCodeBlock(props: {
 									props.setDraftSql(formatted);
 								}
 							},
+						}),
+						autocompletion({
+							override: [sqlSchemaCompletions],
+							activateOnTyping: true,
 						}),
 					]}
 					onChange={onChange}
