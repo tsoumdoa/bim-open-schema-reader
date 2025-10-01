@@ -20,6 +20,7 @@ import GoBackToTop from "./go-back-to-top";
 import { DuckDbProvider, useDuckDb } from "./use-db";
 import { useExpandDisplay } from "../hooks/use-expand-display";
 import QueryObjProvider, { useQueryObjCtx } from "./query-obj-provider";
+import { useEffect, useRef } from "react";
 
 function DashboardHeader(props: { fileName: string }) {
 	return (
@@ -46,7 +47,22 @@ function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 		useQueryObjects;
 	const useExpDis = props.useExpandDisplay;
 	const { queryItemRefs, displayExpanded, setDisplayExpanded } = useExpDis;
+	const prevLenRef = useRef<number>(queryObjects.length);
 
+	useEffect(() => {
+		const prevLen = prevLenRef.current;
+		const currLen = queryObjects.length;
+
+		if (currLen > prevLen) {
+			requestAnimationFrame(() => {
+				window.scrollTo({
+					top: document.documentElement.scrollHeight,
+					behavior: "smooth",
+				});
+			});
+		}
+		prevLenRef.current = currLen;
+	}, [queryObjects.length]);
 	return (
 		<div className="flex h-full min-h-0 max-w-full flex-1 flex-col gap-y-2 pr-2 pl-6">
 			{queryObjects.length > 0 &&

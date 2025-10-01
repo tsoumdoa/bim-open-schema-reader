@@ -19,7 +19,7 @@ import {
 	generalCategory,
 	UseExpandDisplay,
 } from "../utils/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { findCategoryGroup } from "../utils/categorize-categories";
 
 function DropDownMenu(props: {
@@ -29,18 +29,7 @@ function DropDownMenu(props: {
 	indexKey: string;
 }) {
 	const { useQueryObjects } = useQueryObjCtx();
-	const { setDisplayExpanded } = props.useExpandDisplay;
-	const { addQueries, addQuery, queryObjects } = useQueryObjects;
-
-	useEffect(() => {
-		setDisplayExpanded(-1);
-		requestAnimationFrame(() => {
-			window.scrollTo({
-				top: document.documentElement.scrollHeight + 600,
-				behavior: "smooth",
-			});
-		});
-	}, [queryObjects]);
+	const { addQueries, addQuery } = useQueryObjects;
 
 	const handleClick = (
 		tableName: DenormTableName,

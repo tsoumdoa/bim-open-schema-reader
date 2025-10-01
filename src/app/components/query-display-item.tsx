@@ -173,7 +173,7 @@ export default function QueryDisplayItem(props: {
 		}
 	}, [displayExpanded]);
 
-	const showNormalTitle =
+	const showTitle =
 		queryDisplayState === "viewer" || queryDisplayState === "hidden";
 
 	return (
@@ -182,20 +182,23 @@ export default function QueryDisplayItem(props: {
 			key={`${props.index}-${props.queryObject.id}`}
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
-				{showNormalTitle ? (
+				{showTitle ? (
 					<span>
 						<span className="pr-2 text-base font-semibold">{`Query ${props.index + 1}`}</span>
 						{props.queryObject.queryTitle}
 					</span>
 				) : (
-					<Input
-						type="title"
-						placeholder={props.queryObject.queryTitle}
-						ref={titleInputRef}
-						value={titleInputValue}
-						onChange={handleTitleInputChange}
-						disabled={queryState === "original"}
-					/>
+					<div className="flex w-full flex-row items-center justify-start">
+						<span className="text-fit w-fit shrink-0 pr-2 text-base font-semibold whitespace-nowrap">{`Query ${props.index + 1}`}</span>
+						<Input
+							type="title"
+							placeholder={props.queryObject.queryTitle}
+							ref={titleInputRef}
+							value={titleInputValue}
+							onChange={handleTitleInputChange}
+							disabled={queryState === "original"}
+						/>
+					</div>
 				)}
 				<DropDownMenu
 					queryObject={props.queryObject}
