@@ -32,24 +32,33 @@ export function AddQuery(props: {
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 
+	const isMac = navigator.platform.toLowerCase().includes("mac");
+
 	useEffect(() => {
-		// Open the dialog with Cmd+K (macOS) or Ctrl+K (others),
-		// but don't trigger while typing or when already open.
 		const onKeyDown = (e: KeyboardEvent) => {
 			const target = e.target as HTMLElement | null;
 			if (target && target.closest('input, textarea, [contenteditable="true"]'))
 				return;
 			const key = e.key.toLowerCase();
-			const isMac = navigator.platform.toLowerCase().includes("mac");
-			const isShortcut =
+			const addQueryShortcut =
 				(isMac ? e.metaKey && !e.ctrlKey : e.ctrlKey) && key === "k";
 
-			if (isShortcut) {
+			const addNewCustomQueryShortcut =
+				(isMac
+					? e.metaKey && e.shiftKey && !e.ctrlKey
+					: e.ctrlKey && e.shiftKey) && key === "k";
+
+			if (addQueryShortcut) {
 				e.preventDefault();
 				if (!isOpen) {
 					setIsOpen(true);
 					props.setDisplayExpanded(-1);
 				}
+			}
+			if (addNewCustomQueryShortcut) {
+				// TODO: investigate why it's not jumping to the bottom
+				e.preventDefault();
+				handleCreateCustomQuery();
 			}
 		};
 		document.addEventListener("keydown", onKeyDown);
@@ -64,10 +73,15 @@ export function AddQuery(props: {
 		props.addQuery(queryObject);
 		setIsOpen(false);
 	};
-	// const handleCreateCustomQuery = () => {
-	// 	// TODO: have to implement
-	// 	setIsOpen(false);
-	// };
+	const handleCreateCustomQuery = () => {
+		const queryObject: QueryObject = {
+			queryTitle: "New Custom Query",
+			explaination: "",
+			sqlQuery: "select * from duckdb_logs",
+		};
+		props.addQuery(queryObject);
+		setIsOpen(false);
+	};
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
@@ -79,14 +93,17 @@ export function AddQuery(props: {
 						props.setDisplayExpanded(-1);
 					}}
 				>
-					Add Query
+					Add Query{" "}
+					<span className="text-xs text-neutral-500">
+						{isMac ? "Cmd+K" : "Ctrl+K"}
+					</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="gap-1 px-6 pt-6 pb-2 sm:max-w-[500px]">
 				<DialogHeader>
 					<DialogTitle> Query Selector</DialogTitle>
-					<DialogDescription>
-						Select a query from the list below to.
+					<DialogDescription className="text-xs text-neutral-500">
+						Select a query from the list below to add.
 					</DialogDescription>
 				</DialogHeader>
 				<Command className="rounded-lg border shadow-md md:min-w-[450px]">
@@ -130,17 +147,15 @@ export function AddQuery(props: {
 						})}
 					</CommandList>
 				</Command>
-				{/*
-
-				<Button
-					type="submit"
-					variant="outline"
-					onClick={handleCreateCustomQuery}
-				>
-					Create a custom Query
-				</Button>
-					*/}
-				<DialogFooter className="flex w-full flex-row justify-start">
+				<DialogFooter className="flex w-full flex-row justify-start pt-2">
+					<Button
+						className="w-fit"
+						type="submit"
+						variant="outline"
+						onClick={handleCreateCustomQuery}
+					>
+						Create a custom Query
+					</Button>
 					<Button
 						type="submit"
 						variant="ghost"
@@ -149,6 +164,7 @@ export function AddQuery(props: {
 						}}
 					>
 						Close
+						<span className="text-neutral-500">esc</span>
 					</Button>
 				</DialogFooter>
 			</DialogContent>
