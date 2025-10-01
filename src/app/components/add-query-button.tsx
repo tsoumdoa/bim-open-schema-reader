@@ -37,27 +37,30 @@ export function AddQuery(props: {
 	useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
 			const target = e.target as HTMLElement | null;
-			if (target && target.closest('input, textarea, [contenteditable="true"]'))
-				return;
+			const isEditable = !!target?.closest(
+				'input, textarea, [contenteditable="true"]'
+			);
 			const key = e.key.toLowerCase();
 			const addQueryShortcut =
 				(isMac ? e.metaKey && !e.ctrlKey : e.ctrlKey) && key === "k";
 
-			const addNewCustomQueryShortcut =
-				(isMac
-					? e.metaKey && e.shiftKey && !e.ctrlKey
-					: e.ctrlKey && e.shiftKey) && key === "k";
+			const addNewCustomQueryShortcut = isMac
+				? e.metaKey && e.shiftKey && !e.ctrlKey && key === "i"
+				: e.ctrlKey && e.shiftKey && !e.metaKey && key === "i";
 
 			if (addQueryShortcut) {
+				if (isEditable) return;
 				e.preventDefault();
 				if (!isOpen) {
 					setIsOpen(true);
 					props.setDisplayExpanded(-1);
 				}
+				return;
 			}
+
 			if (addNewCustomQueryShortcut) {
-				// TODO: investigate why it's not jumping to the bottom
 				e.preventDefault();
+				props.setDisplayExpanded(-1);
 				handleCreateCustomQuery();
 			}
 		};
@@ -73,6 +76,7 @@ export function AddQuery(props: {
 		props.addQuery(queryObject);
 		setIsOpen(false);
 	};
+
 	const handleCreateCustomQuery = () => {
 		const queryObject: QueryObject = {
 			queryTitle: "New Custom Query",
@@ -82,6 +86,7 @@ export function AddQuery(props: {
 		props.addQuery(queryObject);
 		setIsOpen(false);
 	};
+
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
@@ -95,7 +100,7 @@ export function AddQuery(props: {
 				>
 					Add Query{" "}
 					<span className="text-xs text-neutral-500">
-						{isMac ? "Cmd+K" : "Ctrl+K"}
+						{isMac ? "⌘k" : "ctrl+K"}
 					</span>
 				</Button>
 			</DialogTrigger>
@@ -154,7 +159,12 @@ export function AddQuery(props: {
 						variant="outline"
 						onClick={handleCreateCustomQuery}
 					>
-						Create a custom Query
+						<span className="inline-flex items-baseline gap-2">
+							Create a custom Query
+							<span className="text-xs text-neutral-500">
+								{isMac ? "⌘⇧i" : "ctrl+shift+i"}
+							</span>
+						</span>
 					</Button>
 					<Button
 						type="submit"
@@ -163,8 +173,10 @@ export function AddQuery(props: {
 							setIsOpen(false);
 						}}
 					>
-						Close
-						<span className="text-neutral-500">esc</span>
+						<span className="inline-flex items-baseline gap-2">
+							Close
+							<span className="text-xs text-neutral-500">esc</span>
+						</span>
 					</Button>
 				</DialogFooter>
 			</DialogContent>

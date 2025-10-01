@@ -32,15 +32,15 @@ function DropDownMenu(props: {
 	const { setDisplayExpanded } = props.useExpandDisplay;
 	const { addQueries, addQuery, queryObjects } = useQueryObjects;
 
-	useEffect(() => {
-		setDisplayExpanded(-1);
-		requestAnimationFrame(() => {
-			window.scrollTo({
-				top: document.documentElement.scrollHeight + 600,
-				behavior: "smooth",
-			});
-		});
-	}, [queryObjects]);
+	// useEffect(() => {
+	// 	setDisplayExpanded(-1);
+	// 	requestAnimationFrame(() => {
+	// 		window.scrollTo({
+	// 			top: document.documentElement.scrollHeight + 600,
+	// 			behavior: "smooth",
+	// 		});
+	// 	});
+	// }, [queryObjects]);
 
 	const handleClick = (
 		tableName: DenormTableName,
