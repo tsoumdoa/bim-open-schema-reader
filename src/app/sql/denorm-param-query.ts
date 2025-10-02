@@ -39,7 +39,7 @@ export const denormDoubleParamsPivot = (categoryName: string) => sql`
         INNER JOIN denorm_double_params AS p ON e.index = p.entity
         INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
       WHERE
-        e.category = 'Columns'
+        e.category = '${categoryName}'
     ),
     pivot_double_data AS (
       PIVOT double_data ON name_1 -- IN ('Base Diameter')
@@ -89,7 +89,6 @@ export const denormEntityParams = (categoryName: string) => sql`
     localid;
 `;
 
-//TODO: add pivot
 export const denormEntityParamsPivot = (categoryName: string) => sql`
   WITH
     entity_data AS (
@@ -102,22 +101,23 @@ export const denormEntityParamsPivot = (categoryName: string) => sql`
         INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
       WHERE
         e.category = '${categoryName}'
+    ),
+    pivot_entity_data AS (
+      PIVOT entity_data ON name_1 --IN (<name_of_param_to_filter>)
+      USING first (name_3) AS param_value,
+      first (category_1) AS param_category
+      GROUP BY
+        LocalId,
+        name
     )
   SELECT
-    LocalId,
-    name,
-    Name_1 AS param_name,
-    name_3 AS param_value,
-    category_1 AS param_category,
-    --GlobalId,
-    --category,
-    --path_name,
+    *
+    --<param_name_in_returned_column>
   FROM
-    entity_data
-  WHERE
-    entity_data.category_1 != '__DOCUMENT__'
+    pivot_entity_data AS ped
+    --WHERE <param_name_in_returned_column> is not null
   ORDER BY
-    localid;
+    LocalId;
 `;
 
 export const denormIntegerParams = (categoryName: string) => sql`
@@ -146,7 +146,6 @@ export const denormIntegerParams = (categoryName: string) => sql`
     localid;
 `;
 
-//TODO: add pivot
 export const denormIntegerParamsPivot = (categoryName: string) => sql`
   WITH
     int_data AS (
@@ -158,17 +157,21 @@ export const denormIntegerParamsPivot = (categoryName: string) => sql`
         INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
       WHERE
         e.category = '${categoryName}'
+    ),
+    pivot_int_data AS (
+      PIVOT int_data ON name_1 --IN (<name_of_param_to_filter>)
+      USING first (VALUE) AS param_value,
+      first (Units) AS param_units
+      GROUP BY
+        LocalId,
+        name
     )
   SELECT
-    LocalId,
-    Name_1 AS param_name,
-    VALUE AS param_value,
-    "GROUP" AS param_group,
-    --GlobalId,
-    --category,
-    --path_name,
+    *
+    --<param_name_in_returned_column>
   FROM
-    int_data
+    pivot_int_data AS pid
+    --where <param_name_in_returned_column> is not null
   ORDER BY
     localid;
 `;
@@ -257,7 +260,6 @@ export const denormStringParams = (categoryName: string) => sql`
     localid;
 `;
 
-//TODO: add pivot
 export const denormStringParamsPivot = (categoryName: string) => sql`
   WITH
     str_data AS (
@@ -269,18 +271,21 @@ export const denormStringParamsPivot = (categoryName: string) => sql`
         INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
       WHERE
         e.category = '${categoryName}'
+    ),
+    pivot_str_data AS (
+      PIVOT str_data ON name_1 --IN (<name_of_param_to_filter>)
+      USING first (Strings) AS param_value,
+      first (Units) AS param_units
+      GROUP BY
+        LocalId,
+        name
     )
   SELECT
-    LocalId,
-    name,
-    Name_1 AS param_name,
-    Strings AS param_value,
-    "GROUP" AS param_group,
-    --GlobalId,
-    --category,
-    --path_name,
+    *
+    --<param_name_in_returned_column>
   FROM
-    str_data
+    pivot_str_data AS psd
+    --where <param_name_in_returned_column> is not null
   ORDER BY
     localid;
 `;
