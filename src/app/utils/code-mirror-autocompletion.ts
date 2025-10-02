@@ -164,6 +164,7 @@ const keywordLabels = [
 	"CASE",
 	"WHEN",
 	"EXISTS",
+	"PIVOT",
 	// Utility
 	"EXPLAIN",
 	"DESCRIBE",

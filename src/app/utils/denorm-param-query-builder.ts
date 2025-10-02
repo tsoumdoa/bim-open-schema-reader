@@ -1,10 +1,14 @@
 import {
 	denormDoubleParams,
+	denormDoubleParamsPivot,
 	denormEntityParams,
+	denormEntityParamsPivot,
 	denormIntegerParams,
+	denormIntegerParamsPivot,
 	denormPointsParams,
 	denormPointsParamsPivot,
 	denormStringParams,
+	denormStringParamsPivot,
 } from "../sql/denorm-param-query";
 import { DenormTableName, QueryObject } from "./types";
 import { denormParamQueryBuilderName } from "./queries-selector-list";
@@ -19,22 +23,28 @@ export function denormParamQueryBuilder(
 	)?.displayName;
 	const queryObj = {
 		queryCategory: categoryName,
-		queryTitle: `${title} for ${categoryName || "<undefined>"}`, //format category name
+		queryTitle: `${title} - ${categoryName || "<undefined>"} ${usePivot ? "(Pivot)" : "(Flat)"}`, //format category name
 		sqlQuery: "",
 		explaination: "",
 	};
 	denormParamQueryBuilder;
 	switch (paramType) {
 		case "denorm_double_params":
-			queryObj.sqlQuery = denormDoubleParams(categoryName);
+			queryObj.sqlQuery = usePivot
+				? denormDoubleParamsPivot(categoryName)
+				: denormDoubleParams(categoryName);
 			break;
 
 		case "denorm_entity_params":
-			queryObj.sqlQuery = denormEntityParams(categoryName);
+			queryObj.sqlQuery = usePivot
+				? denormEntityParamsPivot(categoryName)
+				: denormEntityParams(categoryName);
 			break;
 
 		case "denorm_integer_params":
-			queryObj.sqlQuery = denormIntegerParams(categoryName);
+			queryObj.sqlQuery = usePivot
+				? denormIntegerParamsPivot(categoryName)
+				: denormIntegerParams(categoryName);
 			break;
 
 		case "denorm_points_params":
@@ -44,7 +54,9 @@ export function denormParamQueryBuilder(
 			break;
 
 		case "denorm_string_params":
-			queryObj.sqlQuery = denormStringParams(categoryName);
+			queryObj.sqlQuery = usePivot
+				? denormStringParamsPivot(categoryName)
+				: denormStringParams(categoryName);
 			break;
 
 		default:

@@ -43,9 +43,13 @@ function DropDownMenu(props: {
 		addQuery(queryObj);
 	};
 
-	const addAll = () => {
+	const addAll = (usePivot: boolean = false) => {
 		const q = denormParamQueryBuilderName.map((item) => {
-			return denormParamQueryBuilder(item.tableName, props.categoryName);
+			return denormParamQueryBuilder(
+				item.tableName,
+				props.categoryName,
+				usePivot
+			);
 		});
 		addQueries(q);
 	};
@@ -66,44 +70,48 @@ function DropDownMenu(props: {
 				</span>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" side="bottom" className="text-xs">
-				{denormParamQueryBuilderName.map((item, index) =>
-					item.hasPivot ? (
-						<DropdownMenuSub key={`query-builder-dropdown-item-${index}`}>
-							<DropdownMenuSubTrigger className="text-xs">
-								{item.displayName}
-							</DropdownMenuSubTrigger>
-							<DropdownMenuSubContent className="w-fit">
-								<DropdownMenuItem
-									className="w-fit text-xs font-medium hover:cursor-pointer"
-									onClick={() => handleClick(item.tableName)}
-								>
-									Flatten
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									className="w-fit text-xs font-medium hover:cursor-pointer"
-									onClick={() => handleClick(item.tableName, true)}
-								>
-									Pivot
-								</DropdownMenuItem>
-							</DropdownMenuSubContent>
-						</DropdownMenuSub>
-					) : (
-						<DropdownMenuItem
-							key={`item-${index}`}
-							className="text-xs hover:cursor-pointer"
-							onClick={() => handleClick(item.tableName)}
-						>
+				{denormParamQueryBuilderName.map((item, index) => (
+					<DropdownMenuSub key={`query-builder-dropdown-item-${index}`}>
+						<DropdownMenuSubTrigger className="text-xs">
 							{item.displayName}
+						</DropdownMenuSubTrigger>
+						<DropdownMenuSubContent className="w-fit">
+							<DropdownMenuItem
+								className="w-fit text-xs font-medium hover:cursor-pointer"
+								onClick={() => handleClick(item.tableName)}
+							>
+								Flatten
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="w-fit text-xs font-medium hover:cursor-pointer"
+								onClick={() => handleClick(item.tableName, true)}
+							>
+								Pivot
+							</DropdownMenuItem>
+						</DropdownMenuSubContent>
+					</DropdownMenuSub>
+				))}
+				<Separator className="my-1" />
+
+				<DropdownMenuSub key={`query-builder-dropdown-item-all`}>
+					<DropdownMenuSubTrigger className="text-xs font-bold">
+						All
+					</DropdownMenuSubTrigger>
+					<DropdownMenuSubContent className="w-fit">
+						<DropdownMenuItem
+							className="w-fit text-xs font-medium hover:cursor-pointer"
+							onClick={() => addAll()}
+						>
+							Flatten
 						</DropdownMenuItem>
-					)
-				)}
-				<Separator className="" />
-				<DropdownMenuItem
-					className="text-xs font-bold"
-					onClick={() => addAll()}
-				>
-					All
-				</DropdownMenuItem>
+						<DropdownMenuItem
+							className="w-fit text-xs font-medium hover:cursor-pointer"
+							onClick={() => addAll(true)}
+						>
+							Pivot
+						</DropdownMenuItem>
+					</DropdownMenuSubContent>
+				</DropdownMenuSub>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

@@ -123,31 +123,25 @@ export const queriesSelectorList: QueriesSelector[] = [
 export const denormParamQueryBuilderName: {
 	tableName: DenormTableName;
 	displayName: string;
-	hasPivot: boolean;
 }[] = [
 	{
 		tableName: "denorm_double_params",
 		displayName: "Double Parameters",
-		hasPivot: false,
 	},
 	{
 		tableName: "denorm_entity_params",
 		displayName: "Entity Parameters",
-		hasPivot: false,
 	},
 	{
 		tableName: "denorm_integer_params",
 		displayName: "Integer Parameters",
-		hasPivot: false,
 	},
 	{
 		tableName: "denorm_points_params",
 		displayName: "Point Parameters",
-		hasPivot: true,
 	},
 	{
 		tableName: "denorm_string_params",
 		displayName: "String Parameters",
-		hasPivot: false,
 	},
 ] as const;
