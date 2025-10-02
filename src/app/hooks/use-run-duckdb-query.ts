@@ -11,10 +11,12 @@ export function useRunDuckDbQuery(
 	const [sql, setSql] = useState(initialSql);
 
 	const { data, isLoading, isError, error, isSuccess } = useQuery({
-		queryKey: ["duckdb", sql], // cache key: unique per query
+		queryKey: ["duckdb", sql], // cache key: unique per query strings
 		retry: false,
+		refetchOnWindowFocus: false, //to prevent query when user switches tab
 		queryFn: async () => {
 			try {
+				console.log("run query");
 				const start = performance.now();
 				const result = await runQuery(c, sql);
 				const end = performance.now();

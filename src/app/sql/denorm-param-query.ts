@@ -26,7 +26,7 @@ export const denormDoubleParams = (categoryName: string) => sql`
   FROM
     double_data
   ORDER BY
-    index
+    localid;
 `;
 
 export const denormEntityParams = (categoryName: string) => sql`
@@ -56,7 +56,7 @@ export const denormEntityParams = (categoryName: string) => sql`
   WHERE
     entity_data.category_1 != '__DOCUMENT__'
   ORDER BY
-    index
+    localid;
 `;
 
 export const denormIntegerParams = (categoryName: string) => sql`
@@ -80,7 +80,9 @@ export const denormIntegerParams = (categoryName: string) => sql`
     --category,
     --path_name,
   FROM
-    int_data;
+    int_data
+  ORDER BY
+    localid;
 `;
 
 export const denormPointsParams = (categoryName: string) => sql`
@@ -108,7 +110,7 @@ export const denormPointsParams = (categoryName: string) => sql`
   FROM
     pt_data
   ORDER BY
-    index
+    localid;
 `;
 
 export const denormPointsParamsPivot = (categoryName: string) => sql`
@@ -232,5 +234,7 @@ export const denormStringParams = (categoryName: string) => sql`
     --category,
     --path_name,
   FROM
-    str_data;
+    str_data
+  ORDER BY
+    localid;
 `;

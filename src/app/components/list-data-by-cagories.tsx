@@ -62,7 +62,7 @@ function DropDownMenu(props: {
 		>
 			<DropdownMenuTrigger asChild>
 				<span className="w-fit hover:cursor-pointer">
-					{props.categoryName || "undefined"}
+					{props.categoryName || "<undefined>"}
 				</span>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" side="bottom" className="text-xs">
