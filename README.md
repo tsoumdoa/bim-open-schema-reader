@@ -48,3 +48,6 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 - [ ] clear all button...?
 - [ ] yolo pivot mode (utilzie code gen)
 - [ ] explode mode for better presentationn...
+- [ ] order by Localid by default for category query builder code
+- [ ] undefined title is broken in query display
+- [ ] investigate why query time keep changing..
