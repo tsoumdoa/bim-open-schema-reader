@@ -19,7 +19,7 @@ export function denormParamQueryBuilder(
 	)?.displayName;
 	const queryObj = {
 		queryCategory: categoryName,
-		queryTitle: `${title} for ${categoryName}`,
+		queryTitle: `${title} for ${categoryName || "<undefined>"}`, //format category name
 		sqlQuery: "",
 		explaination: "",
 	};
