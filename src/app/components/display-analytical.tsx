@@ -21,6 +21,12 @@ import { DuckDbProvider, useDuckDb } from "./use-db";
 import { useExpandDisplay } from "../hooks/use-expand-display";
 import QueryObjProvider, { useQueryObjCtx } from "./query-obj-provider";
 import { useEffect, useRef } from "react";
+import { useQuickExplorer } from "../hooks/use-quick-explorer";
+import { QuickExplorer } from "./quick-explorer-overlay";
+import { createPortal } from "react-dom";
+import { listCountByCategory } from "../utils/queries";
+import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
+import { cleanCategoryCount } from "../utils/clean-category-cout";
 
 function DashboardHeader(props: { fileName: string }) {
 	return (
@@ -104,6 +110,13 @@ function SideBar(props: { useExpandDisplay: UseExpandDisplay }) {
 
 function DashboardContainer(props: { fileName: string }) {
 	const useExpDis = useExpandDisplay();
+	const { setDisplayExpanded } = useExpDis;
+	const { isActive, setIsActive } = useQuickExplorer(setDisplayExpanded);
+
+	const { conn } = useDuckDb();
+	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
+	const categoryGorupMap = cleanCategoryCount(rows);
+
 	return (
 		<SidebarProvider className="h-full min-h-0 w-full">
 			<SideBar useExpandDisplay={useExpDis} />
@@ -111,6 +124,14 @@ function DashboardContainer(props: { fileName: string }) {
 				<DashboardHeader fileName={props.fileName} />
 				<DashboardMain useExpandDisplay={useExpDis} />
 			</main>
+			{createPortal(
+				<QuickExplorer
+					isActive={isActive}
+					onClose={() => setIsActive(false)}
+					categoryGorupMap={categoryGorupMap}
+				/>,
+				document.body
+			)}
 		</SidebarProvider>
 	);
 }

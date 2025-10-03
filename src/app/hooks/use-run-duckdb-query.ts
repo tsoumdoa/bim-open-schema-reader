@@ -5,7 +5,8 @@ import { useState } from "react";
 
 export function useRunDuckDbQuery(
 	c: duckdb.AsyncDuckDBConnection,
-	initialSql: string
+	initialSql: string,
+	enabled: boolean = true
 ) {
 	const [queryTime, setQueryTime] = useState(0);
 	const [sql, setSql] = useState(initialSql);
@@ -16,7 +17,6 @@ export function useRunDuckDbQuery(
 		refetchOnWindowFocus: false, //to prevent query when user switches tab
 		queryFn: async () => {
 			try {
-				console.log("run query");
 				const start = performance.now();
 				const result = await runQuery(c, sql);
 				const end = performance.now();
@@ -26,6 +26,7 @@ export function useRunDuckDbQuery(
 				throw e;
 			}
 		},
+		enabled: enabled,
 	});
 
 	const cancelQuery = async () => {

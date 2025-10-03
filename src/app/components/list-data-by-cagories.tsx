@@ -1,121 +1,11 @@
 import { listCountByCategory } from "../utils/queries";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { useDuckDb } from "./use-db";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { denormParamQueryBuilderName } from "../utils/queries-selector-list";
 import { Separator } from "@/components/ui/separator";
-import { useQueryObjCtx } from "./query-obj-provider";
-import { denormParamQueryBuilder } from "../utils/denorm-param-query-builder";
-import {
-	DenormTableName,
-	generalCategory,
-	UseExpandDisplay,
-} from "../utils/types";
+import { generalCategory, UseExpandDisplay } from "../utils/types";
 import { useState } from "react";
-import { findCategoryGroup } from "../utils/categorize-categories";
-
-function DropDownMenu(props: {
-	categoryName: string;
-	useExpandDisplay: UseExpandDisplay;
-	setFocused: (focused: string) => void;
-	indexKey: string;
-}) {
-	const { useQueryObjects } = useQueryObjCtx();
-	const { addQueries, addQuery } = useQueryObjects;
-
-	const handleClick = (
-		tableName: DenormTableName,
-		usePivot: boolean = false
-	) => {
-		const queryObj = denormParamQueryBuilder(
-			tableName,
-			props.categoryName,
-			usePivot
-		);
-		addQuery(queryObj);
-	};
-
-	const addAll = (usePivot: boolean = false) => {
-		const q = denormParamQueryBuilderName.map((item) => {
-			return denormParamQueryBuilder(
-				item.tableName,
-				props.categoryName,
-				usePivot
-			);
-		});
-		addQueries(q);
-	};
-
-	return (
-		<DropdownMenu
-			onOpenChange={(open) => {
-				if (open) {
-					props.setFocused(props.indexKey);
-				} else {
-					props.setFocused("");
-				}
-			}}
-		>
-			<DropdownMenuTrigger asChild>
-				<span className="w-fit hover:cursor-pointer">
-					{props.categoryName || "<undefined>"}
-				</span>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" side="bottom" className="text-xs">
-				{denormParamQueryBuilderName.map((item, index) => (
-					<DropdownMenuSub key={`query-builder-dropdown-item-${index}`}>
-						<DropdownMenuSubTrigger className="text-xs">
-							{item.displayName}
-						</DropdownMenuSubTrigger>
-						<DropdownMenuSubContent className="w-fit">
-							<DropdownMenuItem
-								className="w-fit text-xs font-medium hover:cursor-pointer"
-								onClick={() => handleClick(item.tableName)}
-							>
-								Flatten
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								className="w-fit text-xs font-medium hover:cursor-pointer"
-								onClick={() => handleClick(item.tableName, true)}
-							>
-								Pivot
-							</DropdownMenuItem>
-						</DropdownMenuSubContent>
-					</DropdownMenuSub>
-				))}
-				<Separator className="my-1" />
-
-				<DropdownMenuSub key={`query-builder-dropdown-item-all`}>
-					<DropdownMenuSubTrigger className="text-xs font-bold">
-						All
-					</DropdownMenuSubTrigger>
-					<DropdownMenuSubContent className="w-fit">
-						<DropdownMenuItem
-							className="w-fit text-xs font-medium hover:cursor-pointer"
-							onClick={() => addAll()}
-						>
-							Flatten
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							className="w-fit text-xs font-medium hover:cursor-pointer"
-							onClick={() => addAll(true)}
-						>
-							Pivot
-						</DropdownMenuItem>
-					</DropdownMenuSubContent>
-				</DropdownMenuSub>
-			</DropdownMenuContent>
-		</DropdownMenu>
-	);
-}
+import { cleanCategoryCount } from "../utils/clean-category-cout";
+import DropDownMenu from "./data-category-list-dropdown";
 
 export default function ListDataByCategories(props: {
 	useExpandDisplay: UseExpandDisplay;
@@ -123,18 +13,7 @@ export default function ListDataByCategories(props: {
 	const { conn } = useDuckDb();
 	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
 	const [focused, setFocused] = useState("");
-
-	const categoryGorupMap = new Map<string, [string, number][]>();
-
-	for (const row of rows) {
-		const categoryName = findCategoryGroup(row[0] as string);
-		if (!categoryGorupMap.has(categoryName)) {
-			categoryGorupMap.set(categoryName, []);
-		}
-		categoryGorupMap
-			.get(categoryName)
-			?.push([row[0] as string, row[1] as number]);
-	}
+	const categoryGorupMap = cleanCategoryCount(rows);
 
 	return (
 		<div className="flex flex-col text-xs">

@@ -48,7 +48,9 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 - [ ] clear all button...?
 - [x] yolo pivot mode (utilzie code gen) actually no yolo as DuckDB has PIVOT
       support which works
-- [ ] explode mode for better presentationn...
+- [x] explode mode for better presentationn...
 - [x] order by Localid by default for category query builder code
 - [x] undefined title is broken in query display
 - [x] investigate why query time keep changing.. **FIXED**
+- [ ] foldable query name, maybe more of options to hide .dwg links when there are lots of
+      them
