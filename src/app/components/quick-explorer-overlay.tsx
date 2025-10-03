@@ -43,13 +43,10 @@ function BlurredBackdrop(props: {
 }
 
 export function QuickExplorer(props: {
-	isActive: boolean;
 	onClose: () => void;
 	categoryGorupMap: Map<string, [string, number][]>;
 }) {
 	const [focused, setFocused] = useState("");
-
-	if (!props.isActive) return null;
 	return (
 		<BlurredBackdrop onClose={props.onClose}>
 			<Card className="gap-3 border-0 shadow-2xl">

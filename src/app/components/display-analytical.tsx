@@ -124,14 +124,14 @@ function DashboardContainer(props: { fileName: string }) {
 				<DashboardHeader fileName={props.fileName} />
 				<DashboardMain useExpandDisplay={useExpDis} />
 			</main>
-			{createPortal(
-				<QuickExplorer
-					isActive={isActive}
-					onClose={() => setIsActive(false)}
-					categoryGorupMap={categoryGorupMap}
-				/>,
-				document.body
-			)}
+			{isActive &&
+				createPortal(
+					<QuickExplorer
+						onClose={() => setIsActive(false)}
+						categoryGorupMap={categoryGorupMap}
+					/>,
+					document.body
+				)}
 		</SidebarProvider>
 	);
 }
