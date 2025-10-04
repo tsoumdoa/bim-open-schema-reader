@@ -108,3 +108,4 @@ export type CategoryObj = {
 };
 
 export type CategoryObjs = CategoryObj[];
+export type DenormParamQueryType = "flatten" | "pivot" | "stats";
