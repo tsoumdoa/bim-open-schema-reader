@@ -54,7 +54,7 @@ export const denormDoubleParamsPivot = (categoryName: string) => sql`
     --<param_name_in_returned_column>
   FROM
     pivot_double_data AS pdd
-    --where <param_name_in_returned_column> is not null
+    --where <param_name_in_returned_column> is not null and <param_name_in_returned_column> != ''
   ORDER BY
     LocalId
 `;
@@ -162,7 +162,7 @@ export const denormEntityParamsPivot = (categoryName: string) => sql`
     --<param_name_in_returned_column>
   FROM
     pivot_entity_data AS ped
-    --WHERE <param_name_in_returned_column> is not null
+    --where <param_name_in_returned_column> is not null and <param_name_in_returned_column> != ''
   ORDER BY
     LocalId;
 `;
@@ -268,7 +268,7 @@ export const denormIntegerParamsPivot = (categoryName: string) => sql`
     --<param_name_in_returned_column>
   FROM
     pivot_int_data AS pid
-    --where <param_name_in_returned_column> is not null
+    --where <param_name_in_returned_column> is not null and <param_name_in_returned_column> != ''
   ORDER BY
     localid;
 `;
@@ -489,7 +489,7 @@ export const denormStringParamsPivot = (categoryName: string) => sql`
     --<param_name_in_returned_column>
   FROM
     pivot_str_data AS psd
-    --where <param_name_in_returned_column> is not null
+    --where <param_name_in_returned_column> is not null and <param_name_in_returned_column> != ''
   ORDER BY
     localid;
 `;
