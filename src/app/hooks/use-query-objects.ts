@@ -15,7 +15,6 @@ export function useQueryObjects() {
 			...obj,
 			id: nanoid(7),
 		}));
-
 		setQueryObjects((prev) => [...prev, ...newOnes]);
 	};
 
@@ -32,6 +31,15 @@ export function useQueryObjects() {
 		});
 		setQueryObjects(newQueryObjects);
 	};
+	const updateQuery = (queryObject: QueryObject, newQuery: string) => {
+		const newQueryObjects = queryObjects.map((q) => {
+			if (q.id === queryObject.id) {
+				return { ...q, query: newQuery };
+			}
+			return q;
+		});
+		setQueryObjects(newQueryObjects);
+	};
 
 	return {
 		queryObjects,
@@ -39,5 +47,6 @@ export function useQueryObjects() {
 		addQueries,
 		removeQuery,
 		updateQueryTitle,
+		updateQuery,
 	};
 }

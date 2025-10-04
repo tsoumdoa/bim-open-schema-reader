@@ -103,6 +103,7 @@ export default function QueryDisplayItem(props: {
 	index: number;
 	useExpandDisplay: UseExpandDisplay;
 	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
+	updateQuery: (queryObject: QueryObject, newQuery: string) => void;
 }) {
 	const {
 		handleCancelQueryRef,
@@ -126,7 +127,6 @@ export default function QueryDisplayItem(props: {
 		props.queryObject.sqlQuery
 	);
 	const { displayExpanded, setDisplayExpanded } = props.useExpandDisplay;
-
 	const [titleInputValue, setTitleInputValue] = useState(
 		props.queryObject.queryTitle
 	);
@@ -210,21 +210,22 @@ export default function QueryDisplayItem(props: {
 			{queryDisplayState !== "hidden" && (
 				<SqlQueryCodeBlock
 					sqlQuery={sqlQuery}
-					setSqlQuery={setSqlQuery}
 					newSqlQuery={newSqlQuery}
-					setNewSqlQuery={setNewSqlQuery}
 					draftSql={draftSql}
+					setSqlQuery={setSqlQuery}
+					setNewSqlQuery={setNewSqlQuery}
 					setDraftSql={setDraftSql}
 					handleCancelQueryRef={handleCancelQueryRef}
 					queryEditorState={queryEditorState}
-					setQueryEditorState={setQueryEditorState}
 					queryState={queryState}
-					setQueryState={setQueryState}
 					queryDisplayState={queryDisplayState}
-					setQueryDisplayState={setQueryDisplayState}
 					queryTitleState={queryTitleState}
+					setQueryEditorState={setQueryEditorState}
+					setQueryState={setQueryState}
+					setQueryDisplayState={setQueryDisplayState}
 					updateQueryTitle={props.updateQueryTitle}
 					queryObject={props.queryObject}
+					updateQuery={props.updateQuery}
 				/>
 			)}
 

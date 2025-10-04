@@ -186,6 +186,7 @@ export default function SqlQueryCodeBlock(props: {
 	setQueryEditorState: (b: QueryEditorState) => void;
 	setQueryState: (b: QueryState) => void;
 	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
+	updateQuery: (queryObject: QueryObject, newQuery: string) => void;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [nodes, setNodes] = useState<JSX.Element>();
@@ -234,6 +235,7 @@ export default function SqlQueryCodeBlock(props: {
 			const formatedQuery = runFormat(props.draftSql);
 			props.setQueryState("edited");
 			props.setSqlQuery(formatedQuery);
+			props.updateQuery(props.queryObject, formatedQuery);
 		}
 		//add * if the query is edited but the title is not edited
 		if (props.queryTitleState === "original" && props.queryState === "edited") {

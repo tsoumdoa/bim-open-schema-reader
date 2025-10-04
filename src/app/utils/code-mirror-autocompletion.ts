@@ -256,46 +256,43 @@ function collectAliases(sql: string): Record<string, string> {
 		push(m[2], m[1]);
 	}
 
-	// Optionally recognize CTEs if you want to treat them like tables (no columns here)
-	// const cteRe = /\bWITH\s+("?[A-Za-z_][\w]*"?)\s+AS\s*\(/gi;
-	// while ((m = cteRe.exec(sql))) {
-	//   const cteName = normalizeIdent(m[1]);
-	//   aliases[cteName] = cteName;
-	// }
+	// Optionally recognize CTEs if you want to treat them like tables(no columns here)
+	const cteRe = /\bWITH\s+("?[A-Za-z_][\w]*"?)\s+AS\s*\(/gi;
+	while ((m = cteRe.exec(sql))) {
+		const cteName = normalizeIdent(m[1]);
+		aliases[cteName] = cteName;
+	}
 
 	return aliases;
 }
 
-function getCurrentStatementText(ctx: CompletionContext): string {
-	const doc = ctx.state.doc;
-	const text = doc.toString();
-	const pos = ctx.pos;
-
-	// Find start at last semicolon before cursor
-	let start = text.lastIndexOf(";", Math.max(0, pos - 1));
-	start = start === -1 ? 0 : start + 1;
-
-	// Find end at next semicolon after cursor
-	let end = text.indexOf(";", pos);
-	end = end === -1 ? text.length : end;
-
-	return text.slice(start, end);
+function isInLineComment(text: string, pos: number): boolean {
+	if (
+		(pos >= 2 && text[pos - 2] === "-" && text[pos - 1] === "-") ||
+		text[pos - 1] === "-"
+	) {
+		return true;
+	}
+	const lineStart = text.lastIndexOf("\n", Math.max(0, pos - 1)) + 1;
+	const line = text.slice(lineStart, pos);
+	const checkSingleDash = line.indexOf("-");
+	if (checkSingleDash === -1) return false;
+	const idx = line.indexOf("--");
+	if (idx === -1) return false;
+	return true;
 }
 
 // Completion source
 export function sqlSchemaCompletions(ctx: CompletionContext) {
-	// 1) Allow alias discovery from the current statement (includes lines below cursor)
-	const statement = getCurrentStatementText(ctx);
-	const aliasesCurrentStmt = collectAliases(statement);
-
-	// 2) Optionally, also look at the whole doc for robustness (comment out if not desired)
-	// This lets you pick up aliases in very long statements split by missing semicolons.
-	// Merge so that aliases earlier in the statement win if duplicates appear.
 	const fullDoc = ctx.state.sliceDoc(0, ctx.state.doc.length);
-	const aliasesWholeDoc = collectAliases(fullDoc);
-	const aliases = { ...aliasesWholeDoc, ...aliasesCurrentStmt };
-
+	const aliases = collectAliases(fullDoc);
 	const before = ctx.state.sliceDoc(0, ctx.pos);
+
+	const docText = ctx.state.doc.toString();
+	const pos = ctx.pos;
+	if (isInLineComment(docText, pos)) {
+		return null;
+	}
 
 	// Case A: member access "qual.col" where qual = alias or table
 	const memberMatch = /([A-Za-z_][\w]*)\.\w*$/.exec(before);
