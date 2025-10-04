@@ -157,7 +157,7 @@ export default function InitialDisplay(props: {
 				</Button>
 			</div>
 
-			<div className="flex flex-col gap-y-8">
+			<div className="flex flex-col gap-y-8 px-8">
 				<div className="relative">
 					<Dropzone
 						maxFiles={1}
