@@ -113,7 +113,6 @@ const structureCategory: CategoryObj = {
 		"Structural Rebar",
 		"Structural Trusses",
 		"StructuralDeck",
-		"Structure",
 		"Supports",
 	],
 };
@@ -251,9 +250,7 @@ const viewCategory: CategoryObj = {
 		"Schedule Graphics",
 		"Section Boxes",
 		"Sections",
-		"Section Marks",
 		"Elevations",
-		"Elevation Marks",
 		"Plan Region",
 		"Raster Images",
 		"Cameras",
@@ -274,7 +271,14 @@ const materialsCategory: CategoryObj = {
 
 const wallAssemblyCategory: CategoryObj = {
 	generalCategory: "Wall Assembly",
-	categoryNames: ["Substrate", "Membrane", "Finish1", "Finish2", "Insulation"],
+	categoryNames: [
+		"Substrate",
+		"Membrane",
+		"Finish1",
+		"Finish2",
+		"Insulation",
+		"Structure",
+	],
 };
 
 const analyticalCategory: CategoryObj = {

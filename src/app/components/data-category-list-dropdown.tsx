@@ -11,7 +11,11 @@ import { denormParamQueryBuilderName } from "../utils/queries-selector-list";
 import { Separator } from "@/components/ui/separator";
 import { useQueryObjCtx } from "./query-obj-provider";
 import { denormParamQueryBuilder } from "../utils/denorm-param-query-builder";
-import { DenormTableName, UseExpandDisplay } from "../utils/types";
+import {
+	DenormParamQueryType,
+	DenormTableName,
+	UseExpandDisplay,
+} from "../utils/types";
 
 export default function DropDownMenu(props: {
 	categoryName: string;
@@ -25,7 +29,7 @@ export default function DropDownMenu(props: {
 
 	const handleClick = (
 		tableName: DenormTableName,
-		usePivot: boolean = false
+		usePivot: DenormParamQueryType
 	) => {
 		const queryObj = denormParamQueryBuilder(
 			tableName,
@@ -35,7 +39,7 @@ export default function DropDownMenu(props: {
 		addQuery(queryObj);
 	};
 
-	const addAll = (usePivot: boolean = false) => {
+	const addAll = (usePivot: DenormParamQueryType) => {
 		const q = denormParamQueryBuilderName.map((item) => {
 			return denormParamQueryBuilder(
 				item.tableName,
@@ -71,15 +75,21 @@ export default function DropDownMenu(props: {
 						<DropdownMenuSubContent className="w-fit">
 							<DropdownMenuItem
 								className="w-fit text-xs font-medium hover:cursor-pointer"
-								onClick={() => handleClick(item.tableName)}
+								onClick={() => handleClick(item.tableName, "flatten")}
 							>
 								Flatten
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								className="w-fit text-xs font-medium hover:cursor-pointer"
-								onClick={() => handleClick(item.tableName, true)}
+								onClick={() => handleClick(item.tableName, "pivot")}
 							>
 								Pivot
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="w-fit text-xs font-medium hover:cursor-pointer"
+								onClick={() => handleClick(item.tableName, "stats")}
+							>
+								Stats
 							</DropdownMenuItem>
 						</DropdownMenuSubContent>
 					</DropdownMenuSub>
@@ -93,15 +103,21 @@ export default function DropDownMenu(props: {
 					<DropdownMenuSubContent className="w-fit">
 						<DropdownMenuItem
 							className="w-fit text-xs font-medium hover:cursor-pointer"
-							onClick={() => addAll()}
+							onClick={() => addAll("flatten")}
 						>
 							Flatten
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							className="w-fit text-xs font-medium hover:cursor-pointer"
-							onClick={() => addAll(true)}
+							onClick={() => addAll("pivot")}
 						>
 							Pivot
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className="w-fit text-xs font-medium hover:cursor-pointer"
+							onClick={() => addAll("stats")}
+						>
+							Stats
 						</DropdownMenuItem>
 					</DropdownMenuSubContent>
 				</DropdownMenuSub>
