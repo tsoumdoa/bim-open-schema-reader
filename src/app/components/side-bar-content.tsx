@@ -8,6 +8,7 @@ import { DisplayTableInfo } from "./display-table-info";
 import ListDataByCategories from "./list-data-by-cagories";
 import { UseExpandDisplay } from "../utils/types";
 import ListQueriesInSidebar from "./list-queries-in-sidebar";
+import { Sidebar } from "@/components/ui/sidebar";
 
 function AccordionDisplay(props: {
 	children: React.ReactNode;
@@ -24,9 +25,7 @@ function AccordionDisplay(props: {
 		</Accordion>
 	);
 }
-export default function SideBarContent(props: {
-	useExpandDisplay: UseExpandDisplay;
-}) {
+function SideBarContent(props: { useExpandDisplay: UseExpandDisplay }) {
 	return (
 		<div className="space-y-1">
 			<div className="text-sm font-bold text-gray-900">
@@ -42,5 +41,15 @@ export default function SideBarContent(props: {
 				<ListQueriesInSidebar useExpandDisplay={props.useExpandDisplay} />
 			</AccordionDisplay>
 		</div>
+	);
+}
+
+export default function SideBar(props: { useExpandDisplay: UseExpandDisplay }) {
+	return (
+		<Sidebar className="h-full">
+			<div className="overflow-auto p-2">
+				<SideBarContent useExpandDisplay={props.useExpandDisplay} />
+			</div>
+		</Sidebar>
 	);
 }

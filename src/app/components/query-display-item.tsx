@@ -99,7 +99,6 @@ function DropDownMenu(props: {
 export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
-	isDuplicated: boolean;
 	index: number;
 	useExpandDisplay: UseExpandDisplay;
 	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
