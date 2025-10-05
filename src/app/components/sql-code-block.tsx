@@ -1,26 +1,13 @@
 "use no memo";
 import { Check, Copy, Play, Save, SquarePen, X } from "lucide-react";
-import {
-	JSX,
-	useEffect,
-	useLayoutEffect,
-	useCallback,
-	useState,
-	RefObject,
-} from "react";
+import { JSX, useEffect, useLayoutEffect, useCallback, useState } from "react";
 import { highlightAndFormatSql, runFormat } from "../utils/shared";
 import { Button } from "@/components/ui/button";
 import { useRef } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
 import { dracula } from "@uiw/codemirror-theme-dracula";
-import {
-	QueryDisplayState,
-	QueryEditorState,
-	QueryObject,
-	QueryState,
-	QueryTitleState,
-} from "../utils/types";
+import { QueryObject, UseQueryViewerAndEditor } from "../utils/types";
 import { makeKeymap } from "../utils/code-mirror-keymaps";
 import { autocompletion } from "@codemirror/autocomplete";
 import { sqlSchemaCompletions } from "../utils/code-mirror-autocompletion";
@@ -170,49 +157,55 @@ function CancelButton(props: {
 }
 
 export default function SqlQueryCodeBlock(props: {
-	sqlQuery: string;
-	draftSql: string;
-	newSqlQuery: string;
-	handleCancelQueryRef: RefObject<{ cancelQuery: () => void } | null>;
-	queryDisplayState: QueryDisplayState;
-	queryEditorState: QueryEditorState;
-	queryState: QueryState;
-	queryTitleState: QueryTitleState;
 	queryObject: QueryObject;
-	setSqlQuery: (b: string) => void;
-	setNewSqlQuery: (b: string) => void;
-	setDraftSql: (b: string) => void;
-	setQueryDisplayState: (b: QueryDisplayState) => void;
-	setQueryEditorState: (b: QueryEditorState) => void;
-	setQueryState: (b: QueryState) => void;
 	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
 	updateQuery: (queryObject: QueryObject, newQuery: string) => void;
+	useQueryViewerAndEditorHook: UseQueryViewerAndEditor;
 }) {
+	const {
+		handleCancelQueryRef,
+		formatedQuery,
+		sqlQuery,
+		draftSql,
+		queryDisplayState,
+		queryState,
+		queryEditorState,
+		setSqlQuery,
+		setDraftSql,
+		setNewSqlQuery,
+		setQueryDisplayState,
+		setQueryState,
+		setQueryEditorState,
+		queryTitleState,
+		newSqlQuery,
+	} = props.useQueryViewerAndEditorHook;
 	const [copied, setCopied] = useState(false);
 	const [nodes, setNodes] = useState<JSX.Element>();
 	const [lineLength, setLineLength] = useState(0);
-	const formatedQuery = runFormat(props.sqlQuery);
 
-	const onChange = useCallback((val: string) => {
-		props.setQueryEditorState("stale");
-		props.setQueryState("edited");
-		props.setDraftSql(val);
+	const onChange = useCallback(
+		(val: string) => {
+			setQueryEditorState("stale");
+			setQueryState("edited");
+			setDraftSql(val);
 
-		if (props.sqlQuery === val) {
-			props.setQueryState("original");
-		} else {
-			props.setQueryState("edited");
-		}
+			if (sqlQuery === val) {
+				setQueryState("original");
+			} else {
+				setQueryState("edited");
+			}
 
-		setLineLength(val.split("\n").length);
-	}, []);
+			setLineLength(val.split("\n").length);
+		},
+		[sqlQuery, setDraftSql, setQueryEditorState, setQueryState]
+	);
 
 	useLayoutEffect(() => {
-		highlightAndFormatSql(formatedQuery, false).then(({ jsx, lineLength }) => {
+		highlightAndFormatSql(newSqlQuery, false).then(({ jsx, lineLength }) => {
 			setNodes(jsx);
 			setLineLength(lineLength);
 		});
-	}, [props.sqlQuery]);
+	}, [newSqlQuery]);
 
 	const handleCopy = async () => {
 		try {
@@ -225,56 +218,63 @@ export default function SqlQueryCodeBlock(props: {
 	};
 
 	const handleCancelDraftMode = () => {
-		props.setDraftSql(props.sqlQuery);
-		props.setQueryDisplayState("viewer");
-		props.setQueryEditorState("initial");
+		setDraftSql(sqlQuery);
+		setQueryDisplayState("viewer");
+		setQueryEditorState("initial");
 	};
 
 	const handleSave = () => {
-		if (props.draftSql !== props.sqlQuery) {
-			const formatedQuery = runFormat(props.draftSql);
-			props.setQueryState("edited");
-			props.setSqlQuery(formatedQuery);
+		if (draftSql !== sqlQuery) {
+			const formatedQuery = runFormat(draftSql);
+			setQueryState("edited");
+			setSqlQuery(formatedQuery);
 			props.updateQuery(props.queryObject, formatedQuery);
 		}
-		//add * if the query is edited but the title is not edited
-		if (props.queryTitleState === "original" && props.queryState === "edited") {
+		//NOTE: add * if the query is edited but the title is not edited
+		const lastChar = props.queryObject.queryTitle.slice(-1);
+		if (
+			queryTitleState === "original" &&
+			queryState === "edited" &&
+			lastChar !== "*"
+		) {
 			props.updateQueryTitle(
 				props.queryObject,
 				props.queryObject.queryTitle + "*"
 			);
+		} else {
+			props.updateQueryTitle(props.queryObject, props.queryObject.queryTitle);
 		}
-		props.setQueryDisplayState("viewer");
-		props.setQueryEditorState("initial");
+		setQueryDisplayState("viewer");
+		setQueryEditorState("initial");
 	};
 
 	const handleSetToDraftMode = () => {
-		props.setDraftSql(props.sqlQuery);
-		props.setQueryDisplayState("editor");
+		setDraftSql(sqlQuery);
+		setQueryDisplayState("editor");
 	};
 
 	const handleRunButtonClick = () => {
-		props.setNewSqlQuery(props.draftSql);
+		setNewSqlQuery(draftSql);
 	};
 
 	const handleCancelQuery = () => {
-		props.handleCancelQueryRef.current?.cancelQuery();
-		if (props.queryEditorState !== "error") {
-			props.setQueryEditorState("stale");
+		handleCancelQueryRef.current?.cancelQuery();
+		if (queryEditorState !== "error") {
+			setQueryEditorState("stale");
 		}
 	};
-	const isEditing = props.queryDisplayState === "editor";
-	const isRunning = props.queryEditorState === "running";
-	const isStale = props.queryEditorState === "stale";
-	const hasRerunSuccess = props.queryEditorState === "rerun";
+	const isEditing = queryDisplayState === "editor";
+	const isRunning = queryEditorState === "running";
+	const isStale = queryEditorState === "stale";
+	const hasRerunSuccess = queryEditorState === "rerun";
 
-	const displayStale = props.queryEditorState === "stale";
-	const displayError = props.queryEditorState === "error";
-	const displayCanceled = props.queryEditorState === "canceled";
+	const displayStale = queryEditorState === "stale";
+	const displayError = queryEditorState === "error";
+	const displayCanceled = queryEditorState === "canceled";
 	const displayRunButton = isStale || displayError;
 	const displayCancelButton = isRunning || isEditing;
 	const disableEditButton =
-		(props.queryEditorState === "error" && isEditing) || isRunning || isStale;
+		(queryEditorState === "error" && isEditing) || isRunning || isStale;
 
 	return (
 		<div
@@ -337,7 +337,7 @@ export default function SqlQueryCodeBlock(props: {
 			{isEditing ? (
 				<CodeMirror
 					editable={!isRunning}
-					value={props.draftSql}
+					value={draftSql}
 					height="500px"
 					extensions={[
 						sql({}),
@@ -345,8 +345,8 @@ export default function SqlQueryCodeBlock(props: {
 							onRun: handleRunButtonClick,
 							onFormat: () => {
 								if (!isRunning) {
-									const formatted = runFormat(props.draftSql);
-									props.setDraftSql(formatted);
+									const formatted = runFormat(draftSql);
+									setDraftSql(formatted);
 								}
 							},
 						}),

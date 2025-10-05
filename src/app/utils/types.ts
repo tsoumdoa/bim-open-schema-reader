@@ -1,5 +1,6 @@
 import { useExpandDisplay } from "../hooks/use-expand-display";
 import { useQueryObjects } from "../hooks/use-query-objects";
+import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import * as duckdb from "@duckdb/duckdb-wasm";
 
@@ -70,6 +71,9 @@ export type RunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type QueryObjects = QueryObject[];
 export type UseQueryObjects = ReturnType<typeof useQueryObjects>;
 export type UseExpandDisplay = ReturnType<typeof useExpandDisplay>;
+export type UseQueryViewerAndEditor = ReturnType<
+	typeof useQueryViewerAndEditor
+>;
 export type DuckDBCtx = {
 	db: duckdb.AsyncDuckDB;
 	conn: duckdb.AsyncDuckDBConnection;

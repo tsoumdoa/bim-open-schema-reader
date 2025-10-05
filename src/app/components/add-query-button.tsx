@@ -17,7 +17,7 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { QueryObject } from "../utils/types";
 import {
 	Tooltip,
@@ -29,9 +29,9 @@ import { queriesSelectorList } from "../utils/queries-selector-list";
 export function AddQuery(props: {
 	addQuery: (queryObject: QueryObject) => void;
 	setDisplayExpanded: (b: number) => void;
+	disableShortcutRef: RefObject<boolean>;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
-
 	const isMac = navigator.platform.toLowerCase().includes("mac");
 
 	useEffect(() => {
@@ -41,6 +41,11 @@ export function AddQuery(props: {
 				'input, textarea, [contenteditable="true"]'
 			);
 			const key = e.key.toLowerCase();
+
+			if (props.disableShortcutRef.current) {
+				return;
+			}
+
 			const addQueryShortcut =
 				(isMac ? e.metaKey && !e.ctrlKey : e.ctrlKey) && key === "k";
 
@@ -54,6 +59,7 @@ export function AddQuery(props: {
 				if (!isOpen) {
 					setIsOpen(true);
 					props.setDisplayExpanded(-1);
+					props.disableShortcutRef.current = true;
 				}
 				return;
 			}
@@ -89,7 +95,16 @@ export function AddQuery(props: {
 	};
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
+		<Dialog
+			open={isOpen}
+			onOpenChange={(open) => {
+				setIsOpen(open);
+				props.disableShortcutRef.current = open;
+				if (!open) {
+					props.disableShortcutRef.current = false;
+				}
+			}}
+		>
 			<DialogTrigger asChild>
 				<Button
 					variant="outline"
