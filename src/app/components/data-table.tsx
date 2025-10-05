@@ -18,7 +18,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { DataTableFooter } from "./data-table-footer";
 import { DataTableHeader } from "./data-table-header";
@@ -126,16 +126,8 @@ export function DataTable<TData, TValue>(props: {
 }) {
 	const { index, displayExpanded, setDisplayExpanded } = props;
 	const [sorting, setSorting] = useState<SortingState>([]);
-	const [isOverflowing, setIsOverflowing] = useState(false);
 	const pageSize = 30;
 	const tableContainerRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const el = tableContainerRef.current;
-		if (el) {
-			setIsOverflowing(el.scrollWidth > el.clientWidth);
-		}
-	}, [tableContainerRef.current]);
 
 	const columns = props.runDuckDbQuery.headers.map((header, i) => {
 		return {
@@ -166,7 +158,7 @@ export function DataTable<TData, TValue>(props: {
 	});
 
 	return (
-		<div className={`${isOverflowing ? "w-full" : "w-fit"}`}>
+		<div className="w-full">
 			<DataTableHeader
 				table={table}
 				queryTime={props.runDuckDbQuery.queryTime}

@@ -1,47 +1,47 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { DataTable } from "./data-table";
-import { RefObject, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useDuckDb } from "./use-db";
-import { QueryEditorState, QueryState } from "../utils/types";
+import { UseQueryViewerAndEditor } from "../utils/types";
 
 export default function QueryResultDisplayTable(props: {
-	query: string;
-	newQuery: string;
 	index: number;
 	displayExpanded: number;
 	setDisplayExpanded: (b: number) => void;
 	lockScroll: boolean;
 	fileDownloadName: string;
-	handleCancelQueryRef: RefObject<{ cancelQuery: () => void } | null>;
-	queryEditorState: QueryEditorState;
-	setQueryEditorState: (b: QueryEditorState) => void;
-	queryState: QueryState;
-	setQueryState: (b: QueryState) => void;
+	useQueryViewerAndEditorHook: UseQueryViewerAndEditor;
 }) {
+	const {
+		handleCancelQueryRef,
+		setQueryEditorState,
+		newSqlQuery,
+		formatedQuery,
+	} = props.useQueryViewerAndEditorHook;
 	const { conn } = useDuckDb();
-	const runDuckDbQuery = useRunDuckDbQuery(conn, props.query);
+	const runDuckDbQuery = useRunDuckDbQuery(conn, formatedQuery);
 	const { cancelQuery, isLoading, isSuccess, error, run, rows } =
 		runDuckDbQuery;
-	props.handleCancelQueryRef.current = { cancelQuery };
+	handleCancelQueryRef.current = { cancelQuery };
 
 	const rerunTrigeredRef = useRef(false);
 
 	useEffect(() => {
 		if (rerunTrigeredRef.current) {
 			if (isSuccess) {
-				props.setQueryEditorState("rerun");
+				setQueryEditorState("rerun");
 			} else {
-				props.setQueryEditorState("error");
+				setQueryEditorState("error");
 			}
 		}
 	}, [isSuccess, error]);
 
 	useEffect(() => {
-		if (props.newQuery !== props.query) {
+		if (newSqlQuery !== formatedQuery) {
 			rerunTrigeredRef.current = true;
 		}
-		run(props.newQuery);
-	}, [props.newQuery]);
+		run(newSqlQuery);
+	}, [newSqlQuery]);
 
 	if (error) {
 		return (
@@ -55,7 +55,7 @@ export default function QueryResultDisplayTable(props: {
 	if (isSuccess && rows.length > 0) {
 		return (
 			<div
-				className={`flex h-full max-w-[90rem] flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"}`}
+				className={`flex h-full flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"} max-w-[120rem]`}
 			>
 				<DataTable
 					index={props.index}

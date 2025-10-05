@@ -11,24 +11,9 @@ export function DataTableFooter<TData>(props: {
 	pageSize: number;
 	tableContainerRef: React.RefObject<HTMLDivElement | null>;
 }) {
-	const {
-		index,
-		displayExpanded,
-		setDisplayExpanded,
-		table,
-		pageSize,
-		tableContainerRef,
-	} = props;
-	const scrollToTop = () => {
-		if (tableContainerRef.current) {
-			tableContainerRef.current.scrollTo({
-				top: 0,
-				behavior: "smooth",
-			});
-		}
-	};
+	const { index, displayExpanded, setDisplayExpanded, table, pageSize } = props;
 	return (
-		<div className="flex flex-row items-center justify-between space-x-2">
+		<div className="flex flex-row items-center justify-between space-x-2 pt-3">
 			<Button
 				variant="ghost"
 				className="hover:cursor-pointer hover:bg-transparent"
@@ -48,8 +33,8 @@ export function DataTableFooter<TData>(props: {
 						variant="ghost"
 						size="sm"
 						onClick={() => {
+							setDisplayExpanded(index);
 							table.previousPage();
-							scrollToTop();
 						}}
 						disabled={!table.getCanPreviousPage()}
 					>
@@ -59,8 +44,8 @@ export function DataTableFooter<TData>(props: {
 						variant="ghost"
 						size="sm"
 						onClick={() => {
+							setDisplayExpanded(index);
 							table.nextPage();
-							scrollToTop();
 						}}
 						disabled={!table.getCanNextPage()}
 					>

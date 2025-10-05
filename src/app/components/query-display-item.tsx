@@ -104,27 +104,16 @@ export default function QueryDisplayItem(props: {
 	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
 	updateQuery: (queryObject: QueryObject, newQuery: string) => void;
 }) {
-	const {
-		handleCancelQueryRef,
-		formatedQuery,
-		sqlQuery,
-		draftSql,
-		newSqlQuery,
-		queryDisplayState,
-		queryState,
-		queryEditorState,
-		setSqlQuery,
-		setDraftSql,
-		setNewSqlQuery,
-		setQueryDisplayState,
-		setQueryState,
-		setQueryEditorState,
-		queryTitleState,
-		setQueryTitleState,
-	} = useQueryViewerAndEditor(
+	const useQueryViewerAndEditorHook = useQueryViewerAndEditor(
 		props.queryObject.queryTitle,
 		props.queryObject.sqlQuery
 	);
+	const {
+		queryDisplayState,
+		queryState,
+		setQueryDisplayState,
+		setQueryTitleState,
+	} = useQueryViewerAndEditorHook;
 	const { displayExpanded, setDisplayExpanded } = props.useExpandDisplay;
 	const [titleInputValue, setTitleInputValue] = useState(
 		props.queryObject.queryTitle
@@ -208,40 +197,21 @@ export default function QueryDisplayItem(props: {
 			</div>
 			{queryDisplayState !== "hidden" && (
 				<SqlQueryCodeBlock
-					sqlQuery={sqlQuery}
-					newSqlQuery={newSqlQuery}
-					draftSql={draftSql}
-					setSqlQuery={setSqlQuery}
-					setNewSqlQuery={setNewSqlQuery}
-					setDraftSql={setDraftSql}
-					handleCancelQueryRef={handleCancelQueryRef}
-					queryEditorState={queryEditorState}
-					queryState={queryState}
-					queryDisplayState={queryDisplayState}
-					queryTitleState={queryTitleState}
-					setQueryEditorState={setQueryEditorState}
-					setQueryState={setQueryState}
-					setQueryDisplayState={setQueryDisplayState}
-					updateQueryTitle={props.updateQueryTitle}
 					queryObject={props.queryObject}
+					updateQueryTitle={props.updateQueryTitle}
 					updateQuery={props.updateQuery}
+					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
 				/>
 			)}
 
 			<div className="w-full min-w-0 overflow-auto">
 				<QueryResultDisplayTable
-					query={formatedQuery}
-					newQuery={newSqlQuery}
 					index={props.index}
 					displayExpanded={displayExpanded}
 					setDisplayExpanded={setDisplayExpanded}
 					lockScroll={!isFocused()}
 					fileDownloadName={fileDownloadName}
-					handleCancelQueryRef={handleCancelQueryRef}
-					queryEditorState={queryEditorState}
-					setQueryEditorState={setQueryEditorState}
-					queryState={queryState}
-					setQueryState={setQueryState}
+					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
 				/>
 			</div>
 			<Separator className="my-4" />

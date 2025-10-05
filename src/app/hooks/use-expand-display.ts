@@ -19,7 +19,7 @@ export function useExpandDisplay() {
 
 	const handleScrollBack = () => {
 		if (displayExpanded !== -1 && queryItemRefs.current[displayExpanded]) {
-			const headerOffset = 84; // height of fixed header + some offset in px
+			const headerOffset = 50; // height of fixed header + some offset in px
 			const elementPosition =
 				queryItemRefs.current[displayExpanded].getBoundingClientRect().top +
 				window.scrollY;
