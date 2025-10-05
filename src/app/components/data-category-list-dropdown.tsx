@@ -16,13 +16,16 @@ import {
 	DenormTableName,
 	UseExpandDisplay,
 } from "../utils/types";
+import { RefObject } from "react";
 
 export default function DropDownMenu(props: {
+	onClose: () => void;
 	categoryName: string;
 	useExpandDisplay?: UseExpandDisplay;
 	count?: number;
 	setFocused: (focused: string) => void;
 	indexKey: string;
+	disableShortcutRef: RefObject<boolean>;
 }) {
 	const { useQueryObjects } = useQueryObjCtx();
 	const { addQueries, addQuery } = useQueryObjects;
@@ -37,6 +40,8 @@ export default function DropDownMenu(props: {
 			usePivot
 		);
 		addQuery(queryObj);
+		props.disableShortcutRef.current = false;
+		props.onClose();
 	};
 
 	const addAll = (usePivot: DenormParamQueryType) => {
@@ -48,6 +53,8 @@ export default function DropDownMenu(props: {
 			);
 		});
 		addQueries(q);
+		props.disableShortcutRef.current = false;
+		props.onClose();
 	};
 
 	return (

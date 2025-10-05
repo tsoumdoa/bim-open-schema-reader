@@ -85,13 +85,14 @@ export function QuickExplorer(props: {
 														key={`koolthing-category-count-${groupIndex}`}
 														variant="default"
 														className={`transition-all hover:bg-neutral-400 ${focused !== "" && focused !== `quick-${categoryIndex}-${groupIndex}` && "opacity-20"} text-md font-normal hover:cursor-pointer`}
-														onClick={props.onClose}
 													>
 														<DropDownMenu
 															categoryName={(row[0] as string) || ""}
 															setFocused={setFocused}
 															indexKey={`quick-${categoryIndex}-${groupIndex}`}
 															count={row[1]}
+															disableShortcutRef={props.disableShortcutRef}
+															onClose={props.onClose}
 														/>
 													</Badge>
 												))}
