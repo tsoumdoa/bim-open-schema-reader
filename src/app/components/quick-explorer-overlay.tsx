@@ -22,15 +22,9 @@ function ShortcutHelp() {
 	);
 }
 
-function BlurredBackdrop(props: {
-	children: React.ReactNode;
-	onClose: () => void;
-}) {
+function BlurredBackdrop(props: { children: React.ReactNode }) {
 	return (
-		<div
-			className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center duration-200"
-			onClick={props.onClose}
-		>
+		<div className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center duration-200">
 			<div className="absolute inset-0 bg-neutral-100/80 backdrop-blur-xs" />
 			<div
 				className="animate-in zoom-in-95 max-w-8xl relative z-10 w-full px-8 duration-200"
@@ -50,7 +44,7 @@ export function QuickExplorer(props: {
 	const [focused, setFocused] = useState("");
 
 	return (
-		<BlurredBackdrop onClose={props.onClose}>
+		<BlurredBackdrop>
 			<Card className="gap-3 border-0 shadow-2xl">
 				<CardHeader className="flex flex-row items-center justify-between">
 					<CardTitle className="text-xl font-bold lg:text-2xl">
