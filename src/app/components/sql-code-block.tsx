@@ -183,19 +183,22 @@ export default function SqlQueryCodeBlock(props: {
 	const [nodes, setNodes] = useState<JSX.Element>();
 	const [lineLength, setLineLength] = useState(0);
 
-	const onChange = useCallback((val: string) => {
-		setQueryEditorState("stale");
-		setQueryState("edited");
-		setDraftSql(val);
-
-		if (sqlQuery === val) {
-			setQueryState("original");
-		} else {
+	const onChange = useCallback(
+		(val: string) => {
+			setQueryEditorState("stale");
 			setQueryState("edited");
-		}
+			setDraftSql(val);
 
-		setLineLength(val.split("\n").length);
-	}, []);
+			if (sqlQuery === val) {
+				setQueryState("original");
+			} else {
+				setQueryState("edited");
+			}
+
+			setLineLength(val.split("\n").length);
+		},
+		[sqlQuery, setDraftSql, setQueryEditorState, setQueryState]
+	);
 
 	useLayoutEffect(() => {
 		highlightAndFormatSql(newSqlQuery, false).then(({ jsx, lineLength }) => {

@@ -19,9 +19,12 @@ export function useQuickExplorer(
 				(event.metaKey || event.ctrlKey)
 			) {
 				event.preventDefault();
-				setIsActive((prev) => !prev);
+				setIsActive((prev) => {
+					const next = !prev;
+					disableShortcutRef.current = next;
+					return next;
+				});
 				setDisplayExpanded(-1);
-				disableShortcutRef.current = true;
 			}
 		};
 
