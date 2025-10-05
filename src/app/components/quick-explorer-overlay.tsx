@@ -5,7 +5,7 @@ import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { generalCategory } from "../utils/types";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { RefObject, useState } from "react";
 import DropDownMenu from "./data-category-list-dropdown";
 
 function ShortcutHelp() {
@@ -45,8 +45,10 @@ function BlurredBackdrop(props: {
 export function QuickExplorer(props: {
 	onClose: () => void;
 	categoryGorupMap: Map<string, [string, number][]>;
+	disableShortcutRef: RefObject<boolean>;
 }) {
 	const [focused, setFocused] = useState("");
+
 	return (
 		<BlurredBackdrop onClose={props.onClose}>
 			<Card className="gap-3 border-0 shadow-2xl">

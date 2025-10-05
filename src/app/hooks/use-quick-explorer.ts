@@ -2,11 +2,17 @@
 
 import { useEffect, useState } from "react";
 
-export function useQuickExplorer(setDisplayExpanded: (b: number) => void) {
+export function useQuickExplorer(
+	setDisplayExpanded: (b: number) => void,
+	disableShortcutRef: React.RefObject<boolean>
+) {
 	const [isActive, setIsActive] = useState(true);
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
+			if (disableShortcutRef.current) {
+				return;
+			}
 			if (
 				event.code === "Space" &&
 				event.shiftKey &&
@@ -15,6 +21,7 @@ export function useQuickExplorer(setDisplayExpanded: (b: number) => void) {
 				event.preventDefault();
 				setIsActive((prev) => !prev);
 				setDisplayExpanded(-1);
+				disableShortcutRef.current = true;
 			}
 		};
 
@@ -22,6 +29,7 @@ export function useQuickExplorer(setDisplayExpanded: (b: number) => void) {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === "Escape" && isActive) {
 				setIsActive(false);
+				disableShortcutRef.current = false;
 			}
 		};
 

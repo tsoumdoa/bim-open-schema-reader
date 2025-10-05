@@ -11,7 +11,7 @@ import GoBackToTop from "./go-back-to-top";
 import { useDuckDb } from "./use-db";
 import { useExpandDisplay } from "../hooks/use-expand-display";
 import { useQueryObjCtx } from "./query-obj-provider";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuickExplorer } from "../hooks/use-quick-explorer";
 import { QuickExplorer } from "./quick-explorer-overlay";
 import { createPortal } from "react-dom";
@@ -34,16 +34,15 @@ function DashboardHeader(props: { fileName: string }) {
 function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 	const { useQueryObjects } = useQueryObjCtx();
 
-	const { queryObjects, addQuery, removeQuery, updateQueryTitle, updateQuery } =
+	const { queryObjects, removeQuery, updateQueryTitle, updateQuery } =
 		useQueryObjects;
 	const useExpDis = props.useExpandDisplay;
-	const { queryItemRefs, displayExpanded, setDisplayExpanded } = useExpDis;
+	const { queryItemRefs, displayExpanded } = useExpDis;
 	const prevLenRef = useRef<number>(queryObjects.length);
 
 	useEffect(() => {
 		const prevLen = prevLenRef.current;
 		const currLen = queryObjects.length;
-
 		if (currLen > prevLen) {
 			requestAnimationFrame(() => {
 				window.scrollTo({
@@ -54,6 +53,7 @@ function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 		}
 		prevLenRef.current = currLen;
 	}, [queryObjects.length]);
+
 	return (
 		<div className="flex h-full min-h-0 max-w-full flex-1 flex-col gap-y-2 pr-2 pl-6">
 			{queryObjects.length > 0 &&
@@ -76,7 +76,6 @@ function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 						</div>
 					);
 				})}
-			<AddQuery addQuery={addQuery} setDisplayExpanded={setDisplayExpanded} />
 
 			{displayExpanded === -1 && <GoBackToTop />}
 		</div>
@@ -86,7 +85,13 @@ function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 export default function DashboardContainer(props: { fileName: string }) {
 	const useExpDis = useExpandDisplay();
 	const { setDisplayExpanded } = useExpDis;
-	const { isActive, setIsActive } = useQuickExplorer(setDisplayExpanded);
+	const disableShortcutRef = useRef<boolean>(true); // NOTE: shortcut need to be disabled cuz the qucick explorer view is open at start
+	const { isActive, setIsActive } = useQuickExplorer(
+		setDisplayExpanded,
+		disableShortcutRef
+	);
+	const { useQueryObjects } = useQueryObjCtx();
+	const { addQuery } = useQueryObjects;
 
 	const { conn } = useDuckDb();
 	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
@@ -95,15 +100,26 @@ export default function DashboardContainer(props: { fileName: string }) {
 	return (
 		<SidebarProvider className="h-full min-h-0 w-full">
 			<SideBar useExpandDisplay={useExpDis} />
-			<main className="relative w-full min-w-0">
+			<main className="relative h-full w-full min-w-0">
 				<DashboardHeader fileName={props.fileName} />
 				<DashboardMain useExpandDisplay={useExpDis} />
+				<div className="px-5 pb-5">
+					<AddQuery
+						addQuery={addQuery}
+						setDisplayExpanded={setDisplayExpanded}
+						disableShortcutRef={disableShortcutRef}
+					/>
+				</div>
 			</main>
 			{isActive &&
 				createPortal(
 					<QuickExplorer
-						onClose={() => setIsActive(false)}
+						onClose={() => {
+							disableShortcutRef.current = false;
+							setIsActive(false);
+						}}
 						categoryGorupMap={categoryGorupMap}
+						disableShortcutRef={disableShortcutRef}
 					/>,
 					document.body
 				)}
