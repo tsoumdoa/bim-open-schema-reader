@@ -66,7 +66,7 @@ const walls: QueriesSelector = {
 		{
 			queryTitle: "Wall double and point parameters",
 			sqlQuery: wallDoubleAndPointParameters,
-			explaination: "Wall double and point parameters",
+			explaination: "Wall double and point parameters (metric)",
 		},
 		{
 			queryTitle: "Wall element basic info",
@@ -76,7 +76,7 @@ const walls: QueriesSelector = {
 		{
 			queryTitle: "Wall build up schedule",
 			sqlQuery: listWallBuildUps,
-			explaination: "Wall build up schedule",
+			explaination: "Wall build up schedule (metric)",
 		},
 	],
 };

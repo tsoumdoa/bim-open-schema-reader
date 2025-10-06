@@ -257,8 +257,8 @@ export const denormIntegerParamsPivot = (categoryName: string) => sql`
     ),
     pivot_int_data AS (
       PIVOT int_data ON name_1 --IN (<name_of_param_to_filter>)
-      USING first (VALUE) AS param_value,
-      first (Units) AS param_units
+      USING first (VALUE) --AS param_value,
+      --first (Units) AS param_units
       GROUP BY
         LocalId,
         name
@@ -478,8 +478,8 @@ export const denormStringParamsPivot = (categoryName: string) => sql`
     ),
     pivot_str_data AS (
       PIVOT str_data ON name_1 --IN (<name_of_param_to_filter>)
-      USING first (Strings) AS param_value,
-      first (Units) AS param_units
+      USING first (Strings) --AS param_value,
+      --first (Units) AS param_units
       GROUP BY
         LocalId,
         name
