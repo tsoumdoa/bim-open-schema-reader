@@ -167,6 +167,7 @@ const keywordLabels = [
 	"PIVOT",
 	// Utility
 	"EXPLAIN",
+	"IFNULL",
 	"DESCRIBE",
 	"ANALYZE",
 	"PRAGMA",

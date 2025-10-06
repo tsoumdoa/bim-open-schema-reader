@@ -54,3 +54,5 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 - [x] investigate why query time keep changing.. **FIXED**
 - [ ] foldable query name, maybe more of options to hide .dwg links when there are lots of
       them
+- [] make sample file to check wall quantitie calculation and room behaviour
+  (e.g. unplaced room...?)
