@@ -14,6 +14,7 @@ export default function ListDataByCategories(props: {
 	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
 	const [focused, setFocused] = useState("");
 	const categoryGorupMap = cleanCategoryCount(rows);
+	const { setDisplayExpanded } = props.useExpandDisplay;
 
 	return (
 		<div className="flex flex-col text-xs">
@@ -46,10 +47,13 @@ export default function ListDataByCategories(props: {
 												>
 													<td className="px-1 text-left tracking-tight">
 														<DropDownMenu
+															onClose={() => {
+																setDisplayExpanded(-1);
+															}}
 															categoryName={(row[0] as string) || ""}
-															useExpandDisplay={props.useExpandDisplay}
 															setFocused={setFocused}
 															indexKey={`${categoryIndex}-${groupIndex}`}
+															count={row[1]}
 														/>
 													</td>
 													<td className="pr-1 text-right">

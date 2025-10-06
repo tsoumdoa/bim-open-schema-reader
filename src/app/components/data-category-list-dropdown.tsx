@@ -11,21 +11,16 @@ import { denormParamQueryBuilderName } from "../utils/queries-selector-list";
 import { Separator } from "@/components/ui/separator";
 import { useQueryObjCtx } from "./query-obj-provider";
 import { denormParamQueryBuilder } from "../utils/denorm-param-query-builder";
-import {
-	DenormParamQueryType,
-	DenormTableName,
-	UseExpandDisplay,
-} from "../utils/types";
+import { DenormParamQueryType, DenormTableName } from "../utils/types";
 import { RefObject } from "react";
 
 export default function DropDownMenu(props: {
 	onClose: () => void;
 	categoryName: string;
-	useExpandDisplay?: UseExpandDisplay;
 	count?: number;
 	setFocused: (focused: string) => void;
 	indexKey: string;
-	disableShortcutRef: RefObject<boolean>;
+	disableShortcutRef?: RefObject<boolean>;
 }) {
 	const { useQueryObjects } = useQueryObjCtx();
 	const { addQueries, addQuery } = useQueryObjects;
@@ -40,7 +35,9 @@ export default function DropDownMenu(props: {
 			usePivot
 		);
 		addQuery(queryObj);
-		props.disableShortcutRef.current = false;
+		if (props.disableShortcutRef) {
+			props.disableShortcutRef.current = false;
+		}
 		props.onClose();
 	};
 
@@ -53,7 +50,9 @@ export default function DropDownMenu(props: {
 			);
 		});
 		addQueries(q);
-		props.disableShortcutRef.current = false;
+		if (props.disableShortcutRef) {
+			props.disableShortcutRef.current = false;
+		}
 		props.onClose();
 	};
 
