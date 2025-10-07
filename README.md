@@ -63,25 +63,3 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 ## Exporter improvemnt idea
 
 - Current doesn't export unused families, should it be...?
-
-## Level of information propsal
-
-1. Geometric reconstruction ready (**Geometric** - Cube Icon)
-
-- Definition: Contains sufficient numeric attributes to approximate element geometry and derive basic shapes and dimensions, plus some qualitative context.
-- Examples: Walls, roofs, columns, beams, grids, levels, floor slabs, ceilings.
-
-2. Analytics rich (**Analytics** - Chart Icon)
-
-- Definition: Provides robust quantitative measures and meaningful categorical/contextual attributes suitable for descriptive, diagnostic, and early predictive analytics.
-- Examples: Room area/volume, wall area/volume/height, floor area/thickness, roof area/slope, window/door area and height, ceiling height, level elevations, material assignments, categories, phases.
-
-3. Quantities only (**Quantities** - Hash Icon)
-
-- Definition: Limited to counts or totals with minimal or no supporting metrics; useful for basic inventory but weak for analysis without joins.
-- Examples: Number of tags, counts of annotations, instance counts without dimensions or properties.
-
-4. Low analytical value (**Low** - Minius Icon)
-
-- Definition: Data rarely used in general analytics workflows, typically context-specific or requiring specialized models/assumptions to be actionable.
-- Examples: Structural load cases (without results), sun path settings, view-specific graphics overrides, etc all of which are rarely used in the field.

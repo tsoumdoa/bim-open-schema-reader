@@ -1,17 +1,12 @@
 import { UseExpandDisplay } from "../utils/types";
-import {
-	Sidebar,
-	SidebarProvider,
-	SidebarTrigger,
-} from "@/components/ui/sidebar";
-import SideBarContent from "./side-bar-content";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AddQuery } from "./add-query-button";
 import QueryDisplayItem from "./query-display-item";
 import GoBackToTop from "./go-back-to-top";
 import { useDuckDb } from "./use-db";
 import { useExpandDisplay } from "../hooks/use-expand-display";
 import { useQueryObjCtx } from "./query-obj-provider";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useQuickExplorer } from "../hooks/use-quick-explorer";
 import { QuickExplorer } from "./quick-explorer-overlay";
 import { createPortal } from "react-dom";
@@ -19,6 +14,7 @@ import { listCountByCategory } from "../utils/queries";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { cleanCategoryCount } from "../utils/clean-category-cout";
 import SideBar from "./side-bar-content";
+import { DataReadinessFilterProvider } from "./use-data-readiness-filter";
 
 function DashboardHeader(props: { fileName: string }) {
 	return (
@@ -99,30 +95,32 @@ export default function DashboardContainer(props: { fileName: string }) {
 
 	return (
 		<SidebarProvider className="h-full min-h-0 w-full">
-			<SideBar useExpandDisplay={useExpDis} />
-			<main className="relative h-full w-full min-w-0">
-				<DashboardHeader fileName={props.fileName} />
-				<DashboardMain useExpandDisplay={useExpDis} />
-				<div className="px-5 pb-5">
-					<AddQuery
-						addQuery={addQuery}
-						setDisplayExpanded={setDisplayExpanded}
-						disableShortcutRef={disableShortcutRef}
-					/>
-				</div>
-			</main>
-			{isActive &&
-				createPortal(
-					<QuickExplorer
-						onClose={() => {
-							disableShortcutRef.current = false;
-							setIsActive(false);
-						}}
-						categoryGorupMap={categoryGorupMap}
-						disableShortcutRef={disableShortcutRef}
-					/>,
-					document.body
-				)}
+			<DataReadinessFilterProvider>
+				<SideBar useExpandDisplay={useExpDis} />
+				<main className="relative h-full w-full min-w-0">
+					<DashboardHeader fileName={props.fileName} />
+					<DashboardMain useExpandDisplay={useExpDis} />
+					<div className="px-5 pb-5">
+						<AddQuery
+							addQuery={addQuery}
+							setDisplayExpanded={setDisplayExpanded}
+							disableShortcutRef={disableShortcutRef}
+						/>
+					</div>
+				</main>
+				{isActive &&
+					createPortal(
+						<QuickExplorer
+							onClose={() => {
+								disableShortcutRef.current = false;
+								setIsActive(false);
+							}}
+							categoryGorupMap={categoryGorupMap}
+							disableShortcutRef={disableShortcutRef}
+						/>,
+						document.body
+					)}
+			</DataReadinessFilterProvider>
 		</SidebarProvider>
 	);
 }

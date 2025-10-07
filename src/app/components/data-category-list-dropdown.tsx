@@ -17,10 +17,10 @@ import { RefObject } from "react";
 export default function DropDownMenu(props: {
 	onClose: () => void;
 	categoryName: string;
-	count?: number;
 	setFocused: (focused: string) => void;
 	indexKey: string;
 	disableShortcutRef?: RefObject<boolean>;
+	children: React.ReactNode;
 }) {
 	const { useQueryObjects } = useQueryObjCtx();
 	const { addQueries, addQuery } = useQueryObjects;
@@ -66,12 +66,7 @@ export default function DropDownMenu(props: {
 				}
 			}}
 		>
-			<DropdownMenuTrigger asChild>
-				<span className="w-fit hover:cursor-pointer">
-					{props.categoryName || "<undefined>"}{" "}
-					{props.count && `- ${props.count.toLocaleString()}`}
-				</span>
-			</DropdownMenuTrigger>
+			<DropdownMenuTrigger asChild>{props.children}</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" side="bottom" className="text-xs">
 				{denormParamQueryBuilderName.map((item, index) => (
 					<DropdownMenuSub key={`query-builder-dropdown-item-${index}`}>
