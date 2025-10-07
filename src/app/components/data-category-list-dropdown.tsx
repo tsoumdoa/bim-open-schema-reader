@@ -69,7 +69,7 @@ export default function DropDownMenu(props: {
 			<DropdownMenuTrigger asChild>
 				<span className="w-fit hover:cursor-pointer">
 					{props.categoryName || "<undefined>"}{" "}
-					{props.count && `- ${props.count}`}
+					{props.count && `- ${props.count.toLocaleString()}`}
 				</span>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" side="bottom" className="text-xs">

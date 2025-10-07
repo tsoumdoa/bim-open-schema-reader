@@ -53,7 +53,6 @@ export default function ListDataByCategories(props: {
 															categoryName={(row[0] as string) || ""}
 															setFocused={setFocused}
 															indexKey={`${categoryIndex}-${groupIndex}`}
-															count={row[1]}
 														/>
 													</td>
 													<td className="pr-1 text-right">
