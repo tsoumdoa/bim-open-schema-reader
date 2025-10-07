@@ -316,9 +316,9 @@ const viewCategory: CategoryObj = {
 const materialsCategory: CategoryObj = {
 	generalCategory: "Materials",
 	categoryWithReadiness: [
-		{ categoryName: "Materials", analyticReadiness: "MLT" },
-		{ categoryName: "Material Assets", analyticReadiness: "MLT" },
-		{ categoryName: "<Insulation Batting Lines>", analyticReadiness: "LOW" },
+		{ categoryName: "Materials", analyticReadiness: "ANA" },
+		{ categoryName: "Material Assets", analyticReadiness: "ANA" },
+		{ categoryName: "<Insulation Batting Lines>", analyticReadiness: "MLT" },
 	],
 };
 

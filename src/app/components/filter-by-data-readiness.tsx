@@ -54,10 +54,9 @@ function DataReadinessHelpDialog(props: { children: React.ReactNode }) {
 				<DialogHeader>
 					<DialogTitle>Data Readiness</DialogTitle>
 					<DialogDescription className="">
-						Due to limitations of the Revit API and the current exporter
-						implementation, data quality varies. These categories are not
-						definitive and will evolve as the exporter matures. You can propose
-						changes and improvements via GitHub.
+						Data quality varies due to Revit API limits and our current
+						exporter. Use these guidelines to evaluate data readiness for your
+						specific use case.
 					</DialogDescription>
 				</DialogHeader>
 				<ScrollArea className="max-h-[30rem]">
@@ -88,11 +87,11 @@ function DataReadinessHelpDialog(props: { children: React.ReactNode }) {
 							<p>
 								Contains enough quantitative attributes and meaningful
 								categorical/contextual properties to support
-								descriptive/diagnostic analytics and early predictive modeling,
-								even if geometric fidelity is lower than GEO.
+								descriptive/diagnostic analytics modeling, even if geometric
+								fidelity is lower than GEO.
 							</p>
 							<p className="text-gray-500">
-								e.g. Hardscape, Parking, Planiting, Door, etc
+								e.g. Hardscape, Parking, Planiting, Door, Materials etc
 							</p>
 						</div>
 					</section>
@@ -106,14 +105,14 @@ function DataReadinessHelpDialog(props: { children: React.ReactNode }) {
 						<div className="space-y-1 pl-0 text-sm">
 							<p>
 								Contains more information than QTY (beyond simple counts) but
-								clearly less than ANA. Typically has basic numeric metrics
-								(e.g., bounding box, approximate dimensions) with minimal
-								context and few categorical/relational fields—insufficient for
-								robust comparisons or analytics.
+								clearly less than ANA. Has minimal numeric metrics for basic
+								insight, and typically lacks the contextual/relational data
+								needed for deeper analysis.
 							</p>
 							<p className="text-gray-500">
-								e.g. Family instances with only bounding box and limited number
-								of data compare to ANA.
+								e.g. Revisions include a revision number and basic info, but
+								lack links to elements or phases, so you can’t query which
+								elements were created or modified in each revision.
 							</p>
 						</div>
 					</section>
