@@ -276,7 +276,7 @@ const modelElementsCategory: CategoryObj = {
 	categoryWithReadiness: [
 		{ categoryName: "Model Groups", analyticReadiness: "MLT" },
 		{ categoryName: "Generic Models", analyticReadiness: "MLT" },
-		{ categoryName: "Entourage", analyticReadiness: "QTY" },
+		{ categoryName: "Entourage", analyticReadiness: "ANA" },
 		{ categoryName: "Shaft Openings", analyticReadiness: "MLT" },
 		{ categoryName: "Array", analyticReadiness: "LOW" },
 		{ categoryName: "Adaptive Points", analyticReadiness: "GEO" },
