@@ -25,7 +25,7 @@ export function DuckDbProvider(props: {
 export function useDuckDb() {
 	const ctx = useContext(DbContext);
 	if (!ctx) {
-		throw new Error("useDb must be used within a DbProvider");
+		throw new Error("useDataReadinessFilter must be used within a DbProvider");
 	}
 	return ctx;
 }

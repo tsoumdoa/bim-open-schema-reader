@@ -1,346 +1,399 @@
-import { CategoryObj, CategoryObjs, GeneralCategory } from "./types";
+import { CategoryObj, CategoryObjs, GenerailCategoryObj } from "./types";
 
 const projectSettingCategory: CategoryObj = {
 	generalCategory: "Project Setting",
-	categoryNames: [
-		"Design Option Sets",
-		"Design Options",
-		"Internal Origin",
-		"Location Data",
-		"Phases",
-		"Project Information",
-		"Revision",
-		"Project Base Point",
-		"Survey Point",
-		"__DOCUMENT__",
+	categoryWithReadiness: [
+		{
+			categoryName: "Design Option Sets",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Design Options",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Internal Origin",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Location Data",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Phases",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Project Information",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Revision",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Project Base Point",
+			analyticReadiness: "GEO",
+		},
+		{
+			categoryName: "Survey Point",
+			analyticReadiness: "GEO",
+		},
+		{
+			categoryName: "__DOCUMENT__",
+			analyticReadiness: "MLT",
+		},
 	],
 };
 
 const archCategory: CategoryObj = {
 	generalCategory: "Architecture",
-	categoryNames: [
-		"<Stair/Ramp Sketch: Boundary>",
-		"<Stair/Ramp Sketch: Landing Center>",
-		"<Stair/Ramp Sketch: Riser>",
-		"<Stair/Ramp Sketch: Run>",
-		"<Stair/Ramp Sketch: Stair Path>",
-		"<Path of Travel Lines>",
-		"Balusters",
-		"Casework",
-		"Ceilings",
-		"Columns",
-		"Doors",
-		"Fascias",
-		"Floors",
-		"Furniture Systems",
-		"Furniture",
-		"Gutters",
-		"Handrails",
-		"Landings",
-		"Railings",
-		"Ramps",
-		"Roofs",
-		"Runs",
-		"Specialty Equipment",
-		"Stair Paths",
-		"Stairs",
-		"Top Rails",
-		"Vertical Circulation",
-		"Walls",
-		"Windows",
-		"Wall Sweeps",
+	categoryWithReadiness: [
+		{ categoryName: "<Stair/Ramp Sketch: Boundary>", analyticReadiness: "LOW" },
+		{
+			categoryName: "<Stair/Ramp Sketch: Landing Center>",
+			analyticReadiness: "LOW",
+		},
+		{ categoryName: "<Stair/Ramp Sketch: Riser>", analyticReadiness: "LOW" },
+		{ categoryName: "<Stair/Ramp Sketch: Run>", analyticReadiness: "LOW" },
+		{
+			categoryName: "<Stair/Ramp Sketch: Stair Path>",
+			analyticReadiness: "LOW",
+		},
+		{ categoryName: "<Path of Travel Lines>", analyticReadiness: "GEO" },
+		{ categoryName: "Balusters", analyticReadiness: "MLT" },
+		{ categoryName: "Casework", analyticReadiness: "ANA" },
+		{ categoryName: "Ceilings", analyticReadiness: "ANA" },
+		{ categoryName: "Columns", analyticReadiness: "GEO" },
+		{ categoryName: "Doors", analyticReadiness: "ANA" },
+		{ categoryName: "Fascias", analyticReadiness: "MLT" },
+		{ categoryName: "Floors", analyticReadiness: "ANA" },
+		{ categoryName: "Furniture Systems", analyticReadiness: "MLT" },
+		{ categoryName: "Furniture", analyticReadiness: "MLT" },
+		{ categoryName: "Gutters", analyticReadiness: "MLT" },
+		{ categoryName: "Handrails", analyticReadiness: "MLT" },
+		{ categoryName: "Landings", analyticReadiness: "GEO" },
+		{ categoryName: "Railings", analyticReadiness: "MLT" },
+		{ categoryName: "Ramps", analyticReadiness: "GEO" },
+		{ categoryName: "Roofs", analyticReadiness: "ANA" },
+		{ categoryName: "Runs", analyticReadiness: "LOW" },
+		{ categoryName: "Specialty Equipment", analyticReadiness: "MLT" },
+		{ categoryName: "Stair Paths", analyticReadiness: "LOW" },
+		{ categoryName: "Stairs", analyticReadiness: "GEO" },
+		{ categoryName: "Top Rails", analyticReadiness: "MLT" },
+		{ categoryName: "Vertical Circulation", analyticReadiness: "GEO" },
+		{ categoryName: "Walls", analyticReadiness: "GEO" },
+		{ categoryName: "Windows", analyticReadiness: "ANA" },
+		{ categoryName: "Wall Sweeps", analyticReadiness: "MLT" },
 	],
 };
 
 const curtainWallSystemCategory: CategoryObj = {
 	generalCategory: "Curtain Wall System",
-	categoryNames: [
-		"Curtain Panels",
-		"Curtain Roof Grids",
-		"Curtain System Grid Layout",
-		"Curtain Systems",
-		"Curtain Wall Grids",
-		"Curtain Wall Mullions",
+	categoryWithReadiness: [
+		{ categoryName: "Curtain Panels", analyticReadiness: "GEO" },
+		{ categoryName: "Curtain Roof Grids", analyticReadiness: "MLT" },
+		{ categoryName: "Curtain System Grid Layout", analyticReadiness: "MLT" },
+		{ categoryName: "Curtain Systems", analyticReadiness: "ANA" },
+		{ categoryName: "Curtain Wall Grids", analyticReadiness: "MLT" },
+		{ categoryName: "Curtain Wall Mullions", analyticReadiness: "GEO" },
 	],
 };
 
 const levelGridCategory: CategoryObj = {
 	generalCategory: "Level & Grid",
-	categoryNames: [
-		"Center Line",
-		"Grid Heads",
-		"Grids",
-		"Guide Grid",
-		"Level Heads",
-		"Levels",
-		"Reference Planes",
-		"Scope Boxes",
-		"Scope Boxes",
+	categoryWithReadiness: [
+		{ categoryName: "Grid Heads", analyticReadiness: "LOW" },
+		{ categoryName: "Grids", analyticReadiness: "GEO" },
+		{ categoryName: "Guide Grid", analyticReadiness: "LOW" },
+		{ categoryName: "Level Heads", analyticReadiness: "LOW" },
+		{ categoryName: "Levels", analyticReadiness: "GEO" },
+		{ categoryName: "Reference Planes", analyticReadiness: "MLT" },
+		{ categoryName: "Scope Boxes", analyticReadiness: "MLT" },
 	],
 };
 
 const roomAreaCategory: CategoryObj = {
 	generalCategory: "Room & Area",
-	categoryNames: [
-		"<Area Based Load Boundary>",
-		"<Area Boundary>",
-		"<Room Separation>",
-		"<Space Separation>",
-		"Rooms",
-		"Areas",
-		"Area Schemes",
-		"Space Separation",
-		"Spaces",
-		"Space Type Settings",
-		"Analytical Spaces",
+	categoryWithReadiness: [
+		{ categoryName: "<Area Based Load Boundary>", analyticReadiness: "GEO" },
+		{ categoryName: "<Area Boundary>", analyticReadiness: "GEO" },
+		{ categoryName: "<Room Separation>", analyticReadiness: "GEO" },
+		{ categoryName: "<Space Separation>", analyticReadiness: "GEO" },
+		{ categoryName: "Rooms", analyticReadiness: "ANA" },
+		{ categoryName: "Areas", analyticReadiness: "ANA" },
+		{ categoryName: "Area Schemes", analyticReadiness: "LOW" },
+		{ categoryName: "Space Separation", analyticReadiness: "MLT" },
+		{ categoryName: "Spaces", analyticReadiness: "ANA" },
+		{ categoryName: "Space Type Settings", analyticReadiness: "ANA" },
+		{ categoryName: "Analytical Spaces", analyticReadiness: "ANA" },
 	],
 };
 
 const structureCategory: CategoryObj = {
 	generalCategory: "Structure",
-	categoryNames: [
-		"Bearings",
-		"Cover Type",
-		"Plates",
-		"Point Loads",
-		"Slab Edges",
-		"Structural Columns",
-		"Structural Connections",
-		"Structural Foundations",
-		"Structural Framing",
-		"Structural Load Cases",
-		"Structural Loads",
-		"Structural Rebar",
-		"Structural Trusses",
-		"StructuralDeck",
-		"Supports",
+	categoryWithReadiness: [
+		{ categoryName: "Bearings", analyticReadiness: "GEO" },
+		{ categoryName: "Cover Type", analyticReadiness: "MLT" },
+		{ categoryName: "Plates", analyticReadiness: "GEO" },
+		{ categoryName: "Point Loads", analyticReadiness: "MLT" },
+		{ categoryName: "Slab Edges", analyticReadiness: "GEO" },
+		{ categoryName: "Structural Columns", analyticReadiness: "ANA" },
+		{ categoryName: "Structural Connections", analyticReadiness: "MLT" },
+		{ categoryName: "Structural Foundations", analyticReadiness: "ANA" },
+		{ categoryName: "Structural Framing", analyticReadiness: "ANA" },
+		{ categoryName: "Structural Load Cases", analyticReadiness: "LOW" },
+		{ categoryName: "Structural Loads", analyticReadiness: "MLT" },
+		{ categoryName: "Structural Rebar", analyticReadiness: "GEO" },
+		{ categoryName: "Structural Trusses", analyticReadiness: "GEO" },
+		{ categoryName: "StructuralDeck", analyticReadiness: "GEO" },
+		{ categoryName: "Supports", analyticReadiness: "MLT" },
 	],
 };
 
 const mepCategory: CategoryObj = {
 	generalCategory: "M&E",
-	categoryNames: [
-		"Air Terminals",
-		"Mechanical Equipment",
-		"Plumbing Fixtures",
-		"Plumbing Equipment",
-		"Pipe Fittings",
-		"Pipe Accessories",
-		"Pipe Segments",
-		"Pipes",
-		"Piping Systems",
-		"Valves",
-		"Ducts",
-		"Duct Fittings",
-		"Duct Systems",
-		"Flex Ducts",
-		"Conduits",
-		"Conduit Runs",
-		"Conduit Fittings",
-		"Electrical Fixtures",
-		"Lighting Fixtures",
-		"Lighting Devices",
-		"Electrical Equipment",
-		"Data Devices",
-		"Distribution Systems",
-		"Wires",
-		"Wire Materials",
-		"Wire Insulations",
-		"Electrical Circuits",
-		"Electrical Load Areas",
-		"HVAC Zones",
-		"HVAC Load Schedules",
-		"Electrical Analytical Bus",
-		"Electrical Analytical Loads",
-		"Electrical Analytical Power Source",
-		"Electrical Analytical Transformer",
-		"Electrical Demand Factor Definitions",
-		"Electrical Load Classification Parameter Element",
-		"Electrical Load Classifications",
-		"Electrical Spare/Space Circuits",
-		"Voltages",
+	categoryWithReadiness: [
+		{ categoryName: "Air Terminals", analyticReadiness: "ANA" },
+		{ categoryName: "Mechanical Equipment", analyticReadiness: "ANA" },
+		{ categoryName: "Center Line", analyticReadiness: "GEO" },
+		{ categoryName: "Plumbing Fixtures", analyticReadiness: "ANA" },
+		{ categoryName: "Plumbing Equipment", analyticReadiness: "ANA" },
+		{ categoryName: "Pipe Fittings", analyticReadiness: "ANA" },
+		{ categoryName: "Pipe Accessories", analyticReadiness: "MLT" },
+		{ categoryName: "Pipe Segments", analyticReadiness: "ANA" },
+		{ categoryName: "Pipes", analyticReadiness: "ANA" },
+		{ categoryName: "Piping Systems", analyticReadiness: "ANA" },
+		{ categoryName: "Valves", analyticReadiness: "ANA" },
+		{ categoryName: "Ducts", analyticReadiness: "ANA" },
+		{ categoryName: "Duct Fittings", analyticReadiness: "ANA" },
+		{ categoryName: "Duct Systems", analyticReadiness: "ANA" },
+		{ categoryName: "Flex Ducts", analyticReadiness: "ANA" },
+		{ categoryName: "Conduits", analyticReadiness: "ANA" },
+		{ categoryName: "Conduit Runs", analyticReadiness: "ANA" },
+		{ categoryName: "Conduit Fittings", analyticReadiness: "ANA" },
+		{ categoryName: "Electrical Fixtures", analyticReadiness: "MLT" },
+		{ categoryName: "Lighting Fixtures", analyticReadiness: "ANA" },
+		{ categoryName: "Lighting Devices", analyticReadiness: "MLT" },
+		{ categoryName: "Electrical Equipment", analyticReadiness: "ANA" },
+		{ categoryName: "Data Devices", analyticReadiness: "MLT" },
+		{ categoryName: "Distribution Systems", analyticReadiness: "MLT" },
+		{ categoryName: "Wires", analyticReadiness: "ANA" },
+		{ categoryName: "Wire Materials", analyticReadiness: "LOW" },
+		{ categoryName: "Wire Insulations", analyticReadiness: "LOW" },
+		{ categoryName: "Electrical Circuits", analyticReadiness: "ANA" },
+		{ categoryName: "Electrical Load Areas", analyticReadiness: "ANA" },
+		{ categoryName: "HVAC Zones", analyticReadiness: "ANA" },
+		{ categoryName: "HVAC Load Schedules", analyticReadiness: "MLT" },
+		{ categoryName: "Electrical Analytical Bus", analyticReadiness: "MLT" },
+		{ categoryName: "Electrical Analytical Loads", analyticReadiness: "ANA" },
+		{
+			categoryName: "Electrical Analytical Power Source",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Electrical Analytical Transformer",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Electrical Demand Factor Definitions",
+			analyticReadiness: "LOW",
+		},
+		{
+			categoryName: "Electrical Load Classification Parameter Element",
+			analyticReadiness: "LOW",
+		},
+		{
+			categoryName: "Electrical Load Classifications",
+			analyticReadiness: "MLT",
+		},
+		{
+			categoryName: "Electrical Spare/Space Circuits",
+			analyticReadiness: "MLT",
+		},
+		{ categoryName: "Voltages", analyticReadiness: "MLT" },
 	],
 };
 
 const annotateCategory: CategoryObj = {
 	generalCategory: "Annotate",
-	categoryNames: [
-		"Callout Heads",
-		"Color Fill Legends",
-		"Color Fill Schema",
-		"Cut Marks",
-		"Cut Profile",
-		"Detail Groups",
-		"Detail Item Tags",
-		"Detail Items",
-		"Dimensions",
-		"Elevation Marks",
-		"Generic Annotations",
-		"Keynote Tags",
-		"Legend Components",
-		"Material Tags",
-		"Multi-Category Tags",
-		"Path of Travel Lines",
-		"Revision Cloud Tags",
-		"Revision Clouds",
-		"Revision Numbering Sequences",
-		"Section Marks",
-		"Span Direction Symbol",
-		"Spot Coordinates",
-		"Spot Elevation Symbols",
-		"Spot Elevations",
-		"Spot Slopes",
-		"Text Notes",
-		"View Titles",
+	categoryWithReadiness: [
+		{ categoryName: "Callout Heads", analyticReadiness: "LOW" },
+		{ categoryName: "Color Fill Legends", analyticReadiness: "LOW" },
+		{ categoryName: "Color Fill Schema", analyticReadiness: "LOW" },
+		{ categoryName: "Cut Marks", analyticReadiness: "LOW" },
+		{ categoryName: "Cut Profile", analyticReadiness: "LOW" },
+		{ categoryName: "Detail Groups", analyticReadiness: "LOW" },
+		{ categoryName: "Detail Item Tags", analyticReadiness: "LOW" },
+		{ categoryName: "Detail Items", analyticReadiness: "LOW" },
+		{ categoryName: "Dimensions", analyticReadiness: "LOW" },
+		{ categoryName: "Elevation Marks", analyticReadiness: "LOW" },
+		{ categoryName: "Generic Annotations", analyticReadiness: "LOW" },
+		{ categoryName: "Keynote Tags", analyticReadiness: "LOW" },
+		{ categoryName: "Legend Components", analyticReadiness: "LOW" },
+		{ categoryName: "Material Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Multi-Category Tags", analyticReadiness: "LOW" },
+		{ categoryName: "Path of Travel Lines", analyticReadiness: "LOW" },
+		{ categoryName: "Revision Cloud Tags", analyticReadiness: "LOW" },
+		{ categoryName: "Revision Clouds", analyticReadiness: "LOW" },
+		{ categoryName: "Revision Numbering Sequences", analyticReadiness: "LOW" },
+		{ categoryName: "Section Marks", analyticReadiness: "LOW" },
+		{ categoryName: "Span Direction Symbol", analyticReadiness: "LOW" },
+		{ categoryName: "Spot Coordinates", analyticReadiness: "LOW" },
+		{ categoryName: "Spot Elevation Symbols", analyticReadiness: "LOW" },
+		{ categoryName: "Spot Elevations", analyticReadiness: "LOW" },
+		{ categoryName: "Text Notes", analyticReadiness: "LOW" },
+		{ categoryName: "Spot Slopes", analyticReadiness: "LOW" },
+		{ categoryName: "View Titles", analyticReadiness: "LOW" },
 	],
 };
 
 const massingSiteCategory: CategoryObj = {
 	generalCategory: "Massing, Site & Landscape",
-	categoryNames: [
-		"Mass",
-		"Mass Floors",
-		"Mass Opening",
-		"Mass Roof",
-		"Mass Shade",
-		"Mass Walls",
-		"Mass Windows and Skylights",
-		"Site",
-		"Property Lines",
-		"Property Line Segments",
-		"Primary Contours",
-		"Shared Site",
-		"Survey Point",
-		"Toposolid",
-		"Hardscape",
-		"Parking",
-		"Planting",
+	categoryWithReadiness: [
+		{ categoryName: "Mass", analyticReadiness: "MLT" },
+		{ categoryName: "Mass Floors", analyticReadiness: "QTY" },
+		{ categoryName: "Mass Opening", analyticReadiness: "QTY" },
+		{ categoryName: "Mass Roof", analyticReadiness: "QTY" },
+		{ categoryName: "Mass Shade", analyticReadiness: "QTY" },
+		{ categoryName: "Mass Walls", analyticReadiness: "QTY" },
+		{ categoryName: "Mass Windows and Skylights", analyticReadiness: "QTY" },
+		{ categoryName: "Site", analyticReadiness: "ANA" },
+		{ categoryName: "Property Lines", analyticReadiness: "MLT" },
+		{ categoryName: "Property Line Segments", analyticReadiness: "MLT" },
+		{ categoryName: "Primary Contours", analyticReadiness: "MLT" },
+		{ categoryName: "Shared Site", analyticReadiness: "LOW" },
+		{ categoryName: "Survey Point", analyticReadiness: "MLT" },
+		{ categoryName: "Toposolid", analyticReadiness: "ANA" },
+		{ categoryName: "Hardscape", analyticReadiness: "ANA" },
+		{ categoryName: "Parking", analyticReadiness: "ANA" },
+		{ categoryName: "Planting", analyticReadiness: "ANA" },
 	],
 };
 
 const modelElementsCategory: CategoryObj = {
 	generalCategory: "Model Elements",
-	categoryNames: [
-		"Model Groups",
-		"Generic Models",
-		"Entourage",
-		"Shaft Openings",
-		"Array",
-		"Adaptive Points",
-		"Analytical Surfaces",
-		"Work Plane Grid",
-		"Profiles",
-		"Lines",
-		"Constraints",
-		"Rectangular Arc Wall Opening",
-		"Rectangular Straight Wall Opening",
-		"Floor opening cut",
-		"Structural opening cut",
+	categoryWithReadiness: [
+		{ categoryName: "Model Groups", analyticReadiness: "MLT" },
+		{ categoryName: "Generic Models", analyticReadiness: "MLT" },
+		{ categoryName: "Entourage", analyticReadiness: "QTY" },
+		{ categoryName: "Shaft Openings", analyticReadiness: "MLT" },
+		{ categoryName: "Array", analyticReadiness: "LOW" },
+		{ categoryName: "Adaptive Points", analyticReadiness: "GEO" },
+		{ categoryName: "Analytical Surfaces", analyticReadiness: "ANA" },
+		{ categoryName: "Work Plane Grid", analyticReadiness: "MLT" },
+		{ categoryName: "Profiles", analyticReadiness: "MLT" },
+		{ categoryName: "Lines", analyticReadiness: "ANA" },
+		{ categoryName: "Constraints", analyticReadiness: "QTY" },
+		{ categoryName: "Rectangular Arc Wall Opening", analyticReadiness: "ANA" },
+		{
+			categoryName: "Rectangular Straight Wall Opening",
+			analyticReadiness: "ANA",
+		},
+		{ categoryName: "Floor opening cut", analyticReadiness: "ANA" },
+		{ categoryName: "Structural opening cut", analyticReadiness: "ANA" },
 	],
 };
 
 const viewCategory: CategoryObj = {
 	generalCategory: "View",
-	categoryNames: [
-		"Views",
-		"Viewports",
-		"View Reference",
-		"Sheets",
-		"Schedules",
-		"Schedule Graphics",
-		"Section Boxes",
-		"Sections",
-		"Elevations",
-		"Plan Region",
-		"Raster Images",
-		"Cameras",
-		"Design Options",
-		"Design Option Sets",
+	categoryWithReadiness: [
+		{ categoryName: "Views", analyticReadiness: "ANA" },
+		{ categoryName: "Viewports", analyticReadiness: "ANA" },
+		{ categoryName: "View Reference", analyticReadiness: "ANA" },
+		{ categoryName: "Sheets", analyticReadiness: "ANA" },
+		{ categoryName: "Schedules", analyticReadiness: "MLT" },
+		{ categoryName: "Schedule Graphics", analyticReadiness: "ANA" },
+		{ categoryName: "Section Boxes", analyticReadiness: "ANA" },
+		{ categoryName: "Sections", analyticReadiness: "ANA" },
+		{ categoryName: "Elevations", analyticReadiness: "ANA" },
+		{ categoryName: "Plan Region", analyticReadiness: "ANA" },
+		{ categoryName: "Raster Images", analyticReadiness: "ANA" },
+		{ categoryName: "Cameras", analyticReadiness: "ANA" },
 	],
 };
 
 const materialsCategory: CategoryObj = {
 	generalCategory: "Materials",
-	categoryNames: [
-		"Materials",
-		"Material Assets",
-		"Material Tags",
-		"<Insulation Batting Lines>",
+	categoryWithReadiness: [
+		{ categoryName: "Materials", analyticReadiness: "ANA" },
+		{ categoryName: "Material Assets", analyticReadiness: "ANA" },
+		{ categoryName: "<Insulation Batting Lines>", analyticReadiness: "MLT" },
 	],
 };
 
 const wallAssemblyCategory: CategoryObj = {
 	generalCategory: "Wall Assembly",
-	categoryNames: [
-		"Substrate",
-		"Membrane",
-		"Finish1",
-		"Finish2",
-		"Insulation",
-		"Structure",
+	categoryWithReadiness: [
+		{ categoryName: "Substrate", analyticReadiness: "ANA" },
+		{ categoryName: "Membrane", analyticReadiness: "ANA" },
+		{ categoryName: "Finish1", analyticReadiness: "ANA" },
+		{ categoryName: "Finish2", analyticReadiness: "ANA" },
+		{ categoryName: "Insulation", analyticReadiness: "ANA" },
+		{ categoryName: "Structure", analyticReadiness: "ANA" },
 	],
 };
 
 const analyticalCategory: CategoryObj = {
 	generalCategory: "Analytical",
-	categoryNames: [
-		"Analytical Members",
-		"Analytical Nodes",
-		"Analytical Openings",
-		"Analytical Panels",
+	categoryWithReadiness: [
+		{ categoryName: "Analytical Members", analyticReadiness: "GEO" },
+		{ categoryName: "Analytical Nodes", analyticReadiness: "MLT" },
+		{ categoryName: "Analytical Openings", analyticReadiness: "GEO" },
+		{ categoryName: "Analytical Panels", analyticReadiness: "GEO" },
 	],
 };
 
 const architectureTagsCategory: CategoryObj = {
 	generalCategory: "Architecture Tags",
-	categoryNames: [
-		"Area Tags",
-		"Ceiling Tags",
-		"Curtain Panel Tags",
-		"Door Tags",
-		"Floor Tags",
-		"Furniture Tags",
-		"Generic Model Tags",
-		"Parking Tags",
-		"Path of Travel Tags",
-		"Planting Tags",
-		"Property Line Segment Tags",
-		"Railing Tags",
-		"Roof Tags",
-		"Room Tags",
-		"Space Tags",
-		"Stair Tags",
-		"Wall Sweep Tags",
-		"Wall Tags",
-		"Window Tags",
-	],
+	categoryWithReadiness: [
+		{ categoryName: "Area Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Ceiling Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Curtain Panel Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Door Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Floor Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Furniture Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Generic Model Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Parking Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Path of Travel Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Planting Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Property Line Segment Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Railing Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Roof Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Room Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Space Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Stair Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Wall Sweep Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Wall Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Window Tags", analyticReadiness: "QTY" },
+	] as const,
 };
 
 const structureTagsCategory: CategoryObj = {
 	generalCategory: "Structure Tags",
-	categoryNames: [
-		"Area Based Load Tags",
-		"Structural Beam System Tags",
-		"Structural Beam Systems",
-		"Structural Column Tags",
-		"Structural Foundation Tags",
-		"Structural Framing Tags",
+	categoryWithReadiness: [
+		{ categoryName: "Curtain Panels", analyticReadiness: "ANA" },
+		{ categoryName: "Curtain Roof Grids", analyticReadiness: "MLT" },
+		{ categoryName: "Curtain System Grid Layout", analyticReadiness: "MLT" },
+		{ categoryName: "Curtain Systems", analyticReadiness: "GEO" },
+		{ categoryName: "Curtain Wall Grids", analyticReadiness: "MLT" },
+		{ categoryName: "Curtain Wall Mullions", analyticReadiness: "MLT" },
 	],
 };
 
 const mepTagsCategory: CategoryObj = {
 	generalCategory: "M&E Tags",
-	categoryNames: [
-		"Conduit Tags",
-		"Duct Tags",
-		"Electrical Equipment Tags",
-		"Electrical Fixture Tags",
-		"Flex Duct Tags",
-		"Lighting Fixture Tags",
-		"Mechanical Equipment Tags",
-		"Pipe Tags",
-		"Plumbing Equipment Tags",
-		"Wire Tags",
+	categoryWithReadiness: [
+		{ categoryName: "Conduit Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Duct Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Electrical Equipment Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Electrical Fixture Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Flex Duct Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Lighting Fixture Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Mechanical Equipment Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Pipe Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Plumbing Equipment Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Wire Tags", analyticReadiness: "QTY" },
 	],
 };
 
@@ -365,19 +418,39 @@ export const categoriesCategory: CategoryObjs = [
 	// miscCategory, // don't include Misc as whatever are not here should be in Misc
 ];
 
-export function findCategoryGroup(categoryName: string): GeneralCategory {
+export function findCategoryGroup(categoryName: string): GenerailCategoryObj {
 	if (categoryName === "RVT Links") {
-		return "RVT & CAD Links";
+		return {
+			generalCategory: "RVT & CAD Links",
+			categoryName: categoryName,
+			analyticalReadiness: "MLT",
+		};
 	}
 
 	for (const group of categoriesCategory) {
-		if (group.categoryNames.includes(categoryName)) {
-			return group.generalCategory;
+		const match = group.categoryWithReadiness.find(
+			(n) => n.categoryName === categoryName
+		);
+		if (match) {
+			return {
+				generalCategory: group.generalCategory,
+				categoryName: categoryName,
+				analyticalReadiness: match.analyticReadiness,
+			};
 		}
 	}
 
 	if (/\.(dwg)(\s*[\(\[].*[\)\]])?$/i.test(categoryName)) {
-		return "RVT & CAD Links";
+		// return "RVT & CAD Links";
+		return {
+			generalCategory: "RVT & CAD Links",
+			categoryName: categoryName,
+			analyticalReadiness: "QTY",
+		};
 	}
-	return "Misc"; // nothing found
+	return {
+		generalCategory: "Misc",
+		categoryName: categoryName,
+		analyticalReadiness: "LOW",
+	};
 }

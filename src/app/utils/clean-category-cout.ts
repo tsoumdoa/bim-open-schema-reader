@@ -1,15 +1,16 @@
 import { findCategoryGroup } from "./categorize-categories";
+import { GenerailCategoryObj } from "./types";
 
 export function cleanCategoryCount(rows: (string | number)[][]) {
-	const categoryGorupMap = new Map<string, [string, number][]>();
+	const categoryGorupMap = new Map<string, [GenerailCategoryObj, number][]>();
 	for (const row of rows) {
-		const categoryName = findCategoryGroup(row[0] as string);
-		if (!categoryGorupMap.has(categoryName)) {
-			categoryGorupMap.set(categoryName, []);
+		const categoryObj = findCategoryGroup(row[0] as string);
+		if (!categoryGorupMap.has(categoryObj.generalCategory)) {
+			categoryGorupMap.set(categoryObj.generalCategory, []);
 		}
 		categoryGorupMap
-			.get(categoryName)
-			?.push([row[0] as string, row[1] as number]);
+			.get(categoryObj.generalCategory)
+			?.push([categoryObj, row[1] as number]);
 	}
 	return categoryGorupMap;
 }

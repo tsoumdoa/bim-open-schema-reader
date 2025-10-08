@@ -1,4 +1,5 @@
 import { useExpandDisplay } from "../hooks/use-expand-display";
+import useFilterByDataReadiness from "../hooks/use-filter-by-data-readiness";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
@@ -71,6 +72,9 @@ export type RunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type QueryObjects = QueryObject[];
 export type UseQueryObjects = ReturnType<typeof useQueryObjects>;
 export type UseExpandDisplay = ReturnType<typeof useExpandDisplay>;
+export type UseFilterByDataReadiness = ReturnType<
+	typeof useFilterByDataReadiness
+>;
 export type UseQueryViewerAndEditor = ReturnType<
 	typeof useQueryViewerAndEditor
 >;
@@ -108,8 +112,37 @@ export type GeneralCategory = (typeof generalCategory)[number];
 
 export type CategoryObj = {
 	generalCategory: GeneralCategory;
-	categoryNames: string[];
+	categoryWithReadiness: CategoryWithReadiness[];
+};
+
+export type CategoryWithReadiness = {
+	categoryName: string;
+	analyticReadiness: AnalyticsReadinessLevels;
+};
+
+export type GenerailCategoryObj = {
+	generalCategory: GeneralCategory;
+	categoryName: string;
+	analyticalReadiness: AnalyticsReadinessLevels;
 };
 
 export type CategoryObjs = CategoryObj[];
 export type DenormParamQueryType = "flatten" | "pivot" | "stats";
+
+//analytic readiness
+export const analyticReadinessLevels = Object.freeze([
+	"GEO",
+	"ANA",
+	"MLT",
+	"QTY",
+	"LOW",
+] as const);
+export const analyticReadinessTitles = Object.freeze([
+	"Geometric Ready",
+	"Analytics Rich",
+	"Minimal Metrics",
+	"Quantities Only",
+	"Limited Value",
+] as const);
+export type AnalyticsReadinessLevels = (typeof analyticReadinessLevels)[number];
+export type AnalyticsReadinessTitle = (typeof analyticReadinessTitles)[number];
