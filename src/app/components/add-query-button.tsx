@@ -59,7 +59,6 @@ export function AddQuery(props: {
 				if (!isOpen) {
 					setIsOpen(true);
 					props.setDisplayExpanded(-1);
-					props.disableShortcutRef.current = true;
 				}
 				return;
 			}
@@ -99,8 +98,9 @@ export function AddQuery(props: {
 			open={isOpen}
 			onOpenChange={(open) => {
 				setIsOpen(open);
-				props.disableShortcutRef.current = open;
-				if (!open) {
+				if (open) {
+					props.disableShortcutRef.current = true;
+				} else {
 					props.disableShortcutRef.current = false;
 				}
 			}}
