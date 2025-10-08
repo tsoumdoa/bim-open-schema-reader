@@ -9,19 +9,20 @@ export default function useFilterByDataReadiness() {
 	const [selected, setSelected] = useState(initialSet);
 
 	const toggle = (value: AnalyticsReadinessLevels) => {
-		if (selected.has(value)) {
-			selected.delete(value);
+		const newSet = new Set(selected);
+		if (newSet.has(value)) {
+			newSet.delete(value);
 		} else {
-			selected.add(value);
+			newSet.add(value);
 		}
-		setSelected(new Set(selected));
+		setSelected(newSet);
 	};
 
 	const isolate = (value: AnalyticsReadinessLevels) => {
 		setSelected(new Set([value]));
 	};
 
-	const resest = () => {
+	const reset = () => {
 		setSelected(new Set(analyticReadinessLevels));
 	};
 
@@ -34,7 +35,7 @@ export default function useFilterByDataReadiness() {
 		selected,
 		isolate,
 		toggle,
-		resest,
+		reset,
 		isSelected,
 		showReset,
 	};
