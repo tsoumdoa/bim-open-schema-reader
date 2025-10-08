@@ -136,6 +136,7 @@ const structureCategory: CategoryObj = {
 		{ categoryName: "Bearings", analyticReadiness: "GEO" },
 		{ categoryName: "Cover Type", analyticReadiness: "MLT" },
 		{ categoryName: "Plates", analyticReadiness: "GEO" },
+		{ categoryName: "Structural Beam Systems", analyticReadiness: "ANA" },
 		{ categoryName: "Point Loads", analyticReadiness: "MLT" },
 		{ categoryName: "Slab Edges", analyticReadiness: "GEO" },
 		{ categoryName: "Structural Columns", analyticReadiness: "ANA" },
@@ -216,7 +217,7 @@ const mepCategory: CategoryObj = {
 };
 
 const annotateCategory: CategoryObj = {
-	generalCategory: "Annotate",
+	generalCategory: "Annotate & Graphics",
 	categoryWithReadiness: [
 		{ categoryName: "Callout Heads", analyticReadiness: "LOW" },
 		{ categoryName: "Color Fill Legends", analyticReadiness: "LOW" },
@@ -243,7 +244,7 @@ const annotateCategory: CategoryObj = {
 		{ categoryName: "Spot Elevations", analyticReadiness: "LOW" },
 		{ categoryName: "Text Notes", analyticReadiness: "LOW" },
 		{ categoryName: "Spot Slopes", analyticReadiness: "LOW" },
-		{ categoryName: "View Titles", analyticReadiness: "LOW" },
+		{ categoryName: "Raster Images", analyticReadiness: "ANA" },
 	],
 };
 
@@ -300,14 +301,10 @@ const viewCategory: CategoryObj = {
 		{ categoryName: "Views", analyticReadiness: "ANA" },
 		{ categoryName: "Viewports", analyticReadiness: "ANA" },
 		{ categoryName: "View Reference", analyticReadiness: "ANA" },
-		{ categoryName: "Sheets", analyticReadiness: "ANA" },
-		{ categoryName: "Schedules", analyticReadiness: "MLT" },
-		{ categoryName: "Schedule Graphics", analyticReadiness: "ANA" },
 		{ categoryName: "Section Boxes", analyticReadiness: "ANA" },
 		{ categoryName: "Sections", analyticReadiness: "ANA" },
 		{ categoryName: "Elevations", analyticReadiness: "ANA" },
 		{ categoryName: "Plan Region", analyticReadiness: "ANA" },
-		{ categoryName: "Raster Images", analyticReadiness: "ANA" },
 		{ categoryName: "Cameras", analyticReadiness: "ANA" },
 	],
 };
@@ -372,12 +369,11 @@ const architectureTagsCategory: CategoryObj = {
 const structureTagsCategory: CategoryObj = {
 	generalCategory: "Structure Tags",
 	categoryWithReadiness: [
-		{ categoryName: "Curtain Panels", analyticReadiness: "ANA" },
-		{ categoryName: "Curtain Roof Grids", analyticReadiness: "MLT" },
-		{ categoryName: "Curtain System Grid Layout", analyticReadiness: "MLT" },
-		{ categoryName: "Curtain Systems", analyticReadiness: "GEO" },
-		{ categoryName: "Curtain Wall Grids", analyticReadiness: "MLT" },
-		{ categoryName: "Curtain Wall Mullions", analyticReadiness: "MLT" },
+		{ categoryName: "Area Based Load Tags", analyticReadiness: "LOW" },
+		{ categoryName: "Structural Beam System Tags", analyticReadiness: "LOW" },
+		{ categoryName: "Structural Column Tags", analyticReadiness: "LOW" },
+		{ categoryName: "Structural Foundation Tags", analyticReadiness: "LOW" },
+		{ categoryName: "Structural Framing Tags", analyticReadiness: "LOW" },
 	],
 };
 
@@ -394,6 +390,17 @@ const mepTagsCategory: CategoryObj = {
 		{ categoryName: "Pipe Tags", analyticReadiness: "QTY" },
 		{ categoryName: "Plumbing Equipment Tags", analyticReadiness: "QTY" },
 		{ categoryName: "Wire Tags", analyticReadiness: "QTY" },
+	],
+};
+
+const sheetsSchedulesCategory: CategoryObj = {
+	generalCategory: "Sheets and Schedules",
+	categoryWithReadiness: [
+		{ categoryName: "Sheets", analyticReadiness: "ANA" },
+		{ categoryName: "Schedules", analyticReadiness: "QTY" },
+		{ categoryName: "Schedule Graphics", analyticReadiness: "QTY" },
+		{ categoryName: "Title Blocks", analyticReadiness: "QTY" },
+		{ categoryName: "View Titles", analyticReadiness: "LOW" },
 	],
 };
 
@@ -415,6 +422,7 @@ export const categoriesCategory: CategoryObjs = [
 	architectureTagsCategory,
 	structureTagsCategory,
 	mepTagsCategory,
+	sheetsSchedulesCategory,
 	// miscCategory, // don't include Misc as whatever are not here should be in Misc
 ];
 

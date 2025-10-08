@@ -101,11 +101,12 @@ export const generalCategory = [
 	"Structure",
 	"M&E",
 	"View",
+	"Sheets and Schedules",
+	"Annotate & Graphics",
 	"Architecture Tags",
 	"Structure Tags",
 	"M&E Tags",
 	"Analytical",
-	"Annotate",
 	"Misc",
 ] as const;
 export type GeneralCategory = (typeof generalCategory)[number];
