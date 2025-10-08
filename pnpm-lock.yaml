@@ -21,8 +21,8 @@ importers:
         specifier: ^6.38.4
         version: 6.38.4
       '@duckdb/duckdb-wasm':
-        specifier: 1.29.1-dev132.0
-        version: 1.29.1-dev132.0
+        specifier: 1.30.0
+        version: 1.30.0
       '@radix-ui/react-accordion':
         specifier: ^1.2.12
         version: 1.2.12(@types/react-dom@19.2.0(@types/react@19.2.0))(@types/react@19.2.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -209,8 +209,11 @@ packages:
   '@codemirror/view@6.38.4':
     resolution: {integrity: sha512-hduz0suCcUSC/kM8Fq3A9iLwInJDl8fD1xLpTIk+5xkNm8z/FT7UsIa9sOXrkpChh+XXc18RzswE8QqELsVl+g==}
 
-  '@duckdb/duckdb-wasm@1.29.1-dev132.0':
-    resolution: {integrity: sha512-OUkJuH9564GQ/OgggdgJ/Yxmlk5PYnWiJe0rrNkEs0Sfsi00nK6WZgJmWGGAtCK6le2KJxFWZ4Z2MjUKGBzLuQ==}
+  '@codemirror/view@6.38.5':
+    resolution: {integrity: sha512-SFVsNAgsAoou+BjRewMqN+m9jaztB9wCWN9RSRgePqUbq8UVlvJfku5zB2KVhLPgH/h0RLk38tvd4tGeAhygnw==}
+
+  '@duckdb/duckdb-wasm@1.30.0':
+    resolution: {integrity: sha512-9aWrm+4ayl4sTlvGtl/b+LxrUyXaac3yyVqkoJ3F7Vkd62PoS8PcQIRJ/KjXBW36LP1CnPY5jjvFyIcTFLtcXA==}
 
   '@emnapi/core@1.5.0':
     resolution: {integrity: sha512-sbP8GzB1WDzacS8fgNPpHlp6C9VZe+SJP3F90W9rLemaQj2PzIuTEl1qDOYQf58YIpyjViI24y9aPWCjEzY2cg==}
@@ -3072,13 +3075,13 @@ snapshots:
   '@codemirror/lint@6.8.5':
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.4
+      '@codemirror/view': 6.38.5
       crelt: 1.0.6
 
   '@codemirror/search@6.5.11':
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.4
+      '@codemirror/view': 6.38.5
       crelt: 1.0.6
 
   '@codemirror/state@6.5.2':
@@ -3089,7 +3092,7 @@ snapshots:
     dependencies:
       '@codemirror/language': 6.11.3
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.4
+      '@codemirror/view': 6.38.5
       '@lezer/highlight': 1.2.1
 
   '@codemirror/view@6.38.4':
@@ -3099,7 +3102,14 @@ snapshots:
       style-mod: 4.1.2
       w3c-keyname: 2.2.8
 
-  '@duckdb/duckdb-wasm@1.29.1-dev132.0':
+  '@codemirror/view@6.38.5':
+    dependencies:
+      '@codemirror/state': 6.5.2
+      crelt: 1.0.6
+      style-mod: 4.1.2
+      w3c-keyname: 2.2.8
+
+  '@duckdb/duckdb-wasm@1.30.0':
     dependencies:
       apache-arrow: 17.0.0
 
@@ -4373,7 +4383,7 @@ snapshots:
       '@codemirror/lint': 6.8.5
       '@codemirror/search': 6.5.11
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.4
+      '@codemirror/view': 6.38.5
 
   color-convert@2.0.1:
     dependencies:

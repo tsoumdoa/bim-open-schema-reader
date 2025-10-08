@@ -4,7 +4,9 @@ import {
 	listLevelWithCoredStatus,
 } from "../sql/level-and-grid-codrination-status";
 import { basicMaterialsInfo } from "../sql/materials-basic-info";
-import { basicViewInfo } from "../sql/view-basic-info";
+import { tagsTotalCountByCategory } from "../sql/tags-total-count-by-category";
+import { tagsTotalCountByFamily } from "../sql/tags-total-count-by-family";
+import { tagsTotalCountByType } from "../sql/tags-total-count-by-type";
 import { countByViewFamily } from "../sql/view-count-by-view-family";
 import { countViewByFamilyAndType } from "../sql/view-count-by-view-family-and-type";
 import { countByViewType } from "../sql/view-count-by-view-type";
@@ -84,11 +86,6 @@ const walls: QueriesSelector = {
 const views: QueriesSelector = {
 	queryCategory: "Views",
 	queryObjects: [
-		// {
-		// 	queryTitle: "Basic view info",
-		// 	sqlQuery: basicViewInfo,
-		// 	explaination: "Basic info for each view",
-		// },
 		{
 			queryTitle: "Count unplaced views",
 			sqlQuery: countUnplacedViews,
@@ -112,12 +109,35 @@ const views: QueriesSelector = {
 	],
 };
 
+const tags: QueriesSelector = {
+	queryCategory: "Tags",
+	queryObjects: [
+		{
+			queryTitle: "Count Total Tags by  Category",
+			sqlQuery: tagsTotalCountByCategory,
+			explaination:
+				"Count total number of tags in the Revit project by category",
+		},
+		{
+			queryTitle: "Count Total Tags by Family",
+			sqlQuery: tagsTotalCountByFamily,
+			explaination: "Count total number of tags in the Revit project by family",
+		},
+		{
+			queryTitle: "Count Total Tags by Type",
+			sqlQuery: tagsTotalCountByType,
+			explaination: "Count total number of tags in the Revit project by type",
+		},
+	],
+};
+
 export const queriesSelectorList: QueriesSelector[] = [
 	levels,
 	grids,
 	materials,
 	walls,
 	views,
+	tags,
 ];
 
 export const denormParamQueryBuilderName: {
