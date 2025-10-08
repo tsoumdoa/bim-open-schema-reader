@@ -30,7 +30,7 @@ function BlurredBackdrop(props: { children: React.ReactNode }) {
 		<div className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center duration-200">
 			<div className="absolute inset-0 bg-neutral-100/80 backdrop-blur-xs" />
 			<div
-				className="animate-in zoom-in-95 max-w-8xl relative z-10 w-full px-8 duration-200"
+				className="animate-in zoom-in-95 relative z-10 w-full max-w-6xl px-8 duration-200"
 				onClick={(e) => e.stopPropagation()}
 			>
 				{props.children}
