@@ -7,8 +7,20 @@ export default function useFilterByDataReadiness() {
 	const initialSet = new Set(analyticReadinessLevels);
 
 	const [selected, setSelected] = useState(initialSet);
+	const allSelected = selected.size === analyticReadinessLevels.length;
+	const showReset = selected.size !== analyticReadinessLevels.length;
 
 	const toggle = (value: AnalyticsReadinessLevels) => {
+		if (allSelected) {
+			setSelected(new Set([value]));
+		} else {
+			const newSet = new Set(selected);
+			newSet.has(value) ? newSet.delete(value) : newSet.add(value);
+			setSelected(newSet);
+		}
+	};
+
+	const isolateToggle = (value: AnalyticsReadinessLevels) => {
 		const newSet = new Set(selected);
 		if (newSet.has(value)) {
 			newSet.delete(value);
@@ -16,10 +28,6 @@ export default function useFilterByDataReadiness() {
 			newSet.add(value);
 		}
 		setSelected(newSet);
-	};
-
-	const isolate = (value: AnalyticsReadinessLevels) => {
-		setSelected(new Set([value]));
 	};
 
 	const reset = () => {
@@ -30,10 +38,10 @@ export default function useFilterByDataReadiness() {
 		return selected.has(value);
 	};
 
-	const showReset = selected.size !== analyticReadinessLevels.length;
 	return {
+		allSelected,
 		selected,
-		isolate,
+		isolateToggle,
 		toggle,
 		reset,
 		isSelected,

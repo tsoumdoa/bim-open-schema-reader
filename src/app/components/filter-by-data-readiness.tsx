@@ -41,7 +41,7 @@ const Icons = [
 ];
 
 export default function FilterByDataReadiness() {
-	const { toggle, reset, isSelected, showReset, isolate } =
+	const { toggle, reset, isSelected, showReset, isolateToggle } =
 		useDataReadinessFilter();
 
 	return (
@@ -67,8 +67,13 @@ export default function FilterByDataReadiness() {
 				{Icons.map((icon, index) => (
 					<Tooltip delayDuration={500} key={`filter-icon-${index}`}>
 						<TooltipTrigger
-							onClick={() => toggle(icon.abb)}
-							onDoubleClick={() => isolate(icon.abb)}
+							onClick={(e) => {
+								if (e.shiftKey) {
+									isolateToggle(icon.abb);
+								} else {
+									toggle(icon.abb);
+								}
+							}}
 							className={`${!isSelected(icon.abb) && "opacity-15"} animate transition-all hover:cursor-pointer`}
 						>
 							{icon.icon}
