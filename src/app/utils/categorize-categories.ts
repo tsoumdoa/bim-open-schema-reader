@@ -231,7 +231,6 @@ const annotateCategory: CategoryObj = {
 		{ categoryName: "Generic Annotations", analyticReadiness: "LOW" },
 		{ categoryName: "Keynote Tags", analyticReadiness: "LOW" },
 		{ categoryName: "Legend Components", analyticReadiness: "LOW" },
-		{ categoryName: "Material Tags", analyticReadiness: "QTY" },
 		{ categoryName: "Multi-Category Tags", analyticReadiness: "LOW" },
 		{ categoryName: "Path of Travel Lines", analyticReadiness: "LOW" },
 		{ categoryName: "Revision Cloud Tags", analyticReadiness: "LOW" },
@@ -366,6 +365,7 @@ const architectureTagsCategory: CategoryObj = {
 		{ categoryName: "Wall Sweep Tags", analyticReadiness: "QTY" },
 		{ categoryName: "Wall Tags", analyticReadiness: "QTY" },
 		{ categoryName: "Window Tags", analyticReadiness: "QTY" },
+		{ categoryName: "Material Tags", analyticReadiness: "QTY" },
 	] as const,
 };
 
