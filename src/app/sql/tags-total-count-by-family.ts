@@ -48,8 +48,8 @@ export const tagsTotalCountByFamily = sql`
         instance_category = family_category
     )
   SELECT DISTINCT
-    family_param_value,
-    family_category,
+    family_category AS category,
+    family_param_value AS family_name,
     -- count(*) AS tag_count, -- not reliable for now
     list (DISTINCT name) AS type_names
   FROM
