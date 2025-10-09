@@ -74,13 +74,14 @@ export function AddQuery(props: {
 		return () => document.removeEventListener("keydown", onKeyDown);
 	}, [isOpen, props.setDisplayExpanded]);
 
-	const handleSelectCommand = (
+	const handleAddCommand = (
 		queryCategory: string,
 		queryObject: QueryObject
 	) => {
 		queryObject.queryCategory = queryCategory;
 		props.addQuery(queryObject);
 		setIsOpen(false);
+		props.disableShortcutRef.current = false;
 	};
 
 	const handleCreateCustomQuery = () => {
@@ -141,7 +142,7 @@ export function AddQuery(props: {
 										return (
 											<div
 												onClick={() => {
-													handleSelectCommand(querySelector.queryCategory, q);
+													handleAddCommand(querySelector.queryCategory, q);
 												}}
 												key={`${querySelector.queryCategory}-${q.queryTitle}-${i}`}
 											>

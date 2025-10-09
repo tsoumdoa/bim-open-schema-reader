@@ -54,11 +54,10 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 - [x] investigate why query time keep changing.. **FIXED**
 - [ ] foldable query name, maybe more of options to hide .dwg links when there are lots of
       them
-- [ ] make sample file to check wall quantitie calculation and room behaviour
+- [x] make sample file to check wall quantitie calculation and room behaviour
       (e.g. unplaced room...?)
-- [ ] introduce the LOI as proposed below to the whole UI/UX...
-- [ ] make it easier to seprate instance from family (introduction of LOI should
-      be a blocker for this imho)
+- [x] introduce the LOI as proposed below to the whole UI/UX...
+- [ ] improve quantity queries (e.g. room, floor, wall, etc...)
 
 ## Exporter improvemnt idea
 
