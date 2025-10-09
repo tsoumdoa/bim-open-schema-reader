@@ -48,6 +48,7 @@ export const queryCategories = [
 	"Views",
 	"Walls",
 	"Tags",
+	"Sheets",
 ] as const;
 export type QueryCategory = (typeof queryCategories)[number];
 

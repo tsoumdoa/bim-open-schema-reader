@@ -4,6 +4,7 @@ import {
 	listLevelWithCoredStatus,
 } from "../sql/level-and-grid-codrination-status";
 import { basicMaterialsInfo } from "../sql/materials-basic-info";
+import { sheetSchedule } from "../sql/sheets-schedule";
 import { tagsTotalCountByCategory } from "../sql/tags-total-count-by-category";
 import { tagsTotalCountByFamily } from "../sql/tags-total-count-by-family";
 import { countByViewFamily } from "../sql/view-count-by-view-family";
@@ -122,11 +123,24 @@ const tags: QueriesSelector = {
 			sqlQuery: tagsTotalCountByFamily,
 			explaination: "Count total number of tags in the Revit project by family",
 		},
+		// NOTE: can't use this untill the exporter is improved with fily type
+		// support..
 		// {
 		// 	queryTitle: "Count Total Tags by Type",
 		// 	sqlQuery: tagsTotalCountByType,
 		// 	explaination: "Count total number of tags in the Revit project by type",
 		// },
+	],
+};
+
+const sheets: QueriesSelector = {
+	queryCategory: "Sheets",
+	queryObjects: [
+		{
+			queryTitle: "Sheet Schedule",
+			sqlQuery: sheetSchedule,
+			explaination: "Simple sheets schedule",
+		},
 	],
 };
 
@@ -137,6 +151,7 @@ export const queriesSelectorList: QueriesSelector[] = [
 	walls,
 	views,
 	tags,
+	sheets,
 ];
 
 export const denormParamQueryBuilderName: {
