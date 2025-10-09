@@ -28,7 +28,7 @@ export const countUnplacedViews = sql`
         END AS status
       FROM
         str_data
-    ) t
+    )
   GROUP BY
     status
   UNION ALL

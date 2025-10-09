@@ -63,3 +63,6 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 ## Exporter improvemnt idea
 
 - Current doesn't export unused families, should it be...?
+- each instance seems to only have family type not family name which make it
+  impossible to accurate map which family type each instance belongs to when the
+  type has duplicate names
