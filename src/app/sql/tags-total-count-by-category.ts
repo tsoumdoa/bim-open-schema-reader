@@ -44,13 +44,13 @@ export const tagsTotalCountByCategory = sql`
         *
       FROM
         instance_data AS id
-        LEFT JOIN family_data AS fd ON id.name = fd.name
+        LEFT JOIN family_data AS fd ON id.name = fd.name -- this is checking family type name only..
       WHERE
         instance_category = family_category
     )
   SELECT DISTINCT
     family_category,
-    count(DISTINCT LocalId) AS tag_count,
+    count(DISTINCT LocalId) AS tag_count, -- it should count(*) but there are duplicate
     list (DISTINCT family_param_value)
   FROM
     family_of_instance

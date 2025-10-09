@@ -6,7 +6,6 @@ import {
 import { basicMaterialsInfo } from "../sql/materials-basic-info";
 import { tagsTotalCountByCategory } from "../sql/tags-total-count-by-category";
 import { tagsTotalCountByFamily } from "../sql/tags-total-count-by-family";
-import { tagsTotalCountByType } from "../sql/tags-total-count-by-type";
 import { countByViewFamily } from "../sql/view-count-by-view-family";
 import { countViewByFamilyAndType } from "../sql/view-count-by-view-family-and-type";
 import { countByViewType } from "../sql/view-count-by-view-type";
@@ -123,11 +122,11 @@ const tags: QueriesSelector = {
 			sqlQuery: tagsTotalCountByFamily,
 			explaination: "Count total number of tags in the Revit project by family",
 		},
-		{
-			queryTitle: "Count Total Tags by Type",
-			sqlQuery: tagsTotalCountByType,
-			explaination: "Count total number of tags in the Revit project by type",
-		},
+		// {
+		// 	queryTitle: "Count Total Tags by Type",
+		// 	sqlQuery: tagsTotalCountByType,
+		// 	explaination: "Count total number of tags in the Revit project by type",
+		// },
 	],
 };
 

@@ -43,7 +43,7 @@ export const tagsTotalCountByType = sql`
         *
       FROM
         instance_data AS id
-        LEFT JOIN family_data AS fd ON id.name = fd.name
+        LEFT JOIN family_data AS fd ON id.name = fd.name -- this is checking family type name only..
       WHERE
         instance_category = family_category
     )
@@ -51,7 +51,7 @@ export const tagsTotalCountByType = sql`
     family_param_value,
     name,
     family_category,
-    count(*) AS tag_count,
+    -- count(*) AS tag_count, -- not reliable for now
     --list(DISTINCT name) AS type_names
   FROM
     family_of_instance
@@ -60,5 +60,7 @@ export const tagsTotalCountByType = sql`
     family_param_value,
     family_category
   ORDER BY
-    tag_count DESC;
+    family_param_value;
+
+  --   tag_count DESC;
 `;
