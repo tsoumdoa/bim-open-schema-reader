@@ -15,6 +15,7 @@ export default function KeywordFilter(props: {
 				className="h-6"
 				value={keyword ?? ""}
 				onChange={(e) => setKeyword(e.target.value)}
+				aria-label="Keyword search"
 			/>
 			{hasKeyword && (
 				<button
@@ -22,6 +23,7 @@ export default function KeywordFilter(props: {
 					onClick={() => {
 						setKeyword("");
 					}}
+					aria-label="Clear keyword"
 				>
 					<div className="absolute inset-0 rounded-full bg-black/80" />
 					<X
