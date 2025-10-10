@@ -47,11 +47,9 @@ export default function FilterByDataReadiness() {
 	return (
 		<div className="py-1">
 			<div className="animate flex flex-row items-center justify-items-center gap-1 pb-1 transition-all">
-				<div className="text-xs font-medium hover:cursor-help">
-					<DataReadinessHelpDialog>
-						Filter by Data Readiness
-					</DataReadinessHelpDialog>
-				</div>
+				<DataReadinessHelpDialog>
+					Filter by Data Readiness
+				</DataReadinessHelpDialog>
 				<div
 					className={`text-xs font-light transition-opacity hover:cursor-pointer ${showReset
 							? "pointer-events-auto opacity-100"
