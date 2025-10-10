@@ -15,7 +15,9 @@ export default function DataReadinessHelpDialog(props: {
 }) {
 	return (
 		<Dialog>
-			<DialogTrigger>{props.children}</DialogTrigger>
+			<DialogTrigger className="text-xs font-medium hover:cursor-help">
+				{props.children}
+			</DialogTrigger>
 			<DialogContent className="max-w-[500px] overflow-y-scroll">
 				<DialogHeader>
 					<DialogTitle>Data Readiness</DialogTitle>

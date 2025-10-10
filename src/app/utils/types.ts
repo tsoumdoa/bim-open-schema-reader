@@ -50,6 +50,7 @@ export const queryCategories = [
 	"Walls",
 	"Tags",
 	"Sheets",
+	"Rooms",
 ] as const;
 export type QueryCategory = (typeof queryCategories)[number];
 

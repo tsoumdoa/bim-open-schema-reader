@@ -4,6 +4,7 @@ import {
 	listLevelWithCoredStatus,
 } from "../sql/level-and-grid-codrination-status";
 import { basicMaterialsInfo } from "../sql/materials-basic-info";
+import { simpleRoomSchedule } from "../sql/room-simple-schedule";
 import { sheetSchedule } from "../sql/sheets-schedule";
 import { tagsTotalCountByCategory } from "../sql/tags-total-count-by-category";
 import { tagsTotalCountByFamily } from "../sql/tags-total-count-by-family";
@@ -144,6 +145,17 @@ const sheets: QueriesSelector = {
 	],
 };
 
+const rooms: QueriesSelector = {
+	queryCategory: "Rooms",
+	queryObjects: [
+		{
+			queryTitle: "Simple room schedule",
+			sqlQuery: simpleRoomSchedule,
+			explaination: "Simple room schedule",
+		},
+	],
+};
+
 export const queriesSelectorList: QueriesSelector[] = [
 	levels,
 	grids,
@@ -152,6 +164,7 @@ export const queriesSelectorList: QueriesSelector[] = [
 	views,
 	tags,
 	sheets,
+	rooms,
 ];
 
 export const denormParamQueryBuilderName: {

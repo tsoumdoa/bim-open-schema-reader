@@ -6,6 +6,7 @@ export function useKeywordFilter() {
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	useEffect(() => {
 		document.addEventListener("keydown", handleKeyDown);
+		inputRef.current?.focus();
 		return () => {
 			document.removeEventListener("keydown", handleKeyDown);
 		};
