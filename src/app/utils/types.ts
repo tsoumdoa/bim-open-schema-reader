@@ -1,5 +1,6 @@
 import { useExpandDisplay } from "../hooks/use-expand-display";
 import useFilterByDataReadiness from "../hooks/use-filter-by-data-readiness";
+import { useKeywordFilter } from "../hooks/use-keyword-filter";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
@@ -77,6 +78,8 @@ export type UseExpandDisplay = ReturnType<typeof useExpandDisplay>;
 export type UseFilterByDataReadiness = ReturnType<
 	typeof useFilterByDataReadiness
 >;
+export type UseKeywordFilter = ReturnType<typeof useKeywordFilter>;
+
 export type UseQueryViewerAndEditor = ReturnType<
 	typeof useQueryViewerAndEditor
 >;

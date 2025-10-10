@@ -10,6 +10,8 @@ import DropDownMenu from "./data-category-list-dropdown";
 import DataReadinessIcon from "./data-readiness-icon";
 import FilterByDataReadiness from "./filter-by-data-readiness";
 import { useDataReadinessFilter } from "./use-data-readiness-filter";
+import KeywordFilter from "./keyword-filter";
+import { useKeywordFilter } from "../hooks/use-keyword-filter";
 
 function ShortcutHelp() {
 	return (
@@ -46,6 +48,8 @@ export function QuickExplorer(props: {
 }) {
 	const [focused, setFocused] = useState("");
 	const { isSelected } = useDataReadinessFilter();
+	const useKeywordFilterHook = useKeywordFilter();
+	const { keyword } = useKeywordFilterHook;
 
 	return (
 		<BlurredBackdrop>
@@ -65,15 +69,36 @@ export function QuickExplorer(props: {
 					</Button>
 				</CardHeader>
 				<CardContent>
-					<FilterByDataReadiness />
+					<div className="flex flex-row items-center justify-between">
+						<FilterByDataReadiness />
+						<KeywordFilter useKeywordFilter={useKeywordFilterHook} />
+					</div>
 					<ScrollArea className="h-[60vh] pt-1 pr-4">
 						{generalCategory.map((categoryName, categoryIndex) => {
-							const rawRows = props.categoryGorupMap.get(categoryName) ?? [];
-							const visibleRows = rawRows.filter((row) =>
-								isSelected(row[0].analyticalReadiness)
-							);
+							const rawRows = props.categoryGorupMap.get(categoryName);
+							if (!rawRows || rawRows.length === 0) return null;
 
-							if (visibleRows.length === 0) return null;
+							const kw = keyword.trim().toLowerCase();
+							const doKeyword = kw.length > 0;
+
+							const filteredRows = [];
+							for (const row of rawRows) {
+								const item = row[0];
+								if (!isSelected(item.analyticalReadiness)) continue;
+								if (!doKeyword) {
+									filteredRows.push(row);
+									continue;
+								}
+								if (
+									doKeyword &&
+									!item.categoryName.toLowerCase().includes(kw)
+								) {
+									continue;
+								}
+								filteredRows.push(row);
+							}
+
+							if (filteredRows.length === 0) return null;
 
 							const dimmedCategory =
 								focused !== "" && focused.split("-")[1] !== `${categoryIndex}`;
@@ -88,7 +113,7 @@ export function QuickExplorer(props: {
 									</div>
 
 									<div className="flex flex-row flex-wrap gap-3">
-										{visibleRows.map((row, groupIndex) => {
+										{filteredRows.map((row, groupIndex) => {
 											const dimmedBadge =
 												focused !== "" &&
 												focused !== `quick-${categoryIndex}-${groupIndex}`;
