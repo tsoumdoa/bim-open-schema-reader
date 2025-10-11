@@ -58,6 +58,9 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
       (e.g. unplaced room...?)
 - [x] introduce the LOI as proposed below to the whole UI/UX...
 - [ ] improve quantity queries (e.g. room, floor, wall, etc...)
+- [ ] data doesn't persist correct after saving - probably not updating the
+      overall obj correctly....?
+- [ ] refactor 'Wall Element Basic Info' query, it should use new pivot pattern
 
 ## Exporter improvemnt idea
 
@@ -65,3 +68,4 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 - each instance seems to only have family type not family name which make it
   impossible to accurate map which family type each instance belongs to when the
   type has duplicate names
+- Link elements could have lots more metrics... https://better-doc.tzero.one/revit-2025/all/85b534b8-dd6c-bc13-7c46-c803c83481e4

@@ -1,3 +1,5 @@
+import { dwgSchedule } from "../sql/dwg-schedule";
+import { floorSchedule } from "../sql/floor-schedule";
 import { listGrids, listLevels } from "../sql/level-and-grid";
 import {
 	listGridWithCoredStatus,
@@ -15,18 +17,18 @@ import { countUnplacedViews } from "../sql/view-count-unplaced-views";
 import { listWallBuildUps } from "../sql/wall-build-ups";
 import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
 import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
-import { DenormTableName, QueriesSelector } from "./types";
+import { CategoryObj, DenormTableName, QueriesSelector } from "./types";
 
 const levels: QueriesSelector = {
 	queryCategory: "Levels",
 	queryObjects: [
 		{
-			queryTitle: "List all levels",
+			queryTitle: "List all Levels",
 			sqlQuery: listLevels,
 			explaination: "List all levels along with their coordinates",
 		},
 		{
-			queryTitle: "Levels cordination view",
+			queryTitle: "Levels Cordination View",
 			sqlQuery: listLevelWithCoredStatus,
 			explaination:
 				"Compare levels with the linked models to check if they are in the same location",
@@ -38,12 +40,12 @@ const grids: QueriesSelector = {
 	queryCategory: "Grids",
 	queryObjects: [
 		{
-			queryTitle: "List all grids",
+			queryTitle: "List all Grids",
 			sqlQuery: listGrids,
 			explaination: "List all grids along with their coordinates",
 		},
 		{
-			queryTitle: "Grids cordination view",
+			queryTitle: "Grids Cordination View",
 			sqlQuery: listGridWithCoredStatus,
 			explaination:
 				"Compare grids with the linked models to check if they are in the same location",
@@ -55,7 +57,7 @@ const materials: QueriesSelector = {
 	queryCategory: "Materials",
 	queryObjects: [
 		{
-			queryTitle: "Materials basic info",
+			queryTitle: "Materials Basic Info",
 			sqlQuery: basicMaterialsInfo,
 			explaination:
 				"List visual material properties: Color (hex RGB), Shine (0–128), Glow (0–100), Smoothness (0–100), Shininess (0–100).",
@@ -67,17 +69,17 @@ const walls: QueriesSelector = {
 	queryCategory: "Walls",
 	queryObjects: [
 		{
-			queryTitle: "Wall double and point parameters",
+			queryTitle: "Wall Double and Point Parameters",
 			sqlQuery: wallDoubleAndPointParameters,
 			explaination: "Wall double and point parameters (metric)",
 		},
 		{
-			queryTitle: "Wall element basic info",
+			queryTitle: "Wall Element Basic Info",
 			sqlQuery: wallElementBasicInfo,
 			explaination: "Wall element basic info",
 		},
 		{
-			queryTitle: "Wall build up schedule",
+			queryTitle: "Wall Build up Schedule",
 			sqlQuery: listWallBuildUps,
 			explaination: "Wall build up schedule (metric)",
 		},
@@ -88,22 +90,22 @@ const views: QueriesSelector = {
 	queryCategory: "Views",
 	queryObjects: [
 		{
-			queryTitle: "Count unplaced views",
+			queryTitle: "Count Unplaced Views",
 			sqlQuery: countUnplacedViews,
 			explaination: "Count number of placed and unplaced views",
 		},
 		{
-			queryTitle: "Count by view family",
+			queryTitle: "Count by View Family",
 			sqlQuery: countByViewFamily,
 			explaination: "Count number of views by view family",
 		},
 		{
-			queryTitle: "Count by view type",
+			queryTitle: "Count by View Type",
 			sqlQuery: countByViewType,
 			explaination: "Count number of views by view type",
 		},
 		{
-			queryTitle: "Count by view family and type",
+			queryTitle: "Count by View Family and Type",
 			sqlQuery: countViewByFamilyAndType,
 			explaination: "Count number of views by view family and type",
 		},
@@ -125,7 +127,7 @@ const tags: QueriesSelector = {
 			explaination: "Count total number of tags in the Revit project by family",
 		},
 		// NOTE: can't use this untill the exporter is improved with fily type
-		// support..
+		// support due to the duplicated names of type under different families
 		// {
 		// 	queryTitle: "Count Total Tags by Type",
 		// 	sqlQuery: tagsTotalCountByType,
@@ -149,9 +151,31 @@ const rooms: QueriesSelector = {
 	queryCategory: "Rooms",
 	queryObjects: [
 		{
-			queryTitle: "Simple room schedule",
+			queryTitle: "Simple Room Schedule",
 			sqlQuery: simpleRoomSchedule,
 			explaination: "Simple room schedule",
+		},
+	],
+};
+
+const cadLinks: QueriesSelector = {
+	queryCategory: "CAD Links",
+	queryObjects: [
+		{
+			queryTitle: "CAD Links",
+			sqlQuery: dwgSchedule,
+			explaination: "CAD Links",
+		},
+	],
+};
+
+const floors: QueriesSelector = {
+	queryCategory: "Floors",
+	queryObjects: [
+		{
+			queryTitle: "Floor Schedule",
+			sqlQuery: floorSchedule,
+			explaination: "Floor Schedule",
 		},
 	],
 };
@@ -165,6 +189,8 @@ export const queriesSelectorList: QueriesSelector[] = [
 	tags,
 	sheets,
 	rooms,
+	cadLinks,
+	floors,
 ];
 
 export const denormParamQueryBuilderName: {
