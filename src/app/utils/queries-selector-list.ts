@@ -1,5 +1,6 @@
 import { dwgSchedule } from "../sql/dwg-schedule";
 import { floorSchedule } from "../sql/floor-schedule";
+import { floorScheduleByType } from "../sql/floor-schedule-by-type";
 import { listGrids, listLevels } from "../sql/level-and-grid";
 import {
 	listGridWithCoredStatus,
@@ -176,6 +177,11 @@ const floors: QueriesSelector = {
 			queryTitle: "Floor Schedule",
 			sqlQuery: floorSchedule,
 			explaination: "Floor Schedule",
+		},
+		{
+			queryTitle: "Floor Schedule by Floor Type",
+			sqlQuery: floorScheduleByType,
+			explaination: "Floor Schedule by Floor Type",
 		},
 	],
 };
