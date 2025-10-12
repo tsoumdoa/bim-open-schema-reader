@@ -56,12 +56,12 @@ function DataTableBody<TData, TValue>(props: {
 							<TableHead
 								key={"empty-header"}
 								className="sticky top-0 z-20 bg-white"
-							></TableHead>
+							/>
 							{headerGroup.headers.map((header) => {
 								return (
 									<TableHead
 										key={header.id}
-										className="sticky top-0 z-20 bg-white tracking-tight"
+										className="sticky top-0 z-20 bg-white tracking-tighter"
 										onClick={header.column.getToggleSortingHandler()}
 									>
 										<div className="flex items-center gap-x-1 hover:cursor-pointer">
@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>(props: {
 }) {
 	const { index, displayExpanded, setDisplayExpanded } = props;
 	const [sorting, setSorting] = useState<SortingState>([]);
-	const pageSize = 30;
+	const pageSize = 20;
 	const tableContainerRef = useRef<HTMLDivElement>(null);
 
 	const columns = props.runDuckDbQuery.headers.map((header, i) => {

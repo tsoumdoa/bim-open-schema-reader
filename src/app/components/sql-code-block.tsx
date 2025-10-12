@@ -209,7 +209,7 @@ export default function SqlQueryCodeBlock(props: {
 
 	const handleCopy = async () => {
 		try {
-			await navigator.clipboard.writeText(formatedQuery);
+			await navigator.clipboard.writeText(newSqlQuery);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
 		} catch (err) {
