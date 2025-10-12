@@ -130,7 +130,7 @@ export function AddQuery(props: {
 				</DialogHeader>
 				<Command className="rounded-lg border shadow-md md:min-w-[450px]">
 					<CommandInput placeholder="Type a query or search..." />
-					<CommandList>
+					<CommandList className="max-h-[min(60vh,900px)]">
 						<CommandEmpty>No results found.</CommandEmpty>
 						{queriesSelectorList.map((querySelector) => {
 							return (
