@@ -6,7 +6,9 @@ import {
 	listGridWithCoredStatus,
 	listLevelWithCoredStatus,
 } from "../sql/level-and-grid-codrination-status";
+import { levelSchedule } from "../sql/level-schedule";
 import { basicMaterialsInfo } from "../sql/materials-basic-info";
+import { roomScheduleByLevel } from "../sql/room-count-by-level";
 import { simpleRoomSchedule } from "../sql/room-simple-schedule";
 import { sheetSchedule } from "../sql/sheets-schedule";
 import { tagsTotalCountByCategory } from "../sql/tags-total-count-by-category";
@@ -18,14 +20,14 @@ import { countUnplacedViews } from "../sql/view-count-unplaced-views";
 import { listWallBuildUps } from "../sql/wall-build-ups";
 import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
 import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
-import { CategoryObj, DenormTableName, QueriesSelector } from "./types";
+import { DenormTableName, QueriesSelector } from "./types";
 
 const levels: QueriesSelector = {
 	queryCategory: "Levels",
 	queryObjects: [
 		{
-			queryTitle: "List all Levels",
-			sqlQuery: listLevels,
+			queryTitle: "Level Schedule",
+			sqlQuery: levelSchedule,
 			explaination: "List all levels along with their coordinates",
 		},
 		{
@@ -155,6 +157,11 @@ const rooms: QueriesSelector = {
 			queryTitle: "Simple Room Schedule",
 			sqlQuery: simpleRoomSchedule,
 			explaination: "Simple room schedule",
+		},
+		{
+			queryTitle: "Room Schedule by Level",
+			sqlQuery: roomScheduleByLevel,
+			explaination: "Room Schedule by Level",
 		},
 	],
 };

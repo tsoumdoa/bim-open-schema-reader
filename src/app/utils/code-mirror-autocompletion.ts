@@ -135,7 +135,7 @@ const keywordLabels = [
 	"RETURNING",
 	"UNION",
 	"ALL",
-	"EXCEPT",
+	"EXCLUDE",
 	"INTERSECT",
 	// Joins
 	"JOIN",

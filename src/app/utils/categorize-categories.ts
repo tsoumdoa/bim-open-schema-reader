@@ -283,7 +283,7 @@ const modelElementsCategory: CategoryObj = {
 		{ categoryName: "Analytical Surfaces", analyticReadiness: "ANA" },
 		{ categoryName: "Work Plane Grid", analyticReadiness: "LOW" },
 		{ categoryName: "Profiles", analyticReadiness: "MLT" },
-		{ categoryName: "Lines", analyticReadiness: "ANA" },
+		{ categoryName: "Lines", analyticReadiness: "GEO" }, // TODO:check where these lines actaully are in 3D space...
 		{ categoryName: "Constraints", analyticReadiness: "QTY" },
 		{ categoryName: "Rectangular Arc Wall Opening", analyticReadiness: "ANA" },
 		{
