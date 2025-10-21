@@ -62,6 +62,10 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
       overall obj correctly....?
 - [ ] refactor 'Wall Element Basic Info' query, it should use new pivot pattern
 
+## New schedule query
+
+- [ ] structural column/ structural framing schedule (family type, instances )
+
 ## Exporter improvemnt idea
 
 - Current doesn't export unused families, should it be...?

@@ -10,6 +10,7 @@ import { levelSchedule } from "../sql/level-schedule";
 import { basicMaterialsInfo } from "../sql/materials-basic-info";
 import { roomScheduleByLevel } from "../sql/room-count-by-level";
 import { simpleRoomSchedule } from "../sql/room-simple-schedule";
+import { rvtSchedule } from "../sql/rvt-schedule";
 import { sheetSchedule } from "../sql/sheets-schedule";
 import { tagsTotalCountByCategory } from "../sql/tags-total-count-by-category";
 import { tagsTotalCountByFamily } from "../sql/tags-total-count-by-family";
@@ -167,12 +168,17 @@ const rooms: QueriesSelector = {
 };
 
 const cadLinks: QueriesSelector = {
-	queryCategory: "CAD Links",
+	queryCategory: "CAD & RVT Links",
 	queryObjects: [
 		{
 			queryTitle: "CAD Links",
 			sqlQuery: dwgSchedule,
 			explaination: "CAD Links",
+		},
+		{
+			queryTitle: "RVT Links",
+			sqlQuery: rvtSchedule,
+			explaination: "RVT Links",
 		},
 	],
 };
