@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from "react";
 import * as duckdb from "@duckdb/duckdb-wasm";
+import { useEffect, useState, useRef } from "react";
 
 async function initDuckDB() {
   const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles();
