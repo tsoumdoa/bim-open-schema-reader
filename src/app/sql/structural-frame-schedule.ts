@@ -1,6 +1,7 @@
 import { sql } from "../utils/queries";
 
-export const structuralColumnSchedule = sql`
+// TODO: add double data
+export const structuralFrameSchedule = sql`
   WITH
     entity_data AS (
       SELECT
@@ -11,7 +12,7 @@ export const structuralColumnSchedule = sql`
         INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
         INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
       WHERE
-        e.category = 'Structural Columns'
+        e.category = 'Structural Framing'
     ),
     pivot_entity_data AS (
       PIVOT entity_data ON name_1 USING first (name_3) AS param_value,
@@ -29,14 +30,12 @@ export const structuralColumnSchedule = sql`
       WHERE
         Family_param_value IS NULL
     ),
-    column_instances AS (
+    frame_instances AS (
       SELECT
         LocalId,
         name,
-        "Base Level_param_value",
-        "Top Level_param_value",
-        Level_param_value,
-        "rvt:FamilyInstance:StructuralMaterialId_param_value"
+        "Structural Material_param_value" AS struct_mat,
+        "Reference Level_param_value" AS ref_level
       FROM
         pivot_entity_data
       WHERE
@@ -46,14 +45,10 @@ export const structuralColumnSchedule = sql`
       SELECT
         ci.name,
         COUNT(*) AS count,
-        list (DISTINCT Level_param_value) AS levels,
-        first (
-          ci."rvt:FamilyInstance:StructuralMaterialId_param_value"
-        ) AS material, --it should all be same, so just take the first one
-        list (DISTINCT ci."Base Level_param_value") AS base_levels,
-        list (DISTINCT ci."Top Level_param_value") AS top_levels,
+        list (DISTINCT ci.ref_level) AS ref_levels,
+        first (DISTINCT ci.struct_mat) AS material,
       FROM
-        column_instances AS ci
+        frame_instances AS ci
         JOIN family_types f ON f.name = ci.name
       GROUP BY
         ci.name

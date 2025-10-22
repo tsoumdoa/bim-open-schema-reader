@@ -1,6 +1,7 @@
 import { sql } from "../utils/queries";
 
-export const structuralColumnSchedule = sql`
+// TODO: export length and volume of each column from revit and add to this...?
+export const structuralColumnMaterials = sql`
   WITH
     entity_data AS (
       SELECT
@@ -36,32 +37,26 @@ export const structuralColumnSchedule = sql`
         "Base Level_param_value",
         "Top Level_param_value",
         Level_param_value,
-        "rvt:FamilyInstance:StructuralMaterialId_param_value"
+        "rvt:FamilyInstance:StructuralMaterialId_param_value" AS material
       FROM
         pivot_entity_data
       WHERE
         Family_param_value IS NOT NULL
     ),
-    column_instance_schedule AS (
-      SELECT
-        ci.name,
-        COUNT(*) AS count,
-        list (DISTINCT Level_param_value) AS levels,
-        first (
-          ci."rvt:FamilyInstance:StructuralMaterialId_param_value"
-        ) AS material, --it should all be same, so just take the first one
-        list (DISTINCT ci."Base Level_param_value") AS base_levels,
-        list (DISTINCT ci."Top Level_param_value") AS top_levels,
+    column_materials AS (
+      SELECT DISTINCT
+        material,
+        count(DISTINCT name) AS count,
+        list (DISTINCT name) AS names
       FROM
-        column_instances AS ci
-        JOIN family_types f ON f.name = ci.name
+        column_instances
       GROUP BY
-        ci.name
+        material
     )
   SELECT
     *
   FROM
-    column_instance_schedule
+    column_materials AS cm
   ORDER BY
-    name;
+    material;
 `;

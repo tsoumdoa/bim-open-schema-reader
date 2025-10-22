@@ -1,6 +1,7 @@
 import { sql } from "../utils/queries";
 
-export const structuralColumnSchedule = sql`
+// TODO: export length and volume of each column from revit and add to this...?
+export const structuralFrameMaterials = sql`
   WITH
     entity_data AS (
       SELECT
@@ -11,7 +12,7 @@ export const structuralColumnSchedule = sql`
         INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
         INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
       WHERE
-        e.category = 'Structural Columns'
+        e.category = 'Structural Framing'
     ),
     pivot_entity_data AS (
       PIVOT entity_data ON name_1 USING first (name_3) AS param_value,
@@ -29,39 +30,30 @@ export const structuralColumnSchedule = sql`
       WHERE
         Family_param_value IS NULL
     ),
-    column_instances AS (
+    frame_instances AS (
       SELECT
         LocalId,
         name,
-        "Base Level_param_value",
-        "Top Level_param_value",
-        Level_param_value,
-        "rvt:FamilyInstance:StructuralMaterialId_param_value"
+        "Structural Material_param_value" AS struct_mat,
       FROM
         pivot_entity_data
       WHERE
         Family_param_value IS NOT NULL
     ),
-    column_instance_schedule AS (
-      SELECT
-        ci.name,
-        COUNT(*) AS count,
-        list (DISTINCT Level_param_value) AS levels,
-        first (
-          ci."rvt:FamilyInstance:StructuralMaterialId_param_value"
-        ) AS material, --it should all be same, so just take the first one
-        list (DISTINCT ci."Base Level_param_value") AS base_levels,
-        list (DISTINCT ci."Top Level_param_value") AS top_levels,
+    column_materials AS (
+      SELECT DISTINCT
+        struct_mat,
+        count(DISTINCT name) AS count,
+        list (DISTINCT name) AS names
       FROM
-        column_instances AS ci
-        JOIN family_types f ON f.name = ci.name
+        frame_instances
       GROUP BY
-        ci.name
+        struct_mat
     )
   SELECT
     *
   FROM
-    column_instance_schedule
+    column_materials AS cm
   ORDER BY
-    name;
+    struct_mat;
 `;
