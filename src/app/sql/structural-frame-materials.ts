@@ -21,6 +21,22 @@ export const structuralFrameMaterials = sql`
         LocalId,
         name
     ),
+    double_data AS (
+      SELECT
+        *
+      FROM
+        denorm_entities AS e
+        INNER JOIN denorm_double_params AS p ON e.index = p.entity
+        INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+      WHERE
+        e.category = 'Structural Framing'
+    ),
+    pivot_double_data AS (
+      PIVOT double_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,
+      GROUP BY
+        LocalId,
+        name
+    ),
     family_types AS (
       SELECT
         LocalId,
@@ -32,11 +48,13 @@ export const structuralFrameMaterials = sql`
     ),
     frame_instances AS (
       SELECT
-        LocalId,
-        name,
+        ci.LocalId,
+        ci.name,
         "Structural Material_param_value" AS struct_mat,
+        pd.Volume_param_value AS total_volume
       FROM
-        pivot_entity_data
+        pivot_entity_data AS ci
+        JOIN pivot_double_data pd ON pd.LocalId = ci.LocalId
       WHERE
         Family_param_value IS NOT NULL
     ),
@@ -44,7 +62,8 @@ export const structuralFrameMaterials = sql`
       SELECT DISTINCT
         struct_mat,
         count(DISTINCT name) AS count,
-        list (DISTINCT name) AS names
+        list (DISTINCT name) AS names,
+        sum(total_volume) * 0.0283168 AS total_volume_m3
       FROM
         frame_instances
       GROUP BY
