@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
 import { ParquetBlob } from "../utils/types";
-import { BlobReader, BlobWriter, ZipReader } from "@zip.js/zip.js";
 import { validateEntries } from "../utils/validateFiles";
+import { BlobReader, BlobWriter, ZipReader } from "@zip.js/zip.js";
+import { useRef, useState } from "react";
 
 export function useHandleProcess() {
   const [isProcessing, setIsProcessing] = useState(false);

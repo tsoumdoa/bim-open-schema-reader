@@ -12,6 +12,10 @@ import { roomScheduleByLevel } from "../sql/room-count-by-level";
 import { simpleRoomSchedule } from "../sql/room-simple-schedule";
 import { rvtSchedule } from "../sql/rvt-schedule";
 import { sheetSchedule } from "../sql/sheets-schedule";
+import { structuralColumnMaterials } from "../sql/structural-column-materials";
+import { structuralColumnSchedule } from "../sql/structural-column-schedule";
+import { structuralFrameMaterials } from "../sql/structural-frame-materials";
+import { structuralFrameSchedule } from "../sql/structural-frame-schedule";
 import { tagsTotalCountByCategory } from "../sql/tags-total-count-by-category";
 import { tagsTotalCountByFamily } from "../sql/tags-total-count-by-family";
 import { countByViewFamily } from "../sql/view-count-by-view-family";
@@ -199,6 +203,32 @@ const floors: QueriesSelector = {
 	],
 };
 
+const structure: QueriesSelector = {
+	queryCategory: "Structure",
+	queryObjects: [
+		{
+			queryTitle: "Column Schedule",
+			sqlQuery: structuralColumnSchedule,
+			explaination: "Structural column Schedule",
+		},
+		{
+			queryTitle: "Column Materials",
+			sqlQuery: structuralColumnMaterials,
+			explaination: "Structural column Materials",
+		},
+		{
+			queryTitle: "Frame Schedule",
+			sqlQuery: structuralFrameSchedule,
+			explaination: "Structural frame Schedule",
+		},
+		{
+			queryTitle: "Frame Materials",
+			sqlQuery: structuralFrameMaterials,
+			explaination: "Structural frame Materials",
+		},
+	],
+};
+
 export const queriesSelectorList: QueriesSelector[] = [
 	levels,
 	grids,
@@ -210,6 +240,7 @@ export const queriesSelectorList: QueriesSelector[] = [
 	rooms,
 	cadLinks,
 	floors,
+	structure,
 ];
 
 export const denormParamQueryBuilderName: {

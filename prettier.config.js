@@ -9,7 +9,12 @@ const config = {
   tabWidth: 2,
   semi: true,
   singleQuote: false,
-  plugins: ["prettier-plugin-sql", "prettier-plugin-embed", "prettier-plugin-tailwindcss"],
+  plugins: [
+    "prettier-plugin-sql",
+    "prettier-plugin-embed",
+    "prettier-plugin-tailwindcss",
+    "@trivago/prettier-plugin-sort-imports",
+  ],
   embeddedSqlTags: ["sql"],
   language: "sql",
   keywordCase: "upper",
