@@ -21,6 +21,22 @@ export const structuralFrameSchedule = sql`
         LocalId,
         name
     ),
+    double_data AS (
+      SELECT
+        *
+      FROM
+        denorm_entities AS e
+        INNER JOIN denorm_double_params AS p ON e.index = p.entity
+        INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+      WHERE
+        e.category = 'Structural Framing'
+    ),
+    pivot_double_data AS (
+      PIVOT double_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,
+      GROUP BY
+        LocalId,
+        name
+    ),
     family_types AS (
       SELECT
         LocalId,
@@ -41,22 +57,27 @@ export const structuralFrameSchedule = sql`
       WHERE
         Family_param_value IS NOT NULL
     ),
-    column_instance_schedule AS (
+    frame_instance_schedule AS (
       SELECT
         ci.name,
         COUNT(*) AS count,
         list (DISTINCT ci.ref_level) AS ref_levels,
         first (DISTINCT ci.struct_mat) AS material,
+        min(pd.Length_param_value) * 304.8 AS min_length_mm,
+        max(pd.Length_param_value) * 304.8 AS max_length_mm,
+        sum(pd.Length_param_value) * 304.8 AS total_length_mm,
+        sum(pd.Volume_param_value) * 0.0283168 AS total_volume_m3
       FROM
         frame_instances AS ci
         JOIN family_types f ON f.name = ci.name
+        JOIN pivot_double_data pd ON pd.LocalId = ci.LocalId
       GROUP BY
         ci.name
     )
   SELECT
     *
   FROM
-    column_instance_schedule
+    frame_instance_schedule
   ORDER BY
     name;
 `;
