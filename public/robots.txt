@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bos-reader.vercel.app/sitemap.xml
