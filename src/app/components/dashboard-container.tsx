@@ -13,7 +13,6 @@ import { QuickExplorer } from "./quick-explorer-overlay";
 import SideBar from "./side-bar-content";
 import { DataReadinessFilterProvider } from "./use-data-readiness-filter";
 import { useDuckDb } from "./use-db";
-import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -89,7 +88,8 @@ export default function DashboardContainer(props: { fileName: string }) {
 		disableShortcutRef
 	);
 	const { useQueryObjects } = useQueryObjCtx();
-	const { addQuery, deleteAll } = useQueryObjects;
+	const { addQuery, deleteAll, queryObjects } = useQueryObjects;
+	const objLength = queryObjects.length;
 
 	const { conn } = useDuckDb();
 	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
@@ -108,9 +108,11 @@ export default function DashboardContainer(props: { fileName: string }) {
 							setDisplayExpanded={setDisplayExpanded}
 							disableShortcutRef={disableShortcutRef}
 						/>
-						<ButtonWithConfirmation action={deleteAll}>
-							Delete All Queries
-						</ButtonWithConfirmation>
+						{objLength > 2 && (
+							<ButtonWithConfirmation action={deleteAll}>
+								Delete All Queries
+							</ButtonWithConfirmation>
+						)}
 					</div>
 				</main>
 				{isActive &&
