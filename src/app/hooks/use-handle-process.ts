@@ -19,8 +19,11 @@ export function useHandleProcess() {
 			const reader = new ZipReader(new BlobReader(file));
 			const entries = await reader.getEntries();
 			const fileNames = entries.map((entry) => entry.filename);
+
 			const isValid = validateEntries(fileNames);
-			if (!isValid) setOpen(true);
+			if (!isValid) {
+				throw new Error("Invalid BOS file");
+			}
 
 			for (const entry of entries) {
 				if (!entry.directory) {
@@ -33,16 +36,16 @@ export function useHandleProcess() {
 					});
 				}
 			}
-			await reader.close();
+			reader.close();
+			setIsProcessing(false);
+			setDbReady(true);
 		} catch (err) {
 			setOpen(true);
 			setFiles(undefined);
-			console.error(err);
+			setIsProcessing(false);
 		}
-
-		setIsProcessing(false);
-		setDbReady(true);
 	};
+
 	return {
 		handleProcess,
 		isProcessing,
