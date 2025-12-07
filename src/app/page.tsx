@@ -52,8 +52,11 @@ export default function Home() {
 		parquetData,
 		files,
 		setFiles,
+		bosFileType,
 	} = useHandleProcess();
 	const queryClient = new QueryClient();
+
+	//TODO: THINK about how to separte with or without geo data with bos
 
 	return (
 		<QueryClientProvider client={queryClient}>
@@ -61,10 +64,11 @@ export default function Home() {
 				<Header />
 				<UnzipFailedAlertDialog open={open} setOpen={setOpen} />
 				<main>
-					{dbReady ? (
+					{dbReady && bosFileType !== "INVALID" ? (
 						<AnalyticalDisplay
 							parquetFileEntries={parquetData.current}
 							fileName={(files && files[0].name) || ""}
+							bosFileType={bosFileType}
 						/>
 					) : (
 						<InitialDisplay

@@ -1,4 +1,4 @@
-import { ParquetBlob } from "../utils/types";
+import { BosFileType, ParquetBlob } from "../utils/types";
 import { validateEntries } from "../utils/validateFiles";
 import { BlobReader, BlobWriter, ZipReader } from "@zip.js/zip.js";
 import { useRef, useState } from "react";
@@ -9,6 +9,7 @@ export function useHandleProcess() {
 	const [dbReady, setDbReady] = useState(false);
 	const [open, setOpen] = useState(false);
 	const parquetData = useRef<ParquetBlob[]>([]);
+	const [bosFileType, setBosFileType] = useState<BosFileType>("INVALID");
 	const handleProcess = async () => {
 		setIsProcessing(true);
 		if (!files || files.length === 0) return;
@@ -20,10 +21,11 @@ export function useHandleProcess() {
 			const entries = await reader.getEntries();
 			const fileNames = entries.map((entry) => entry.filename);
 
-			const isValid = validateEntries(fileNames);
-			if (!isValid) {
+			const validationRes = validateEntries(fileNames);
+			if (validationRes === "INVALID") {
 				throw new Error("Invalid BOS file");
 			}
+			setBosFileType(validationRes);
 
 			for (const entry of entries) {
 				if (!entry.directory) {
@@ -55,5 +57,6 @@ export function useHandleProcess() {
 		parquetData,
 		files,
 		setFiles,
+		bosFileType,
 	};
 }
