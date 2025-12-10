@@ -18,7 +18,7 @@ export const validFileNames = [
 	"Relations.parquet",
 	"StringParameters.parquet",
 	"Strings.parquet",
-] as const;
+];
 
 export const validFileNamesWithGeo = [
 	"Descriptors.parquet",
@@ -38,7 +38,10 @@ export const validFileNamesWithGeo = [
 	"Strings.parquet",
 	"Transforms.parquet",
 	"VertexBuffer.parquet",
-] as const;
+];
+
+export type ValidFileNames = (typeof validFileNames)[number];
+export type ValidFileNamesWithGeo = (typeof validFileNamesWithGeo)[number];
 
 export type BosFileType = "INVALID" | "GEO" | "NON_GEO";
 export type QueryDisplayState = "hidden" | "viewer" | "editor";
@@ -111,6 +114,7 @@ export type UseQueryViewerAndEditor = ReturnType<
 export type DuckDBCtx = {
 	db: duckdb.AsyncDuckDB;
 	conn: duckdb.AsyncDuckDBConnection;
+	bosFileType: BosFileType;
 };
 export type QueryObjectCtx = {
 	useQueryObjects: UseQueryObjects;

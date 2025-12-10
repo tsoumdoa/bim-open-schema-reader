@@ -1,13 +1,15 @@
-import { validFileNames } from "./types";
+import { ValidFileNames, validFileNames, ValidFileNamesWithGeo } from "./types";
 
 // NOTE: boilerplate
 export const sql = (strings: TemplateStringsArray, ...values: string[]) =>
-  strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+	strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
 
-export const createBosTable = () => {
-  return validFileNames
-    .map((fileName) => {
-      return sql`
+export const createBosTable = (
+	fileNames: string[] | ValidFileNamesWithGeo[]
+) => {
+	return fileNames
+		.map((fileName) => {
+			return sql`
         CREATE VIEW ${fileName.replace(".parquet", "")} AS
         SELECT
           *,
@@ -15,8 +17,8 @@ export const createBosTable = () => {
         FROM
           ${fileName};
       `;
-    })
-    .join("\n");
+		})
+		.join("\n");
 };
 
 export const createHelperViwesAndTables = sql`

@@ -11,11 +11,12 @@ function DbProvider(props: {
 	children: React.ReactNode;
 	parquetFileEntries: ParquetBlob[];
 }) {
-	const { db, conn } = useDuckDb();
+	const { db, conn, bosFileType } = useDuckDb();
 	const { error, isInitializing, isInitialized } = useImportParquet(
 		db,
 		conn,
-		props.parquetFileEntries
+		props.parquetFileEntries,
+		bosFileType
 	);
 	if (isInitializing) {
 		return <div>Initializing...</div>;
@@ -48,6 +49,7 @@ export default function AnalyticalDisplay(props: {
 			<DuckDbProvider
 				db={dbRef.current}
 				c={connectionRef.current}
+				bosFileType={props.bosFileType}
 				useQueryObjects={useQueryObj}
 			>
 				<QueryObjProvider useQueryObjects={useQueryObj}>
