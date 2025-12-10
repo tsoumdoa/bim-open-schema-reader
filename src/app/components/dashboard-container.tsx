@@ -3,7 +3,7 @@ import { useQuickExplorer } from "../hooks/use-quick-explorer";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { cleanCategoryCount } from "../utils/clean-category-cout";
 import { listCountByCategory } from "../utils/queries";
-import { UseExpandDisplay } from "../utils/types";
+import { BosFileType, UseExpandDisplay } from "../utils/types";
 import { AddQuery } from "./add-query-button";
 import ButtonWithConfirmation from "./button-with-confirmation";
 import GoBackToTop from "./go-back-to-top";
@@ -13,17 +13,27 @@ import { QuickExplorer } from "./quick-explorer-overlay";
 import SideBar from "./side-bar-content";
 import { DataReadinessFilterProvider } from "./use-data-readiness-filter";
 import { useDuckDb } from "./use-db";
+import { Badge } from "@/components/ui/badge";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-function DashboardHeader(props: { fileName: string }) {
+function DashboardHeader(props: {
+	fileName: string;
+	bosFileType: BosFileType;
+}) {
 	return (
 		<div className="sticky top-0 z-50 flex flex-row items-center justify-start gap-x-1 bg-white px-2">
 			<SidebarTrigger className="" />
 			<p className="py-2 text-sm">
 				file name: <span className="font-bold">{props.fileName}</span>
 			</p>
+			<Badge
+				className="text-xs text-neutral-800  h-5 min-w-5 rounded-full px-1"
+				variant="outline"
+			>
+				{props.bosFileType === "GEO" ? "Geometry Data" : "Non Geometry Data"}
+			</Badge>
 		</div>
 	);
 }
@@ -79,7 +89,10 @@ function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 	);
 }
 
-export default function DashboardContainer(props: { fileName: string }) {
+export default function DashboardContainer(props: {
+	fileName: string;
+	bosFileType: BosFileType;
+}) {
 	const useExpDis = useExpandDisplay();
 	const { setDisplayExpanded } = useExpDis;
 	const disableShortcutRef = useRef<boolean>(true); // NOTE: shortcut need to be disabled cuz the qucick explorer view is open at start
@@ -100,7 +113,11 @@ export default function DashboardContainer(props: { fileName: string }) {
 			<DataReadinessFilterProvider>
 				<SideBar useExpandDisplay={useExpDis} />
 				<main className="relative h-full w-full min-w-0">
-					<DashboardHeader fileName={props.fileName} />
+					<DashboardHeader
+						fileName={props.fileName}
+						bosFileType={props.bosFileType}
+					/>
+
 					<DashboardMain useExpandDisplay={useExpDis} />
 					<div className="px-5 pb-5 gap-x-2 flex">
 						<AddQuery
