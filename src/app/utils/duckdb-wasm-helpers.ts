@@ -58,13 +58,14 @@ export async function registerParquetFile(
 	await db.registerFileBuffer(entry.filename, entry.parquet);
 }
 
+// creating table from all parquet files
 export async function initTables(
 	c: duckdb.AsyncDuckDBConnection,
 	bosFileType: BosFileType
 ) {
 	const fileNames =
 		bosFileType === "GEO" ? validFileNamesWithGeo : validFileNames;
-	const query = createBosTable(fileNames) + createHelperViwesAndTables;
+	const query = createBosTable(fileNames); /* + createHelperViwesAndTables */
 	console.log(query);
 	await c.query(query);
 }
