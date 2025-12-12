@@ -41,7 +41,7 @@
     "hast-util-to-jsx-runtime": "^2.3.6",
     "lucide-react": "^0.541.0",
     "nanoid": "^5.1.6",
-    "next": "16.0.7",
+    "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.1.0",
     "react-dropzone": "^14.3.8",
