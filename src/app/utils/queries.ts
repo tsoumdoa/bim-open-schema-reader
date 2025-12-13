@@ -1,11 +1,11 @@
-import { ValidFileNames, validFileNames, ValidFileNamesWithGeo } from "./types";
+import { ValidFileNames, ValidFileNamesWithGeo } from "./types";
 
 // NOTE: boilerplate
 export const sql = (strings: TemplateStringsArray, ...values: string[]) =>
 	strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
 
 export const createBosTable = (
-	fileNames: string[] | ValidFileNamesWithGeo[]
+	fileNames: ValidFileNames[] | ValidFileNamesWithGeo[]
 ) => {
 	return fileNames
 		.map((fileName) => {
@@ -21,7 +21,7 @@ export const createBosTable = (
 		.join("\n");
 };
 
-export const createHelperViwesAndTables = sql`
+export const createHelperViwesAndTables = (isDoubleParameters: boolean) => sql`
   -- parameter enum table
   CREATE
   OR REPLACE TABLE Enum_Parameter (index INTEGER, ParameterType VARCHAR(20));
@@ -107,14 +107,17 @@ export const createHelperViwesAndTables = sql`
     LEFT OUTER JOIN Points ON Points.index = PointParameters.Value
     LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = PointParameters.Descriptor;
 
-  -- denormalize Double Parameters
+  -- denormalize Single Parameters
+  -- WARNING: TO BE DEPRECATEED - name kept as double_parameters for now due the comaptibility
   CREATE
   OR REPLACE VIEW denorm_double_params AS
   SELECT
     *
   FROM
-    DoubleParameters
-    LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = DoubleParameters.Descriptor;
+    ${isDoubleParameters ? "DoubleParameters" : "SingleParameters"}
+    LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = ${isDoubleParameters
+		? "DoubleParameters.Descriptor"
+		: "SingleParameters.Descriptor"};
 
   -- denormalize Integer Parameters
   CREATE

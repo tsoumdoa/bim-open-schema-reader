@@ -11,12 +11,11 @@ function DbProvider(props: {
 	children: React.ReactNode;
 	parquetFileEntries: ParquetBlob[];
 }) {
-	const { db, conn, bosFileType } = useDuckDb();
+	const { db, conn } = useDuckDb();
 	const { error, isInitializing, isInitialized } = useImportParquet(
 		db,
 		conn,
-		props.parquetFileEntries,
-		bosFileType
+		props.parquetFileEntries
 	);
 	if (isInitializing) {
 		return <div>Initializing...</div>;

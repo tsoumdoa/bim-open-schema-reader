@@ -6,6 +6,8 @@ export function validateEntries(entries: string[]): BosFileType {
 	if (entries.length !== 11 && entries.length !== 17) return "INVALID";
 	if (entries.length === 17) hasGeo = true;
 
+	//NOTE: override for compatibility for now
+
 	const set = new Set(entries);
 
 	if (hasGeo) {

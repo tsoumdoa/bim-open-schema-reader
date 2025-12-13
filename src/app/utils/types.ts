@@ -9,7 +9,7 @@ import * as duckdb from "@duckdb/duckdb-wasm";
 export const validFileNames = [
 	"Descriptors.parquet",
 	"Documents.parquet",
-	"DoubleParameters.parquet",
+	// "SingleParameters.parquet", //TODO: Removed from validation for now
 	"Entities.parquet",
 	"EntityParameters.parquet",
 	"IntegerParameters.parquet",
@@ -23,7 +23,7 @@ export const validFileNames = [
 export const validFileNamesWithGeo = [
 	"Descriptors.parquet",
 	"Documents.parquet",
-	"DoubleParameters.parquet",
+	// "SingleParameters.parquet", //TODO: Removed from validation for now
 	"Elements.parquet",
 	"Entities.parquet",
 	"EntityParameters.parquet",
