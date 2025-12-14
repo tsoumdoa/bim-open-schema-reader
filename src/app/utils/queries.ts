@@ -175,6 +175,10 @@ export const listCountByCategory = sql`
     paramname ASC;
 `;
 
+export const summarizeTableInfor = (tableName: string) => sql`
+  summarize ${tableName};
+`;
+
 // exmaple with string literal
 // export const listAllTableInfo = (tableName: string) => sql`
 //   SELECT

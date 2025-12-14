@@ -143,7 +143,7 @@ export const DropzoneContent = ({
 					: new Intl.ListFormat("en").format(src.map((file) => file.name))}
 			</p>
 			<p className="text-muted-foreground w-full text-xs text-wrap">
-				Drag and drop or click to replace
+				Drag and drop a .bos file here, or click to replace
 			</p>
 		</div>
 	);
@@ -158,7 +158,8 @@ export const DropzoneEmptyState = ({
 	children,
 	className,
 }: DropzoneEmptyStateProps) => {
-	const { src, accept, maxSize, minSize, maxFiles } = useDropzoneContext();
+	const { src, accept, maxSize, minSize /* , maxFiles */ } =
+		useDropzoneContext();
 
 	if (src) {
 		return null;
@@ -192,11 +193,8 @@ export const DropzoneEmptyState = ({
 				Select Bim Open Schema file.
 			</p>
 			<p className="text-muted-foreground w-full truncate text-xs text-wrap">
-				Drag and drop or click to upload
+				Drag and drop a .bos file here, or click to browse
 			</p>
-			{caption && (
-				<p className="text-muted-foreground text-xs text-wrap">xxx.bos</p>
-			)}
 		</div>
 	);
 };

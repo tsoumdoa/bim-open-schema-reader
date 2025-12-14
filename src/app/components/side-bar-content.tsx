@@ -20,7 +20,7 @@ function AccordionDisplay(props: {
 				<AccordionTrigger className="py-0">
 					{props.accordionTitle}
 				</AccordionTrigger>
-				<AccordionContent>{props.children}</AccordionContent>
+				<AccordionContent className="pb-0">{props.children}</AccordionContent>
 			</AccordionItem>
 		</Accordion>
 	);
@@ -31,7 +31,7 @@ function SideBarContent(props: { useExpandDisplay: UseExpandDisplay }) {
 			<div className="text-sm font-bold text-gray-900">
 				Open BIM Schema Reader
 			</div>
-			<AccordionDisplay accordionTitle="Table Schema">
+			<AccordionDisplay accordionTitle="Schema Tables">
 				<DisplayTableInfo />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Add Query by Category">
