@@ -2,14 +2,14 @@ import { ValidFileNames, ValidFileNamesWithGeo } from "./types";
 
 // NOTE: boilerplate
 export const sql = (strings: TemplateStringsArray, ...values: string[]) =>
-	strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+  strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
 
 export const createBosTable = (
-	fileNames: ValidFileNames[] | ValidFileNamesWithGeo[]
+  fileNames: ValidFileNames[] | ValidFileNamesWithGeo[]
 ) => {
-	return fileNames
-		.map((fileName) => {
-			return sql`
+  return fileNames
+    .map((fileName) => {
+      return sql`
         CREATE VIEW ${fileName.replace(".parquet", "")} AS
         SELECT
           *,
@@ -17,8 +17,8 @@ export const createBosTable = (
         FROM
           ${fileName};
       `;
-		})
-		.join("\n");
+    })
+    .join("\n");
 };
 
 export const createHelperViwesAndTables = (isDoubleParameters: boolean) => sql`
@@ -116,8 +116,8 @@ export const createHelperViwesAndTables = (isDoubleParameters: boolean) => sql`
   FROM
     ${isDoubleParameters ? "DoubleParameters" : "SingleParameters"}
     LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = ${isDoubleParameters
-		? "DoubleParameters.Descriptor"
-		: "SingleParameters.Descriptor"};
+    ? "DoubleParameters.Descriptor"
+    : "SingleParameters.Descriptor"};
 
   -- denormalize Integer Parameters
   CREATE
@@ -176,7 +176,10 @@ export const listCountByCategory = sql`
 `;
 
 export const summarizeTableInfor = (tableName: string) => sql`
-  summarize ${tableName};
+  SELECT
+    COUNT(*)
+  FROM
+    ${tableName};
 `;
 
 // exmaple with string literal
