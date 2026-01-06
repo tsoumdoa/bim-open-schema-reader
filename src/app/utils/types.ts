@@ -7,9 +7,10 @@ import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import * as duckdb from "@duckdb/duckdb-wasm";
 
 export const validFileNames = [
+	"Diagonistics.parquet",
 	"Descriptors.parquet",
 	"Documents.parquet",
-	"DoubleParameters.parquet",
+	// "SingleParameters.parquet", //TODO: Removed from validation for now
 	"Entities.parquet",
 	"EntityParameters.parquet",
 	"IntegerParameters.parquet",
@@ -22,9 +23,10 @@ export const validFileNames = [
 
 export const validFileNamesWithGeo = [
 	"Descriptors.parquet",
+	"Diagnostics.parquet",
 	"Documents.parquet",
-	"DoubleParameters.parquet",
-	"Elements.parquet",
+	// "SingleParameters.parquet", //TODO: Removed from validation for now
+	"Instances.parquet",
 	"Entities.parquet",
 	"EntityParameters.parquet",
 	"IndexBuffer.parquet",
@@ -38,6 +40,29 @@ export const validFileNamesWithGeo = [
 	"Strings.parquet",
 	"Transforms.parquet",
 	"VertexBuffer.parquet",
+];
+
+export const NonGeoTableNames = [
+	"Descriptors",
+	"Documents",
+	"Entities",
+	"EntityParameters",
+	"IntegerParameters",
+	"PointParameters",
+	"Points",
+	"Relations",
+	"StringParameters",
+	"Strings",
+	"SingleParameters", //
+	"DoubleParameters", // WARNING: DoubleParameters to be deprecated
+];
+export const GeoTableNames = [
+	"Instances",
+	"IndexBuffer",
+	"Materials",
+	"Meshes",
+	"Transforms",
+	"VertexBuffer",
 ];
 
 export type ValidFileNames = (typeof validFileNames)[number];
@@ -54,12 +79,24 @@ export type QueryEditorState =
 	| "rerun"
 	| "error"
 	| "canceled";
-export type DenormTableName =
-	| "denorm_double_params"
-	| "denorm_entity_params"
-	| "denorm_integer_params"
-	| "denorm_points_params"
-	| "denorm_string_params";
+export const denormTableNames = [
+	"denorm_double_params",
+	"denorm_entity_params",
+	"denorm_integer_params",
+	"denorm_points_params",
+	"denorm_string_params",
+];
+export const denormGeoTableNames = [
+	"denorm_elements",
+	"denorm_index_buffer",
+	"denorm_materials",
+	"denorm_meshes",
+	"denorm_transforms",
+	"denorm_vertex_buffer",
+];
+
+export type DenormTableName = (typeof denormTableNames)[number];
+export type DenormGeoTableName = (typeof denormGeoTableNames)[number];
 
 export type ParquetBlob = {
 	filename: string;

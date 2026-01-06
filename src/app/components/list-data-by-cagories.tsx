@@ -20,7 +20,7 @@ export default function ListDataByCategories(props: {
   const { setDisplayExpanded } = props.useExpandDisplay;
   const { isSelected } = useDataReadinessFilter();
   return (
-    <div className="flex flex-col text-xs">
+    <div className="flex flex-col text-xs ">
       <div className="overflow-x-auto">
         <FilterByDataReadiness />
         {generalCategory.map((categoryName, categoryIndex) => {

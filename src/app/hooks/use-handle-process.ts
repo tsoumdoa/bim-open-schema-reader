@@ -23,6 +23,7 @@ export function useHandleProcess() {
 
 			const validationRes = validateEntries(fileNames);
 			if (validationRes === "INVALID") {
+				console.log("invalid entries");
 				throw new Error("Invalid BOS file");
 			}
 			setBosFileType(validationRes);
@@ -42,6 +43,7 @@ export function useHandleProcess() {
 			setIsProcessing(false);
 			setDbReady(true);
 		} catch (err) {
+			console.log(err);
 			setOpen(true);
 			setFiles(undefined);
 			setIsProcessing(false);

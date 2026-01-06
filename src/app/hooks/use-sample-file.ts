@@ -3,8 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function useSampleFile(
   setFiles: (files: File[] | undefined) => void
 ) {
-  const url =
-    "https://rschema-reader-demo.tzero.one/Snowdon%20Towers%20Sample%20Architectural.parquet.zip";
+  const url = "https://rschema-reader-demo.tzero.one/snowdon.bos";
 
   const { data, error, isFetching, refetch } = useQuery({
     queryKey: ["data", url],
@@ -15,10 +14,7 @@ export default function useSampleFile(
         // throw new Error(`Request failed: ${res.status}`);
       }
       const blob = await res.blob();
-      const file = new File(
-        [blob],
-        "Snowdon Towers Sample Architectural.parquet.zip"
-      );
+      const file = new File([blob], "Snowdon Towers Sample Architectural.bos");
       setFiles([file]);
       return true;
     },
