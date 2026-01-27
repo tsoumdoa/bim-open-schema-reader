@@ -10,7 +10,7 @@ export const listLevelWithCoredStatus = sql`
       FROM
         denorm_entities AS p
         INNER JOIN denorm_string_params AS r2 ON p.index = r2.entity
-        INNER JOIN denorm_double_params AS r0 ON p.index = r0.entity
+        INNER JOIN denorm_single_params AS r0 ON p.index = r0.entity
       WHERE
         p.category LIKE 'Levels'
         AND r0.name LIKE 'Elevation'
@@ -125,7 +125,7 @@ export const listGridWithCoredStatus = sql`
         denorm_entities AS e
         INNER JOIN denorm_points_params AS dp1 ON e.index = dp1.entity
         INNER JOIN denorm_string_params AS dp2 ON e.index = dp2.entity
-        LEFT JOIN denorm_double_params AS dp3 ON e.index = dp3.entity
+        LEFT JOIN denorm_single_params AS dp3 ON e.index = dp3.entity
       WHERE
         e.category LIKE 'Grids'
         AND dp2.name LIKE 'rvt:Grid:Type'

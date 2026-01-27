@@ -12,7 +12,7 @@ export const levelSchedule = sql`
       FROM
         denorm_entities AS p
         INNER JOIN denorm_string_params AS r2 ON p.index = r2.entity
-        INNER JOIN denorm_double_params AS r0 ON p.index = r0.entity
+        INNER JOIN denorm_single_params AS r0 ON p.index = r0.entity
       WHERE
         p.category LIKE 'Levels'
         AND r0.name LIKE 'Elevation'
