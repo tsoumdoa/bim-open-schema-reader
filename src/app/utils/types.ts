@@ -7,18 +7,16 @@ import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import * as duckdb from "@duckdb/duckdb-wasm";
 
 export const validFileNames = [
-	"Diagonistics.parquet",
 	"Descriptors.parquet",
+	"Diagnostics.parquet",
 	"Documents.parquet",
-	// "SingleParameters.parquet", //TODO: Removed from validation for now
 	"Entities.parquet",
-	"Relations.parquet",
-	"EntityRelation.parquet",
 	"EntityParameters.parquet",
 	"IntegerParameters.parquet",
 	"PointParameters.parquet",
 	"Points.parquet",
 	"Relations.parquet",
+	"SingleParameters.parquet",
 	"StringParameters.parquet",
 	"Strings.parquet",
 ];
@@ -27,18 +25,17 @@ export const validFileNamesWithGeo = [
 	"Descriptors.parquet",
 	"Diagnostics.parquet",
 	"Documents.parquet",
-	// "SingleParameters.parquet", //TODO: Removed from validation for now
-	"Instances.parquet",
 	"Entities.parquet",
-	"Relations.parquet",
 	"EntityParameters.parquet",
 	"IndexBuffer.parquet",
+	"Instances.parquet",
 	"IntegerParameters.parquet",
 	"Materials.parquet",
 	"Meshes.parquet",
 	"PointParameters.parquet",
 	"Points.parquet",
 	"Relations.parquet",
+	"SingleParameters.parquet",
 	"StringParameters.parquet",
 	"Strings.parquet",
 	"Transforms.parquet",
@@ -56,8 +53,7 @@ export const NonGeoTableNames = [
 	"Relations",
 	"StringParameters",
 	"Strings",
-	"SingleParameters", //
-	"DoubleParameters", // WARNING: DoubleParameters to be deprecated
+	"SingleParameters",
 ];
 export const GeoTableNames = [
 	"Instances",

@@ -17,7 +17,10 @@ export function validateEntries(entries: string[]): BosFileType {
 		return "GEO";
 	} else {
 		for (const required of validFileNames)
-			if (!set.has(required)) return "INVALID";
+			if (!set.has(required)) {
+				console.log(required);
+				return "INVALID";
+			}
 
 		return "NON_GEO";
 	}
