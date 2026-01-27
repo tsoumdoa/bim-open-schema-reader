@@ -12,6 +12,8 @@ export const validFileNames = [
 	"Documents.parquet",
 	// "SingleParameters.parquet", //TODO: Removed from validation for now
 	"Entities.parquet",
+	"Relations.parquet",
+	"EntityRelation.parquet",
 	"EntityParameters.parquet",
 	"IntegerParameters.parquet",
 	"PointParameters.parquet",
@@ -28,6 +30,7 @@ export const validFileNamesWithGeo = [
 	// "SingleParameters.parquet", //TODO: Removed from validation for now
 	"Instances.parquet",
 	"Entities.parquet",
+	"Relations.parquet",
 	"EntityParameters.parquet",
 	"IndexBuffer.parquet",
 	"IntegerParameters.parquet",

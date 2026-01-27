@@ -2,14 +2,14 @@ import { ValidFileNames, ValidFileNamesWithGeo } from "./types";
 
 // NOTE: boilerplate
 export const sql = (strings: TemplateStringsArray, ...values: string[]) =>
-  strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+	strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
 
 export const createBosTable = (
-  fileNames: ValidFileNames[] | ValidFileNamesWithGeo[]
+	fileNames: ValidFileNames[] | ValidFileNamesWithGeo[]
 ) => {
-  return fileNames
-    .map((fileName) => {
-      return sql`
+	return fileNames
+		.map((fileName) => {
+			return sql`
         CREATE VIEW ${fileName.replace(".parquet", "")} AS
         SELECT
           *,
@@ -17,8 +17,8 @@ export const createBosTable = (
         FROM
           ${fileName};
       `;
-    })
-    .join("\n");
+		})
+		.join("\n");
 };
 
 export const createHelperViwesAndTables = (isDoubleParameters: boolean) => sql`
@@ -55,18 +55,19 @@ export const createHelperViwesAndTables = (isDoubleParameters: boolean) => sql`
   CREATE
   OR REPLACE VIEW denorm_entities AS
   SELECT
-    LocalId,
-    GlobalId,
+    Entities.LocalId,
+    Entities.GlobalId,
     Entities."index" AS index,
     Entities.name AS entity_name,
     s_name.Strings AS name,
-    s_category.Strings AS category,
+    type_name.Strings AS category,
     s_path.Strings AS path_name,
     s_title.Strings AS project_name
   FROM
     Entities
     LEFT OUTER JOIN Strings AS s_name ON Entities."name" = s_name."index"
-    LEFT OUTER JOIN Strings AS s_category ON Entities.category = s_category."index"
+    LEFT OUTER JOIN Entities AS instance_ent ON instance_ent."index" = Entities.Category
+    LEFT OUTER JOIN Strings AS type_name ON instance_ent."name" = type_name."index"
     LEFT OUTER JOIN Documents ON Entities.Document = Documents."index"
     LEFT OUTER JOIN Strings AS s_path ON Documents.Path = s_path."index"
     LEFT OUTER JOIN Strings AS s_title ON Documents.Title = s_title."index";
@@ -116,8 +117,8 @@ export const createHelperViwesAndTables = (isDoubleParameters: boolean) => sql`
   FROM
     ${isDoubleParameters ? "DoubleParameters" : "SingleParameters"}
     LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = ${isDoubleParameters
-    ? "DoubleParameters.Descriptor"
-    : "SingleParameters.Descriptor"};
+		? "DoubleParameters.Descriptor"
+		: "SingleParameters.Descriptor"};
 
   -- denormalize Integer Parameters
   CREATE
