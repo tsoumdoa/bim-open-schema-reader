@@ -18,7 +18,7 @@ export const floorSchedule = sql`
         *
       FROM
         denorm_entities AS e
-        INNER JOIN denorm_double_params AS p ON e.index = p.entity
+        INNER JOIN denorm_single_params AS p ON e.index = p.entity
         INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
       WHERE
         e.category = 'Floors'

@@ -21,7 +21,7 @@ export const createBosTable = (
 		.join("\n");
 };
 
-export const createHelperViwesAndTables = (isDoubleParameters: boolean) => sql`
+export const createHelperViwesAndTables = () => sql`
   -- parameter enum table
   CREATE
   OR REPLACE TABLE Enum_Parameter (index INTEGER, ParameterType VARCHAR(20));
@@ -111,14 +111,12 @@ export const createHelperViwesAndTables = (isDoubleParameters: boolean) => sql`
   -- denormalize Single Parameters
   -- WARNING: TO BE DEPRECATEED - name kept as double_parameters for now due the comaptibility
   CREATE
-  OR REPLACE VIEW denorm_double_params AS
+  OR REPLACE VIEW denorm_single_params AS
   SELECT
     *
   FROM
-    ${isDoubleParameters ? "DoubleParameters" : "SingleParameters"}
-    LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = ${isDoubleParameters
-		? "DoubleParameters.Descriptor"
-		: "SingleParameters.Descriptor"};
+    SingleParameters
+    LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = SingleParameters.Descriptor;
 
   -- denormalize Integer Parameters
   CREATE
