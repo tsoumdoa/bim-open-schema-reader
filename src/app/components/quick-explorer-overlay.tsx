@@ -14,149 +14,149 @@ import { XIcon } from "lucide-react";
 import { RefObject, useState } from "react";
 
 function ShortcutHelp() {
-  return (
-    <div className="text-muted-foreground mt-4 border-t pt-4 text-center text-sm">
-      Press{" "}
-      <kbd className="bg-muted rounded px-2 py-1 font-mono text-xs">Shift</kbd>{" "}
-      +{" "}
-      <kbd className="bg-muted rounded px-2 py-1 font-mono text-xs">Space</kbd>{" "}
-      or <kbd className="bg-muted rounded px-2 py-1 font-mono text-xs">Esc</kbd>{" "}
-      to close
-    </div>
-  );
+	return (
+		<div className="text-muted-foreground mt-4 border-t pt-4 text-center text-sm">
+			Press{" "}
+			<kbd className="bg-muted rounded px-2 py-1 font-mono text-xs">Shift</kbd>{" "}
+			+{" "}
+			<kbd className="bg-muted rounded px-2 py-1 font-mono text-xs">Space</kbd>{" "}
+			or <kbd className="bg-muted rounded px-2 py-1 font-mono text-xs">Esc</kbd>{" "}
+			to close
+		</div>
+	);
 }
 
 function BlurredBackdrop(props: { children: React.ReactNode }) {
-  return (
-    <div className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center duration-200">
-      <div className="absolute inset-0 bg-neutral-100/80 backdrop-blur-xs" />
-      <div
-        className="animate-in zoom-in-95 relative z-10 w-full max-w-6xl px-8 duration-200"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {props.children}
-      </div>
-    </div>
-  );
+	return (
+		<div className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center duration-200">
+			<div className="absolute inset-0 bg-neutral-100/80 backdrop-blur-xs" />
+			<div
+				className="animate-in zoom-in-95 relative z-10 w-full max-w-6xl px-8 duration-200"
+				onClick={(e) => e.stopPropagation()}
+			>
+				{props.children}
+			</div>
+		</div>
+	);
 }
 
 export function QuickExplorer(props: {
-  onClose: () => void;
-  categoryGorupMap: Map<string, [GenerailCategoryObj, number][]>;
-  disableShortcutRef: RefObject<boolean>;
+	onClose: () => void;
+	categoryGorupMap: Map<string, [GenerailCategoryObj, number][]>;
+	disableShortcutRef: RefObject<boolean>;
 }) {
-  const [focused, setFocused] = useState("");
-  const { isSelected } = useDataReadinessFilter();
-  const useKeywordFilterHook = useKeywordFilter();
-  const { keyword } = useKeywordFilterHook;
+	const [focused, setFocused] = useState("");
+	const { isSelected } = useDataReadinessFilter();
+	const useKeywordFilterHook = useKeywordFilter();
+	const { keyword } = useKeywordFilterHook;
 
-  return (
-    <BlurredBackdrop>
-      <Card className="gap-0 border-0 shadow-2xl">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-xl font-bold lg:text-2xl">
-            Quick Explorer
-          </CardTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={props.onClose}
-            className="size-8"
-          >
-            <XIcon className="size-4" />
-            <span className="sr-only">Close</span>
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-row items-center justify-between">
-            <FilterByDataReadiness />
-            <KeywordFilter useKeywordFilter={useKeywordFilterHook} />
-          </div>
-          <ScrollArea className="h-[60vh] pt-1 pr-4">
-            {generalCategory.map((categoryName, categoryIndex) => {
-              const rawRows = props.categoryGorupMap.get(categoryName);
-              if (!rawRows || rawRows.length === 0) return null;
+	return (
+		<BlurredBackdrop>
+			<Card className="gap-0 border-0 shadow-2xl">
+				<CardHeader className="flex flex-row items-center justify-between">
+					<CardTitle className="text-xl font-bold lg:text-2xl">
+						Quick Explorer
+					</CardTitle>
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={props.onClose}
+						className="size-8"
+					>
+						<XIcon className="size-4" />
+						<span className="sr-only">Close</span>
+					</Button>
+				</CardHeader>
+				<CardContent>
+					<div className="flex flex-row items-center justify-between">
+						<FilterByDataReadiness />
+						<KeywordFilter useKeywordFilter={useKeywordFilterHook} />
+					</div>
+					<ScrollArea className="h-[60vh] pt-1 pr-4">
+						{generalCategory.map((categoryName, categoryIndex) => {
+							const rawRows = props.categoryGorupMap.get(categoryName);
+							if (!rawRows || rawRows.length === 0) return null;
 
-              const kw = keyword.trim().toLowerCase();
-              const doKeyword = kw.length > 0;
+							const kw = keyword.trim().toLowerCase();
+							const doKeyword = kw.length > 0;
 
-              const filteredRows = [];
-              for (const row of rawRows) {
-                const item = row[0];
-                if (!isSelected(item.analyticalReadiness)) continue;
-                if (!doKeyword) {
-                  filteredRows.push(row);
-                  continue;
-                }
-                if (
-                  doKeyword &&
-                  item.categoryName?.toLowerCase().includes(kw)
-                ) {
-                  continue;
-                }
-                filteredRows.push(row);
-              }
+							const filteredRows = [];
+							for (const row of rawRows) {
+								const item = row[0];
+								if (!isSelected(item.analyticalReadiness)) continue;
+								if (!doKeyword) {
+									filteredRows.push(row);
+									continue;
+								}
+								if (
+									doKeyword &&
+									item.categoryName?.toLowerCase().includes(kw)
+								) {
+									continue;
+								}
+								filteredRows.push(row);
+							}
 
-              if (filteredRows.length === 0) return null;
+							if (filteredRows.length === 0) return null;
 
-              const dimmedCategory =
-                focused !== "" && focused.split("-")[1] !== `${categoryIndex}`;
+							const dimmedCategory =
+								focused !== "" && focused.split("-")[1] !== `${categoryIndex}`;
 
-              return (
-                <div key={`quickCat-${categoryIndex}`} className="pb-2">
-                  <div
-                    className={`pb-2 text-2xl font-bold lg:text-3xl ${
-                      dimmedCategory ? "opacity-20" : ""
-                    }`}
-                  >
-                    {categoryName}
-                  </div>
+							return (
+								<div key={`quickCat-${categoryIndex}`} className="pb-2">
+									<div
+										className={`pb-2 text-2xl font-bold lg:text-3xl ${
+											dimmedCategory ? "opacity-20" : ""
+										}`}
+									>
+										{categoryName}
+									</div>
 
-                  <div className="flex flex-row flex-wrap gap-3">
-                    {filteredRows.map((row, groupIndex) => {
-                      const dimmedBadge =
-                        focused !== "" &&
-                        focused !== `quick-${categoryIndex}-${groupIndex}`;
+									<div className="flex flex-row flex-wrap gap-3">
+										{filteredRows.map((row, groupIndex) => {
+											const dimmedBadge =
+												focused !== "" &&
+												focused !== `quick-${categoryIndex}-${groupIndex}`;
 
-                      return (
-                        <Badge
-                          key={`koolthing-category-count-${groupIndex}`}
-                          variant="default"
-                          className={`transition-all hover:bg-neutral-400 ${
-                            dimmedBadge ? "opacity-20" : ""
-                          } text-md font-normal hover:cursor-pointer`}
-                        >
-                          <DropDownMenu
-                            categoryName={(row[0].categoryName as string) || ""}
-                            setFocused={setFocused}
-                            indexKey={`quick-${categoryIndex}-${groupIndex}`}
-                            disableShortcutRef={props.disableShortcutRef}
-                            onClose={props.onClose}
-                          >
-                            <div className="flex flex-row items-center gap-2">
-                              <DataReadinessIcon
-                                dataReadiness={row[0].analyticalReadiness}
-                                useThin={false}
-                              />
-                              <span className="w-fit hover:cursor-pointer">
-                                {row[0].categoryName || "<undefined>"}{" "}
-                                {`- ${row[1].toLocaleString()}`}
-                              </span>
-                            </div>
-                          </DropDownMenu>
-                        </Badge>
-                      );
-                    })}
-                  </div>
+											return (
+												<Badge
+													key={`koolthing-category-count-${groupIndex}`}
+													variant="default"
+													className={`transition-all hover:bg-neutral-400 ${
+														dimmedBadge ? "opacity-20" : ""
+													} text-md font-normal hover:cursor-pointer`}
+												>
+													<DropDownMenu
+														categoryName={(row[0].categoryName as string) || ""}
+														setFocused={setFocused}
+														indexKey={`quick-${categoryIndex}-${groupIndex}`}
+														disableShortcutRef={props.disableShortcutRef}
+														onClose={props.onClose}
+													>
+														<div className="flex flex-row items-center gap-2">
+															<DataReadinessIcon
+																dataReadiness={row[0].analyticalReadiness}
+																useThin={false}
+															/>
+															<span className="w-fit hover:cursor-pointer">
+																{row[0].categoryName || "<undefined>"}{" "}
+																{`- ${row[1].toLocaleString()}`}
+															</span>
+														</div>
+													</DropDownMenu>
+												</Badge>
+											);
+										})}
+									</div>
 
-                  <Separator className="my-2" />
-                </div>
-              );
-            })}
-          </ScrollArea>
-          <ShortcutHelp />
-        </CardContent>
-      </Card>
-    </BlurredBackdrop>
-  );
+									<Separator className="my-2" />
+								</div>
+							);
+						})}
+					</ScrollArea>
+					<ShortcutHelp />
+				</CardContent>
+			</Card>
+		</BlurredBackdrop>
+	);
 }
