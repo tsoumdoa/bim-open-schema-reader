@@ -229,7 +229,11 @@ export default function SqlQueryCodeBlock(props: {
 			const formatedQuery = runFormat(draftSql);
 			setQueryState("edited");
 			setSqlQuery(formatedQuery);
+			setNewSqlQuery(formatedQuery);
 			props.updateQuery(props.queryObject, formatedQuery);
+		} else {
+			const formatedQuery = runFormat(sqlQuery);
+			setNewSqlQuery(formatedQuery);
 		}
 		//NOTE: add * if the query is edited but the title is not edited
 		const lastChar = props.queryObject.queryTitle.slice(-1);
