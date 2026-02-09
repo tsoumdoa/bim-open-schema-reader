@@ -87,7 +87,7 @@ export function AddQuery(props: {
 	const handleCreateCustomQuery = () => {
 		const queryObject: QueryObject = {
 			queryTitle: "New Custom Query",
-			explaination: "",
+			explanation: "",
 			sqlQuery: "select * from duckdb_logs",
 		};
 		props.addQuery(queryObject);
@@ -157,7 +157,7 @@ export function AddQuery(props: {
 															align="start"
 															alignOffset={-8}
 														>
-															<p>{q.explaination}</p>
+															<p>{q.explanation}</p>
 														</TooltipContent>
 													</Tooltip>
 												</CommandItem>

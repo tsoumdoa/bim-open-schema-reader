@@ -21,7 +21,7 @@ export const createBosTable = (
 		.join("\n");
 };
 
-export const createHelperViwesAndTables = () => sql`
+export const createHelperViewsAndTables = () => sql`
 	-- parameter enum table
 	CREATE
 	OR REPLACE TABLE Enum_Parameter (index INTEGER, ParameterType VARCHAR(20));
@@ -109,7 +109,7 @@ export const createHelperViwesAndTables = () => sql`
 		LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = PointParameters.Descriptor;
 
 	-- denormalize Single Parameters
-	-- WARNING: TO BE DEPRECATEED - name kept as double_parameters for now due the comaptibility
+	-- WARNING: TO BE DEPRECATED - name kept as double_parameters for now due the compatibility
 	CREATE
 	OR REPLACE VIEW denorm_single_params AS
 	SELECT
@@ -174,14 +174,14 @@ export const listCountByCategory = sql`
 		paramname ASC;
 `;
 
-export const summarizeTableInfor = (tableName: string) => sql`
+export const summarizeTableInfo = (tableName: string) => sql`
 	SELECT
 		COUNT(*)
 	FROM
 		${tableName};
 `;
 
-// exmaple with string literal
+// example with string literal
 // export const listAllTableInfo = (tableName: string) => sql`
 //   SELECT
 //     *

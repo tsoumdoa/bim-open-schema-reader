@@ -1,6 +1,6 @@
 import { UseExpandDisplay } from "../utils/types";
 import { DisplayTableInfo } from "./display-table-info";
-import ListDataByCategories from "./list-data-by-cagories";
+import ListDataByCategories from "./list-data-by-categories";
 import ListQueriesInSidebar from "./list-queries-in-sidebar";
 import {
 	Accordion,

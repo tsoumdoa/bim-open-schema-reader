@@ -35,7 +35,7 @@ function AboutMenuItem(props: { queryObject: QueryObject }) {
 					</span>
 				</TooltipTrigger>
 				<TooltipContent side="top" align="start">
-					<p>{props.queryObject.explaination}</p>
+					<p>{props.queryObject.explanation}</p>
 				</TooltipContent>
 			</Tooltip>
 		</DropdownMenuItem>

@@ -1,7 +1,7 @@
 import { useExpandDisplay } from "../hooks/use-expand-display";
 import { useQuickExplorer } from "../hooks/use-quick-explorer";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
-import { cleanCategoryCount } from "../utils/clean-category-cout";
+import { cleanCategoryCount } from "../utils/clean-category-count";
 import { listCountByCategory } from "../utils/queries";
 import { BosFileType, UseExpandDisplay } from "../utils/types";
 import { AddQuery } from "./add-query-button";
@@ -95,7 +95,7 @@ export default function DashboardContainer(props: {
 }) {
 	const useExpDis = useExpandDisplay();
 	const { setDisplayExpanded } = useExpDis;
-	const disableShortcutRef = useRef<boolean>(true); // NOTE: shortcut need to be disabled cuz the qucick explorer view is open at start
+	const disableShortcutRef = useRef<boolean>(true); // NOTE: shortcut need to be disabled cuz the quick explorer view is open at start
 	const { isActive, setIsActive } = useQuickExplorer(
 		setDisplayExpanded,
 		disableShortcutRef
@@ -106,7 +106,7 @@ export default function DashboardContainer(props: {
 
 	const { conn } = useDuckDb();
 	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
-	const categoryGorupMap = cleanCategoryCount(rows);
+	const categoryGroupMap = cleanCategoryCount(rows);
 
 	return (
 		<SidebarProvider className="h-full min-h-0 w-full">
@@ -139,7 +139,7 @@ export default function DashboardContainer(props: {
 								disableShortcutRef.current = false;
 								setIsActive(false);
 							}}
-							categoryGorupMap={categoryGorupMap}
+							categoryGroupMap={categoryGroupMap}
 							disableShortcutRef={disableShortcutRef}
 						/>,
 						document.body

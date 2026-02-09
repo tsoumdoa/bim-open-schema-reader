@@ -1,5 +1,5 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
-import { cleanCategoryCount } from "../utils/clean-category-cout";
+import { cleanCategoryCount } from "../utils/clean-category-count";
 import { listCountByCategory } from "../utils/queries";
 import { generalCategory, UseExpandDisplay } from "../utils/types";
 import DropDownMenu from "./data-category-list-dropdown";
@@ -16,7 +16,7 @@ export default function ListDataByCategories(props: {
 	const { conn } = useDuckDb();
 	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
 	const [focused, setFocused] = useState("");
-	const categoryGorupMap = cleanCategoryCount(rows);
+	const categoryGroupMap = cleanCategoryCount(rows);
 	const { setDisplayExpanded } = props.useExpandDisplay;
 	const { isSelected } = useDataReadinessFilter();
 	return (
@@ -24,7 +24,7 @@ export default function ListDataByCategories(props: {
 			<div className="overflow-x-auto">
 				<FilterByDataReadiness />
 				{generalCategory.map((categoryName, categoryIndex) => {
-					const rawRows = categoryGorupMap.get(categoryName) ?? [];
+					const rawRows = categoryGroupMap.get(categoryName) ?? [];
 					const visibleRows = rawRows.filter((row) =>
 						isSelected(row[0].analyticalReadiness)
 					);
