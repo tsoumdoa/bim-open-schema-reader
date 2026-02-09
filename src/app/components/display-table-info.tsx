@@ -2,7 +2,7 @@ import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { formatData } from "../utils/format";
 import {
 	listAllTableInfoWithColumnInfo,
-	summarizeTableInfor,
+	summarizeTableInfo,
 } from "../utils/queries";
 import {
 	// denormGeoTableNames,
@@ -24,7 +24,7 @@ function TableSummary(props: { name: string }) {
 	const { conn } = useDuckDb();
 	const { rows, isSuccess, isLoading } = useRunDuckDbQuery(
 		conn,
-		summarizeTableInfor(props.name)
+		summarizeTableInfo(props.name)
 	);
 	if (!isSuccess) {
 		return <div>Loading...</div>;

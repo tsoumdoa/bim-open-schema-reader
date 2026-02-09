@@ -5,7 +5,7 @@ import { listGrids, listLevels } from "../sql/level-and-grid";
 import {
 	listGridWithCoredStatus,
 	listLevelWithCoredStatus,
-} from "../sql/level-and-grid-codrination-status";
+} from "../sql/level-and-grid-coordination-status";
 import { levelSchedule } from "../sql/level-schedule";
 import { basicMaterialsInfo } from "../sql/materials-basic-info";
 import { roomScheduleByLevel } from "../sql/room-count-by-level";
@@ -33,13 +33,13 @@ const levels: QueriesSelector = {
 		{
 			queryTitle: "Level Schedule",
 			sqlQuery: levelSchedule,
-			explaination: "List all levels along with their coordinates",
+			explanation: "List all levels along with their coordinates",
 		},
 		{
 			queryTitle: "Levels Cordination View",
 			sqlQuery: listLevelWithCoredStatus,
-			explaination:
-				"Compare levels with the linked models to check if they are in the same location",
+			explanation:
+				"Compare levels with linked models to check if they are in same location",
 		},
 	],
 };
@@ -50,13 +50,13 @@ const grids: QueriesSelector = {
 		{
 			queryTitle: "List all Grids",
 			sqlQuery: listGrids,
-			explaination: "List all grids along with their coordinates",
+			explanation: "List all grids along with their coordinates",
 		},
 		{
 			queryTitle: "Grids Cordination View",
 			sqlQuery: listGridWithCoredStatus,
-			explaination:
-				"Compare grids with the linked models to check if they are in the same location",
+			explanation:
+				"Compare grids with linked models to check if they are in same location",
 		},
 	],
 };
@@ -67,7 +67,7 @@ const materials: QueriesSelector = {
 		{
 			queryTitle: "Materials Basic Info",
 			sqlQuery: basicMaterialsInfo,
-			explaination:
+			explanation:
 				"List visual material properties: Color (hex RGB), Shine (0–128), Glow (0–100), Smoothness (0–100), Shininess (0–100).",
 		},
 	],
@@ -79,17 +79,17 @@ const walls: QueriesSelector = {
 		{
 			queryTitle: "Wall Double and Point Parameters",
 			sqlQuery: wallDoubleAndPointParameters,
-			explaination: "Wall double and point parameters (metric)",
+			explanation: "Wall double and point parameters (metric)",
 		},
 		{
 			queryTitle: "Wall Element Basic Info",
 			sqlQuery: wallElementBasicInfo,
-			explaination: "Wall element basic info",
+			explanation: "Wall element basic info",
 		},
 		{
 			queryTitle: "Wall Build up Schedule",
 			sqlQuery: listWallBuildUps,
-			explaination: "Wall build up schedule (metric)",
+			explanation: "Wall build up schedule (metric)",
 		},
 	],
 };
@@ -100,22 +100,22 @@ const views: QueriesSelector = {
 		{
 			queryTitle: "Count Unplaced Views",
 			sqlQuery: countUnplacedViews,
-			explaination: "Count number of placed and unplaced views",
+			explanation: "Count number of placed and unplaced views",
 		},
 		{
 			queryTitle: "Count by View Family",
 			sqlQuery: countByViewFamily,
-			explaination: "Count number of views by view family",
+			explanation: "Count number of views by view family",
 		},
 		{
 			queryTitle: "Count by View Type",
 			sqlQuery: countByViewType,
-			explaination: "Count number of views by view type",
+			explanation: "Count number of views by view type",
 		},
 		{
 			queryTitle: "Count by View Family and Type",
 			sqlQuery: countViewByFamilyAndType,
-			explaination: "Count number of views by view family and type",
+			explanation: "Count number of views by view family and type",
 		},
 	],
 };
@@ -126,13 +126,13 @@ const tags: QueriesSelector = {
 		{
 			queryTitle: "Count Total Tags by  Category",
 			sqlQuery: tagsTotalCountByCategory,
-			explaination:
+			explanation:
 				"Count total number of tags in the Revit project by category",
 		},
 		{
 			queryTitle: "Count Total Tags by Family",
 			sqlQuery: tagsTotalCountByFamily,
-			explaination: "Count total number of tags in the Revit project by family",
+			explanation: "Count total number of tags in the Revit project by family",
 		},
 		// NOTE: can't use this untill the exporter is improved with fily type
 		// support due to the duplicated names of type under different families
@@ -150,7 +150,7 @@ const sheets: QueriesSelector = {
 		{
 			queryTitle: "Sheet Schedule",
 			sqlQuery: sheetSchedule,
-			explaination: "Simple sheets schedule",
+			explanation: "Simple sheets schedule",
 		},
 	],
 };
@@ -161,12 +161,12 @@ const rooms: QueriesSelector = {
 		{
 			queryTitle: "Simple Room Schedule",
 			sqlQuery: simpleRoomSchedule,
-			explaination: "Simple room schedule",
+			explanation: "Simple room schedule",
 		},
 		{
 			queryTitle: "Room Schedule by Level",
 			sqlQuery: roomScheduleByLevel,
-			explaination: "Room Schedule by Level",
+			explanation: "Room Schedule by Level",
 		},
 	],
 };
@@ -177,12 +177,12 @@ const cadLinks: QueriesSelector = {
 		{
 			queryTitle: "CAD Links",
 			sqlQuery: dwgSchedule,
-			explaination: "CAD Links",
+			explanation: "CAD Links",
 		},
 		{
 			queryTitle: "RVT Links",
 			sqlQuery: rvtSchedule,
-			explaination: "RVT Links",
+			explanation: "RVT Links",
 		},
 	],
 };
@@ -193,12 +193,12 @@ const floors: QueriesSelector = {
 		{
 			queryTitle: "Floor Schedule",
 			sqlQuery: floorSchedule,
-			explaination: "Floor Schedule",
+			explanation: "Floor Schedule",
 		},
 		{
 			queryTitle: "Floor Schedule by Floor Type",
 			sqlQuery: floorScheduleByType,
-			explaination: "Floor Schedule by Floor Type",
+			explanation: "Floor Schedule by Floor Type",
 		},
 	],
 };
@@ -209,22 +209,22 @@ const structure: QueriesSelector = {
 		{
 			queryTitle: "Column Schedule",
 			sqlQuery: structuralColumnSchedule,
-			explaination: "Structural column Schedule",
+			explanation: "Structural column Schedule",
 		},
 		{
 			queryTitle: "Column Materials",
 			sqlQuery: structuralColumnMaterials,
-			explaination: "Structural column Materials",
+			explanation: "Structural column Materials",
 		},
 		{
 			queryTitle: "Frame Schedule",
 			sqlQuery: structuralFrameSchedule,
-			explaination: "Structural frame Schedule",
+			explanation: "Structural frame Schedule",
 		},
 		{
 			queryTitle: "Frame Materials",
 			sqlQuery: structuralFrameMaterials,
-			explaination: "Structural frame Materials",
+			explanation: "Structural frame Materials",
 		},
 	],
 };

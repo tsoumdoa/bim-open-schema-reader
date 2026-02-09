@@ -126,7 +126,7 @@ export type QueryObject = {
 	id?: string;
 	queryCategory?: string;
 	queryTitle: string;
-	explaination: string;
+	explanation: string;
 	sqlQuery: string;
 	isCustom?: boolean;
 	returnedRowsNumber?: number;
@@ -188,10 +188,10 @@ export type CategoryObj = {
 
 export type CategoryWithReadiness = {
 	categoryName: string;
-	analyticReadiness: AnalyticsReadinessLevels;
+	analyticalReadiness: AnalyticsReadinessLevels;
 };
 
-export type GenerailCategoryObj = {
+export type GeneralCategoryObj = {
 	generalCategory: GeneralCategory;
 	categoryName: string;
 	analyticalReadiness: AnalyticsReadinessLevels;

@@ -41,7 +41,7 @@ export function denormParamQueryBuilder(
 		queryCategory: categoryName,
 		queryTitle: `${title} - ${categoryName || "<undefined>"} ${queryTypeTitle(queryType)}`, //format category name
 		sqlQuery: "",
-		explaination: "",
+		explanation: "",
 	};
 	denormParamQueryBuilder;
 	switch (paramType) {

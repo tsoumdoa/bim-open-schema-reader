@@ -1,5 +1,5 @@
 import { useKeywordFilter } from "../hooks/use-keyword-filter";
-import { GenerailCategoryObj, generalCategory } from "../utils/types";
+import { GeneralCategoryObj, generalCategory } from "../utils/types";
 import DropDownMenu from "./data-category-list-dropdown";
 import DataReadinessIcon from "./data-readiness-icon";
 import FilterByDataReadiness from "./filter-by-data-readiness";
@@ -42,7 +42,7 @@ function BlurredBackdrop(props: { children: React.ReactNode }) {
 
 export function QuickExplorer(props: {
 	onClose: () => void;
-	categoryGorupMap: Map<string, [GenerailCategoryObj, number][]>;
+	categoryGroupMap: Map<string, [GeneralCategoryObj, number][]>;
 	disableShortcutRef: RefObject<boolean>;
 }) {
 	const [focused, setFocused] = useState("");
@@ -74,7 +74,7 @@ export function QuickExplorer(props: {
 					</div>
 					<ScrollArea className="h-[60vh] pt-1 pr-4">
 						{generalCategory.map((categoryName, categoryIndex) => {
-							const rawRows = props.categoryGorupMap.get(categoryName);
+							const rawRows = props.categoryGroupMap.get(categoryName);
 							if (!rawRows || rawRows.length === 0) return null;
 
 							const kw = keyword.trim().toLowerCase();

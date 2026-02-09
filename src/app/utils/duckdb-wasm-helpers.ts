@@ -1,4 +1,4 @@
-import { createBosTable, createHelperViwesAndTables } from "./queries";
+import { createBosTable, createHelperViewsAndTables } from "./queries";
 import { ParquetBlob } from "./types";
 import * as duckdb from "@duckdb/duckdb-wasm";
 
@@ -58,6 +58,6 @@ export async function initTables(
 	c: duckdb.AsyncDuckDBConnection,
 	fileNames: string[]
 ) {
-	const query = createBosTable(fileNames) + createHelperViwesAndTables();
+	const query = createBosTable(fileNames) + createHelperViewsAndTables();
 	await c.query(query);
 }
