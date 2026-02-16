@@ -103,6 +103,7 @@ export type ParquetBlob = {
 };
 
 export const queryCategories = [
+	"3D Viewer",
 	"CAD & RVT Links",
 	"Floors",
 	"Grids",
@@ -130,6 +131,7 @@ export type QueryObject = {
 	sqlQuery: string;
 	isCustom?: boolean;
 	returnedRowsNumber?: number;
+	isRender3D?: boolean;
 };
 
 const exportFileTypes = ["csv", "tsv", "json"] as const;

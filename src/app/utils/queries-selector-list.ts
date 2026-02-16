@@ -1,6 +1,14 @@
 import { dwgSchedule } from "../sql/dwg-schedule";
 import { floorSchedule } from "../sql/floor-schedule";
 import { floorScheduleByType } from "../sql/floor-schedule-by-type";
+import {
+	renderAllGeometry,
+	renderWallsGeometry,
+	renderFloorsGeometry,
+	renderColumnsGeometry,
+	renderDoorsGeometry,
+	renderWindowsGeometry,
+} from "../sql/geometry-queries";
 import { listGrids, listLevels } from "../sql/level-and-grid";
 import {
 	listGridWithCoredStatus,
@@ -229,7 +237,56 @@ const structure: QueriesSelector = {
 	],
 };
 
+const viewer3d: QueriesSelector = {
+	queryCategory: "3D Viewer",
+	queryObjects: [
+		{
+			queryTitle: "Render All Geometry",
+			sqlQuery: renderAllGeometry,
+			explanation:
+				"Renders all 3D geometry in the viewer. Use the 'Show 3D' button to view.",
+			isRender3D: true,
+		},
+		{
+			queryTitle: "Render Walls",
+			sqlQuery: renderWallsGeometry,
+			explanation:
+				"Renders only walls in the 3D viewer. Use the 'Show 3D' button to view.",
+			isRender3D: true,
+		},
+		{
+			queryTitle: "Render Floors",
+			sqlQuery: renderFloorsGeometry,
+			explanation:
+				"Renders only floors in the 3D viewer. Use the 'Show 3D' button to view.",
+			isRender3D: true,
+		},
+		{
+			queryTitle: "Render Columns",
+			sqlQuery: renderColumnsGeometry,
+			explanation:
+				"Renders only structural columns in the 3D viewer. Use the 'Show 3D' button to view.",
+			isRender3D: true,
+		},
+		{
+			queryTitle: "Render Doors",
+			sqlQuery: renderDoorsGeometry,
+			explanation:
+				"Renders only doors in the 3D viewer. Use the 'Show 3D' button to view.",
+			isRender3D: true,
+		},
+		{
+			queryTitle: "Render Windows",
+			sqlQuery: renderWindowsGeometry,
+			explanation:
+				"Renders only windows in the 3D viewer. Use the 'Show 3D' button to view.",
+			isRender3D: true,
+		},
+	],
+};
+
 export const queriesSelectorList: QueriesSelector[] = [
+	viewer3d,
 	levels,
 	grids,
 	materials,

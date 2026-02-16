@@ -79,7 +79,7 @@ export const createHelperViewsAndTables = () => sql`
 		dsc.index AS index,
 		strName.Strings AS Name,
 		strUnit.Strings AS Units,
-		strGroup.Strings AS GROUP,
+		strGroup.Strings AS "Group",
 		strType.Strings AS Type
 	FROM
 		Descriptors AS dsc
@@ -136,6 +136,120 @@ export const createHelperViewsAndTables = () => sql`
 		EntityParameters
 		LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = EntityParameters.Descriptor
 		LEFT OUTER JOIN denorm_entities AS de ON de.index = EntityParameters.Value;
+
+	-- denormalize geometry: VertexBuffer
+	CREATE
+	OR REPLACE VIEW denorm_vertex_buffer_view AS
+	SELECT
+		VertexBuffer.index AS index,
+		VertexBuffer.VertexX / 10000.0 AS x,
+		VertexBuffer.VertexY / 10000.0 AS y,
+		VertexBuffer.VertexZ / 10000.0 AS z
+	FROM
+		VertexBuffer;
+
+	-- denormalize geometry: IndexBuffer
+	CREATE
+	OR REPLACE VIEW denorm_index_buffer_view AS
+	SELECT
+		IndexBuffer.index AS index,
+		IndexBuffer.IndexBuffer AS index_value
+	FROM
+		IndexBuffer;
+
+	-- denormalize geometry: Meshes
+	CREATE
+	OR REPLACE VIEW denorm_meshes_view AS
+	SELECT
+		Meshes.index AS index,
+		Meshes.MeshVertexOffset AS vertex_offset,
+		Meshes.MeshIndexOffset AS index_offset
+	FROM
+		Meshes;
+
+	-- denormalize geometry: Materials
+	CREATE
+	OR REPLACE VIEW denorm_materials_view AS
+	SELECT
+		Materials.index AS index,
+		Materials.MaterialRed / 255.0 AS red,
+		Materials.MaterialGreen / 255.0 AS green,
+		Materials.MaterialBlue / 255.0 AS blue,
+		Materials.MaterialAlpha / 255.0 AS alpha,
+		Materials.MaterialRoughness / 255.0 AS roughness,
+		Materials.MaterialMetallic / 255.0 AS metallic
+	FROM
+		Materials;
+
+	-- denormalize geometry: Transforms
+	CREATE
+	OR REPLACE VIEW denorm_transforms_view AS
+	SELECT
+		Transforms.index AS index,
+		Transforms.TransformTX AS tx,
+		Transforms.TransformTY AS ty,
+		Transforms.TransformTZ AS tz,
+		Transforms.TransformQX AS qx,
+		Transforms.TransformQY AS qy,
+		Transforms.TransformQZ AS qz,
+		Transforms.TransformQW AS qw,
+		Transforms.TransformSX AS sx,
+		Transforms.TransformSY AS sy,
+		Transforms.TransformSZ AS sz
+	FROM
+		Transforms;
+
+	-- denormalize geometry: Instances
+	CREATE
+	OR REPLACE VIEW denorm_instances_view AS
+	SELECT
+		Instances.index AS index,
+		Instances.InstanceEntityIndex AS entity_index,
+		Instances.InstanceMaterialIndex AS material_index,
+		Instances.InstanceMeshIndex AS mesh_index,
+		Instances.InstanceTransformIndex AS transform_index,
+		Instances.InstanceFlags AS flags
+	FROM
+		Instances;
+
+	-- denormalize geometry: Elements (joins all geometry tables with entities)
+	CREATE
+	OR REPLACE VIEW denorm_geometry_elements AS
+	SELECT
+		i.index AS instance_index,
+		i.entity_index,
+		i.mesh_index,
+		i.transform_index,
+		i.material_index,
+		i.flags,
+		e.LocalId,
+		e.GlobalId,
+		e.entity_name,
+		e.category,
+		m.vertex_offset,
+		m.index_offset AS mesh_index_offset,
+		t.tx,
+		t.ty,
+		t.tz,
+		t.qx,
+		t.qy,
+		t.qz,
+		t.qw,
+		t.sx,
+		t.sy,
+		t.sz,
+		mat.red,
+		mat.green,
+		mat.blue,
+		mat.alpha,
+		mat.roughness,
+		mat.metallic
+	FROM
+		denorm_instances_view i
+		LEFT OUTER JOIN denorm_entities e ON i.entity_index = e.index
+		LEFT OUTER JOIN denorm_meshes_view m ON i.mesh_index = m.index
+		LEFT OUTER JOIN denorm_transforms_view t ON i.transform_index = t.index
+		LEFT OUTER JOIN denorm_materials_view mat ON i.material_index = mat.index;
 `;
 
 export const listAllTableInfo = sql`
