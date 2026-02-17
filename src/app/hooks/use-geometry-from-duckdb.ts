@@ -17,7 +17,7 @@ import * as THREE from "three";
 
 function rowsToVertexData(rows: (string | number)[][]): VertexData[] {
 	return rows.map((row) => ({
-		index: row[0] as number,
+		index: Number(row[0] as number),
 		x: row[1] as number,
 		y: row[2] as number,
 		z: row[3] as number,
@@ -26,14 +26,14 @@ function rowsToVertexData(rows: (string | number)[][]): VertexData[] {
 
 function rowsToIndexData(rows: (string | number)[][]): IndexData[] {
 	return rows.map((row) => ({
-		index: row[0] as number,
+		index: Number(row[0] as number),
 		index_value: row[1] as number,
 	}));
 }
 
 function rowsToMeshData(rows: (string | number)[][]): MeshData[] {
 	return rows.map((row) => ({
-		index: row[0] as number,
+		index: Number(row[0] as number),
 		vertex_offset: row[1] as number,
 		index_offset: row[2] as number,
 	}));
@@ -41,7 +41,7 @@ function rowsToMeshData(rows: (string | number)[][]): MeshData[] {
 
 function rowsToMaterialData(rows: (string | number)[][]): MaterialData[] {
 	return rows.map((row) => ({
-		index: row[0] as number,
+		index: Number(row[0] as number),
 		red: row[1] as number,
 		green: row[2] as number,
 		blue: row[3] as number,
@@ -53,7 +53,7 @@ function rowsToMaterialData(rows: (string | number)[][]): MaterialData[] {
 
 function rowsToTransformData(rows: (string | number)[][]): TransformData[] {
 	return rows.map((row) => ({
-		index: row[0] as number,
+		index: Number(row[0] as number),
 		tx: row[1] as number,
 		ty: row[2] as number,
 		tz: row[3] as number,
@@ -93,13 +93,13 @@ function rowsToInstanceData(rows: (string | number)[][]): {
 	metallic: number;
 }[] {
 	return rows.map((row) => ({
-		instance_index: row[0] as number,
-		entity_index: row[1] as number,
-		material_index: row[2] as number,
-		mesh_index: row[3] as number,
-		transform_index: row[4] as number,
-		vertex_offset: row[5] as number,
-		index_offset: row[6] as number,
+		instance_index: Number(row[0] as number),
+		entity_index: Number(row[1] as number),
+		material_index: Number(row[2] as number),
+		mesh_index: Number(row[3] as number),
+		transform_index: Number(row[4] as number),
+		vertex_offset: Number(row[5] as number),
+		index_offset: Number(row[6] as number),
 		tx: row[7] as number,
 		ty: row[8] as number,
 		tz: row[9] as number,

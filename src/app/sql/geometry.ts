@@ -3,9 +3,9 @@ import { sql } from "../utils/queries";
 export const denormVertexBuffer = sql`
 	SELECT
 		VertexBuffer.index AS index,
-		VertexBuffer.VertexX / 10000.0 AS x,
-		VertexBuffer.VertexY / 10000.0 AS y,
-		VertexBuffer.VertexZ / 10000.0 AS z
+		VertexBuffer.VertexX AS x,
+		VertexBuffer.VertexY AS y,
+		VertexBuffer.VertexZ AS z
 	FROM
 		VertexBuffer;
 `;
@@ -30,12 +30,12 @@ export const denormMeshes = sql`
 export const denormMaterials = sql`
 	SELECT
 		Materials.index AS index,
-		Materials.MaterialRed / 255.0 AS red,
-		Materials.MaterialGreen / 255.0 AS green,
-		Materials.MaterialBlue / 255.0 AS blue,
-		Materials.MaterialAlpha / 255.0 AS alpha,
-		Materials.MaterialRoughness / 255.0 AS roughness,
-		Materials.MaterialMetallic / 255.0 AS metallic
+		Materials.MaterialRed AS red,
+		Materials.MaterialGreen AS green,
+		Materials.MaterialBlue AS blue,
+		Materials.MaterialAlpha AS alpha,
+		Materials.MaterialRoughness AS roughness,
+		Materials.MaterialMetallic AS metallic
 	FROM
 		Materials;
 `;
