@@ -7,66 +7,10 @@ import {
 	Environment,
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import * as THREE from "three";
 
-interface BimViewerProps {
-	conn: any;
-	category?: string;
-	showStats?: boolean;
-}
-
-function Scene({
-	conn,
-	category,
-	onInstanceCountChange,
-	onLoadingChange,
-	onError,
-}: {
-	conn: any;
-	category?: string;
-	onInstanceCountChange?: (count: number) => void;
-	onLoadingChange?: (loading: boolean) => void;
-	onError?: (error: Error | null) => void;
-}) {
-	const { loading, error, scene, instanceCount } = useGeometryFromDuckDB(
-		conn,
-		category
-	);
-
-	useEffect(() => {
-		onLoadingChange?.(loading);
-	}, [loading, onLoadingChange]);
-
-	useEffect(() => {
-		onError?.(error);
-	}, [error, onError]);
-
-	useEffect(() => {
-		if (onInstanceCountChange) {
-			onInstanceCountChange(instanceCount);
-		}
-	}, [instanceCount, onInstanceCountChange]);
-
-	if (loading) {
-		return (
-			<mesh>
-				<boxGeometry args={[1, 1, 1]} />
-				<meshStandardMaterial color="gray" wireframe />
-			</mesh>
-		);
-	}
-
-	if (error) {
-		console.error("Geometry error:", error);
-		return (
-			<mesh>
-				<boxGeometry args={[1, 1, 1]} />
-				<meshStandardMaterial color="red" wireframe />
-			</mesh>
-		);
-	}
-
+function Scene({ scene }: { scene: any }) {
 	if (!scene) return null;
 
 	return <primitive object={scene} />;
@@ -76,38 +20,17 @@ export function BimViewer({
 	conn,
 	category,
 	showStats = false,
-}: BimViewerProps) {
+}: {
+	conn: any;
+	category?: string;
+	showStats?: boolean;
+}) {
 	const instanceCountRef = useRef(0);
-	const [isLoading, setIsLoading] = useState(false);
-	const [connError, setConnError] = useState<Error | null>(null);
-
-	const handleInstanceCountChange = (count: number) => {
-		instanceCountRef.current = count;
-	};
-
-	const handleLoadingChange = (loading: boolean) => {
-		setIsLoading(loading);
-	};
-
-	const handleError = (error: Error | null) => {
-		setConnError(error);
-	};
-
-	if (!conn) {
-		console.log("BimViewer: conn is null/undefined");
-		return (
-			<div className="flex items-center justify-center h-full bg-gray-900">
-				<div className="text-white">Waiting for database...</div>
-			</div>
-		);
-	}
-
-	console.log(
-		"BimViewer: conn exists, conn type:",
-		typeof conn,
-		"has query:",
-		typeof conn?.query
-	);
+	const {
+		loading: isLoading,
+		error: connError,
+		scene,
+	} = useGeometryFromDuckDB(conn, category);
 
 	return (
 		<div className="relative w-full h-full">
@@ -118,7 +41,7 @@ export function BimViewer({
 			)}
 			{connError && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center bg-red-900/50">
-					<div className="text-white p-4">Error: {connError.message}</div>
+					<div className="text-white p-4">Error: {connError?.message}</div>
 				</div>
 			)}
 			<Canvas
@@ -147,13 +70,7 @@ export function BimViewer({
 				/>
 				<directionalLight position={[-50, 50, -50]} intensity={0.3} />
 
-				<Scene
-					conn={conn}
-					category={category}
-					onInstanceCountChange={handleInstanceCountChange}
-					onLoadingChange={handleLoadingChange}
-					onError={handleError}
-				/>
+				<Scene scene={scene} />
 
 				<Environment preset="city" />
 				<gridHelper args={[1000, 100]} />
