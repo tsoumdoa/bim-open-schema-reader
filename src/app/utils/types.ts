@@ -79,6 +79,8 @@ export type QueryEditorState =
 	| "error"
 	| "canceled";
 export const denormTableNames = [
+	"denorm_descriptors",
+	"denorm_entities",
 	"denorm_single_params",
 	"denorm_entity_params",
 	"denorm_integer_params",
@@ -86,12 +88,13 @@ export const denormTableNames = [
 	"denorm_string_params",
 ];
 export const denormGeoTableNames = [
-	"denorm_elements",
-	"denorm_index_buffer",
-	"denorm_materials",
-	"denorm_meshes",
-	"denorm_transforms",
-	"denorm_vertex_buffer",
+	"denorm_geometry_elements",
+	"denorm_index_buffer_view",
+	"denorm_instances_view",
+	"denorm_materials_view",
+	"denorm_meshes_view",
+	"denorm_transforms_view",
+	"denorm_vertex_buffer_view",
 ];
 
 export type DenormTableName = (typeof denormTableNames)[number];

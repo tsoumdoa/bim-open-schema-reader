@@ -92,11 +92,13 @@ export const createHelperViewsAndTables = () => sql`
 	CREATE
 	OR REPLACE VIEW denorm_string_params AS
 	SELECT
-		*
+		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
+		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
-		StringParameters
-		JOIN Strings ON Strings.index = StringParameters.Value
-		JOIN denorm_descriptors ON denorm_descriptors.index = StringParameters.Descriptor;
+		StringParameters p
+		JOIN Strings v USING (index)
+		JOIN denorm_descriptors d USING (index);
 
 	-- denormalize PointParameters
 	CREATE
@@ -109,7 +111,6 @@ export const createHelperViewsAndTables = () => sql`
 		LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = PointParameters.Descriptor;
 
 	-- denormalize Single Parameters
-	-- WARNING: TO BE DEPRECATED - name kept as double_parameters for now due the compatibility
 	CREATE
 	OR REPLACE VIEW denorm_single_params AS
 	SELECT
@@ -137,6 +138,7 @@ export const createHelperViewsAndTables = () => sql`
 		LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = EntityParameters.Descriptor
 		LEFT OUTER JOIN denorm_entities AS de ON de.index = EntityParameters.Value;
 
+	-- DENORM GEOMETRICAL DATA TABLES
 	-- denormalize geometry: VertexBuffer
 	CREATE
 	OR REPLACE VIEW denorm_vertex_buffer_view AS

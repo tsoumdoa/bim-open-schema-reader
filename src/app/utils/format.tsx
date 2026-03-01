@@ -11,28 +11,32 @@ export const formatData = (data: string | number) => {
 	}
 
 	if (typeof data === "object" && data !== null) {
-		const stringified = JSON.stringify(data);
-		const json = JSON.parse(stringified);
+		try {
+			const stringified = JSON.stringify(data);
+			const json = JSON.parse(stringified);
 
-		if (Array.isArray(json)) {
-			return (
-				<ul>
-					{json.map((item, i) => {
-						return (
-							<li key={i}>
-								{item ? (
-									formatData(item)
-								) : (
-									<span className="text-neutral-500">n/a</span>
-								)}
-							</li>
-						);
-					})}
-				</ul>
-			);
+			if (Array.isArray(json)) {
+				return (
+					<ul>
+						{json.map((item, i) => {
+							return (
+								<li key={i}>
+									{item ? (
+										formatData(item)
+									) : (
+										<span className="text-neutral-500">n/a</span>
+									)}
+								</li>
+							);
+						})}
+					</ul>
+				);
+			}
+
+			return JSON.stringify(data, null, 2); // pretty-print
+		} catch {
+			return data;
 		}
-
-		return JSON.stringify(data, null, 2); // pretty-print
 	}
 
 	return data;
