@@ -104,39 +104,45 @@ export const createHelperViewsAndTables = () => sql`
 	CREATE
 	OR REPLACE VIEW denorm_points_params AS
 	SELECT
-		*
+		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
+		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
-		PointParameters
-		LEFT OUTER JOIN Points ON Points.index = PointParameters.Value
-		LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = PointParameters.Descriptor;
+		PointParameters p
+		JOIN Points v USING (index)
+		JOIN denorm_descriptors d USING (index);
 
 	-- denormalize Single Parameters
 	CREATE
 	OR REPLACE VIEW denorm_single_params AS
 	SELECT
-		*
+		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
-		SingleParameters
-		LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = SingleParameters.Descriptor;
+		SingleParameters p
+		JOIN denorm_descriptors d USING (index);
 
 	-- denormalize Integer Parameters
 	CREATE
 	OR REPLACE VIEW denorm_integer_params AS
 	SELECT
-		*
+		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
-		IntegerParameters
-		LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = IntegerParameters.Descriptor;
+		IntegerParameters p
+		JOIN denorm_descriptors d USING (index);
 
 	-- denormalize Entity Parameters
 	CREATE
 	OR REPLACE VIEW denorm_entity_params AS
 	SELECT
-		*
+		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
+		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
-		EntityParameters
-		LEFT OUTER JOIN denorm_descriptors ON denorm_descriptors.index = EntityParameters.Descriptor
-		LEFT OUTER JOIN denorm_entities AS de ON de.index = EntityParameters.Value;
+		EntityParameters p
+		JOIN denorm_entities v USING (index)
+		JOIN denorm_descriptors d USING (index);
 
 	-- DENORM GEOMETRICAL DATA TABLES
 	-- denormalize geometry: VertexBuffer
