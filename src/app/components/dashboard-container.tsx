@@ -170,7 +170,7 @@ export default function DashboardContainer(props: {
 					/>
 
 					{showViewer && props.bosFileType === "GEO" && (
-						<div className="h-[400px] w-full border-b border-gray-200">
+						<div className="h-100 w-full border-b border-gray-200">
 							<BimViewer conn={conn} category={viewerCategory} showStats />
 						</div>
 					)}
