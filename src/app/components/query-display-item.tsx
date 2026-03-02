@@ -172,28 +172,25 @@ export default function QueryDisplayItem(props: {
 		undefined
 	);
 	const { conn } = useDuckDb();
-	const { useQueryObjects } = useQueryObjCtx();
-	const { queryObjects } = useQueryObjects;
 
 	useEffect(() => {
-		const latestQuery = queryObjects[queryObjects.length - 1];
-		if (latestQuery?.isRender3D) {
+		if (props.queryObject?.isRender3D) {
 			setShowViewer(true);
-			if (latestQuery.queryTitle.includes("All")) {
+			if (props.queryObject.queryTitle.includes("All")) {
 				setViewerCategory(undefined);
-			} else if (latestQuery.queryTitle.includes("Walls")) {
+			} else if (props.queryObject.queryTitle.includes("Walls")) {
 				setViewerCategory("Walls");
-			} else if (latestQuery.queryTitle.includes("Floors")) {
+			} else if (props.queryObject.queryTitle.includes("Floors")) {
 				setViewerCategory("Floors");
-			} else if (latestQuery.queryTitle.includes("Columns")) {
+			} else if (props.queryObject.queryTitle.includes("Columns")) {
 				setViewerCategory("Structural Columns");
-			} else if (latestQuery.queryTitle.includes("Doors")) {
+			} else if (props.queryObject.queryTitle.includes("Doors")) {
 				setViewerCategory("Doors");
-			} else if (latestQuery.queryTitle.includes("Windows")) {
+			} else if (props.queryObject.queryTitle.includes("Windows")) {
 				setViewerCategory("Windows");
 			}
 		}
-	}, [queryObjects]);
+	}, [props.queryObject]);
 
 	return (
 		<div
