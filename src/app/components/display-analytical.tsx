@@ -3,6 +3,7 @@ import { useImportParquet } from "../hooks/use-import-parquet";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import { BosFileType, ParquetBlob } from "../utils/types";
 import DashboardContainer from "./dashboard-container";
+import { GeometryProvider } from "./geometry-context";
 import QueryObjProvider from "./query-obj-provider";
 import { SimpleErrMessage } from "./simple-err-message";
 import { DuckDbProvider, useDuckDb } from "./use-db";
@@ -21,7 +22,7 @@ function DbProvider(props: {
 		return <div>Initializing...</div>;
 	}
 	if (isInitialized) {
-		return props.children;
+		return <GeometryProvider conn={conn}>{props.children}</GeometryProvider>;
 	}
 	return (
 		<SimpleErrMessage

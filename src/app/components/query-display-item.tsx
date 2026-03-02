@@ -8,7 +8,6 @@ import {
 import { BimViewer } from "./bim-viewer";
 import QueryResultDisplayTable from "./query-result-display";
 import SqlQueryCodeBlock from "./sql-code-block";
-import { useDuckDb } from "./use-db";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -160,9 +159,6 @@ export default function QueryDisplayItem(props: {
 	useEffect(() => {
 		if (displayExpanded !== -1) {
 			setQueryDisplayState("hidden");
-			setShowViewer(false);
-		} else {
-			setShowViewer(true);
 		}
 	}, [displayExpanded]);
 
@@ -170,29 +166,33 @@ export default function QueryDisplayItem(props: {
 		queryDisplayState === "viewer" || queryDisplayState === "hidden";
 
 	const [showViewer, setShowViewer] = useState(false);
-	const [viewerCategory, setViewerCategory] = useState<string | undefined>(
-		undefined
-	);
-	const { conn } = useDuckDb();
+	const [entityIndices, setEntityIndices] = useState<number[]>([]);
 
 	useEffect(() => {
-		if (props.queryObject?.isRender3D) {
+		if (displayExpanded !== -1) {
+			setShowViewer(false);
+		} else if (entityIndices.length > 0) {
 			setShowViewer(true);
-			if (props.queryObject.queryTitle.includes("All")) {
-				setViewerCategory(undefined);
-			} else if (props.queryObject.queryTitle.includes("Walls")) {
-				setViewerCategory("Walls");
-			} else if (props.queryObject.queryTitle.includes("Floors")) {
-				setViewerCategory("Floors");
-			} else if (props.queryObject.queryTitle.includes("Columns")) {
-				setViewerCategory("Structural Columns");
-			} else if (props.queryObject.queryTitle.includes("Doors")) {
-				setViewerCategory("Doors");
-			} else if (props.queryObject.queryTitle.includes("Windows")) {
-				setViewerCategory("Windows");
-			}
 		}
-	}, [props.queryObject]);
+	}, [displayExpanded, entityIndices]);
+
+	const handleQueryResults = (
+		headers: string[],
+		rows: (string | number)[][]
+	) => {
+		const entityIndexColIndex = headers.findIndex(
+			(h) => h.toLowerCase() === "entity_index"
+		);
+		if (entityIndexColIndex === -1) {
+			setEntityIndices([]);
+			return;
+		}
+		const indices = rows
+			.map((row) => Number(row[entityIndexColIndex]))
+			.filter((idx) => !isNaN(idx));
+		const uniqueIndices = [...new Set(indices)];
+		setEntityIndices(uniqueIndices);
+	};
 
 	return (
 		<div
@@ -226,14 +226,9 @@ export default function QueryDisplayItem(props: {
 				/>
 			</div>
 
-			{showViewer && (
+			{showViewer && entityIndices.length > 0 && (
 				<div className="h-100 w-full border-b border-gray-200">
-					<BimViewer
-						conn={conn}
-						category={viewerCategory}
-						showStats
-						initialVisible={false}
-					/>
+					<BimViewer entityIndices={entityIndices} />
 				</div>
 			)}
 			{queryDisplayState !== "hidden" && (
@@ -253,6 +248,7 @@ export default function QueryDisplayItem(props: {
 					lockScroll={!isFocused()}
 					fileDownloadName={fileDownloadName}
 					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
+					onResultsAvailable={handleQueryResults}
 				/>
 			</div>
 			<Separator className="my-4" />

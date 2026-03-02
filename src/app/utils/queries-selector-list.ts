@@ -243,44 +243,32 @@ const viewer3d: QueriesSelector = {
 		{
 			queryTitle: "Render All Geometry",
 			sqlQuery: renderAllGeometry,
-			explanation:
-				"Renders all 3D geometry in the viewer. Use the 'Show 3D' button to view.",
-			isRender3D: true,
+			explanation: "Renders all 3D geometry in the viewer.",
 		},
 		{
 			queryTitle: "Render Walls",
 			sqlQuery: renderWallsGeometry,
-			explanation:
-				"Renders only walls in the 3D viewer. Use the 'Show 3D' button to view.",
-			isRender3D: true,
+			explanation: "Renders only walls in the 3D viewer.",
 		},
 		{
 			queryTitle: "Render Floors",
 			sqlQuery: renderFloorsGeometry,
-			explanation:
-				"Renders only floors in the 3D viewer. Use the 'Show 3D' button to view.",
-			isRender3D: true,
+			explanation: "Renders only floors in the 3D viewer.",
 		},
 		{
 			queryTitle: "Render Columns",
 			sqlQuery: renderColumnsGeometry,
-			explanation:
-				"Renders only structural columns in the 3D viewer. Use the 'Show 3D' button to view.",
-			isRender3D: true,
+			explanation: "Renders only structural columns in the 3D viewer.",
 		},
 		{
 			queryTitle: "Render Doors",
 			sqlQuery: renderDoorsGeometry,
-			explanation:
-				"Renders only doors in the 3D viewer. Use the 'Show 3D' button to view.",
-			isRender3D: true,
+			explanation: "Renders only doors in the 3D viewer.",
 		},
 		{
 			queryTitle: "Render Windows",
 			sqlQuery: renderWindowsGeometry,
-			explanation:
-				"Renders only windows in the 3D viewer. Use the 'Show 3D' button to view.",
-			isRender3D: true,
+			explanation: "Renders only windows in the 3D viewer.",
 		},
 	],
 };

@@ -11,6 +11,7 @@ export default function QueryResultDisplayTable(props: {
 	lockScroll: boolean;
 	fileDownloadName: string;
 	useQueryViewerAndEditorHook: UseQueryViewerAndEditor;
+	onResultsAvailable?: (headers: string[], rows: (string | number)[][]) => void;
 }) {
 	const {
 		handleCancelQueryRef,
@@ -20,7 +21,7 @@ export default function QueryResultDisplayTable(props: {
 	} = props.useQueryViewerAndEditorHook;
 	const { conn } = useDuckDb();
 	const runDuckDbQuery = useRunDuckDbQuery(conn, formatedQuery);
-	const { cancelQuery, isLoading, isSuccess, error, run, rows } =
+	const { cancelQuery, isLoading, isSuccess, error, run, rows, headers } =
 		runDuckDbQuery;
 	handleCancelQueryRef.current = { cancelQuery };
 
@@ -35,6 +36,12 @@ export default function QueryResultDisplayTable(props: {
 			}
 		}
 	}, [isSuccess, error]);
+
+	useEffect(() => {
+		if (props.onResultsAvailable && isSuccess && rows.length > 0) {
+			props.onResultsAvailable(headers, rows);
+		}
+	}, [isSuccess, rows, headers, props.onResultsAvailable]);
 
 	useEffect(() => {
 		if (newSqlQuery !== formatedQuery) {
