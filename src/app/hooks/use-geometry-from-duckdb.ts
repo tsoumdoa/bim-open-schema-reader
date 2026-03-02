@@ -10,9 +10,8 @@ import {
 	createBufferGeometryFromMesh,
 	batchInstancesByMaterialAndGeometry,
 	convertZUpToYUp,
-	BatchedGeometry,
 } from "@/lib/geometry-utils";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import * as THREE from "three";
 
 function rowsToVertexData(rows: (string | number)[][]): VertexData[] {

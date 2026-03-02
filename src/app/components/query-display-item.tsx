@@ -5,8 +5,11 @@ import {
 	QueryObject,
 	UseExpandDisplay,
 } from "../utils/types";
+import { BimViewer } from "./bim-viewer";
+import { useQueryObjCtx } from "./query-obj-provider";
 import QueryResultDisplayTable from "./query-result-display";
 import SqlQueryCodeBlock from "./sql-code-block";
+import { useDuckDb } from "./use-db";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -164,6 +167,34 @@ export default function QueryDisplayItem(props: {
 	const showTitle =
 		queryDisplayState === "viewer" || queryDisplayState === "hidden";
 
+	const [showViewer, setShowViewer] = useState(false);
+	const [viewerCategory, setViewerCategory] = useState<string | undefined>(
+		undefined
+	);
+	const { conn } = useDuckDb();
+	const { useQueryObjects } = useQueryObjCtx();
+	const { queryObjects } = useQueryObjects;
+
+	useEffect(() => {
+		const latestQuery = queryObjects[queryObjects.length - 1];
+		if (latestQuery?.isRender3D) {
+			setShowViewer(true);
+			if (latestQuery.queryTitle.includes("All")) {
+				setViewerCategory(undefined);
+			} else if (latestQuery.queryTitle.includes("Walls")) {
+				setViewerCategory("Walls");
+			} else if (latestQuery.queryTitle.includes("Floors")) {
+				setViewerCategory("Floors");
+			} else if (latestQuery.queryTitle.includes("Columns")) {
+				setViewerCategory("Structural Columns");
+			} else if (latestQuery.queryTitle.includes("Doors")) {
+				setViewerCategory("Doors");
+			} else if (latestQuery.queryTitle.includes("Windows")) {
+				setViewerCategory("Windows");
+			}
+		}
+	}, [queryObjects]);
+
 	return (
 		<div
 			className={`${!isFocused() ? "opacity-35" : ""} flex w-full flex-col gap-y-2`}
@@ -195,6 +226,12 @@ export default function QueryDisplayItem(props: {
 					removeObject={props.removeObject}
 				/>
 			</div>
+
+			{showViewer && (
+				<div className="h-100 w-full border-b border-gray-200">
+					<BimViewer conn={conn} category={viewerCategory} showStats />
+				</div>
+			)}
 			{queryDisplayState !== "hidden" && (
 				<SqlQueryCodeBlock
 					queryObject={props.queryObject}
