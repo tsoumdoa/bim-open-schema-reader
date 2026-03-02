@@ -1,13 +1,15 @@
 "use client";
 
 import { useGeometryFromDuckDB } from "@/app/hooks/use-geometry-from-duckdb";
+import { Button } from "@/components/ui/button";
 import {
 	OrbitControls,
 	PerspectiveCamera,
 	Environment,
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useRef } from "react";
+import { EyeOff, Box } from "lucide-react";
+import { useState } from "react";
 import * as THREE from "three";
 
 function Scene({ scene }: { scene: any }) {
@@ -24,16 +26,25 @@ export function BimViewer({
 	conn: any;
 	category?: string;
 	showStats?: boolean;
+	initialVisible?: boolean;
 }) {
-	const instanceCountRef = useRef(0);
 	const {
 		loading: isLoading,
 		error: connError,
 		scene,
+		instanceCount,
 	} = useGeometryFromDuckDB(conn, category);
 
 	return (
 		<div className="relative w-full h-full">
+			<div className="absolute top-2 right-2 z-10 flex gap-2">
+				{showStats && instanceCount > 0 && (
+					<div className="bg-black/70 text-white px-3 py-1.5 rounded text-sm flex items-center gap-2">
+						<Box className="h-4 w-4" />
+						{instanceCount} elements
+					</div>
+				)}
+			</div>
 			{isLoading && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
 					<div className="text-white">Loading geometry...</div>
@@ -75,12 +86,6 @@ export function BimViewer({
 				<Environment preset="city" />
 				<gridHelper args={[1000, 100]} />
 			</Canvas>
-
-			{showStats && (
-				<div className="absolute top-4 left-4 bg-black/70 text-white p-2 rounded text-sm">
-					Instances: {instanceCountRef.current}
-				</div>
-			)}
 		</div>
 	);
 }

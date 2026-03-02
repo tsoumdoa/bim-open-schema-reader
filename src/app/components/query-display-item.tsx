@@ -6,7 +6,6 @@ import {
 	UseExpandDisplay,
 } from "../utils/types";
 import { BimViewer } from "./bim-viewer";
-import { useQueryObjCtx } from "./query-obj-provider";
 import QueryResultDisplayTable from "./query-result-display";
 import SqlQueryCodeBlock from "./sql-code-block";
 import { useDuckDb } from "./use-db";
@@ -161,6 +160,7 @@ export default function QueryDisplayItem(props: {
 	useEffect(() => {
 		if (displayExpanded !== -1) {
 			setQueryDisplayState("hidden");
+			setShowViewer(false);
 		}
 	}, [displayExpanded]);
 
@@ -226,7 +226,12 @@ export default function QueryDisplayItem(props: {
 
 			{showViewer && (
 				<div className="h-100 w-full border-b border-gray-200">
-					<BimViewer conn={conn} category={viewerCategory} showStats />
+					<BimViewer
+						conn={conn}
+						category={viewerCategory}
+						showStats
+						initialVisible={false}
+					/>
 				</div>
 			)}
 			{queryDisplayState !== "hidden" && (
