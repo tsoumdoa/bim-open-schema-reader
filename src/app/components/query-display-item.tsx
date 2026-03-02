@@ -161,6 +161,8 @@ export default function QueryDisplayItem(props: {
 		if (displayExpanded !== -1) {
 			setQueryDisplayState("hidden");
 			setShowViewer(false);
+		} else {
+			setShowViewer(true);
 		}
 	}, [displayExpanded]);
 
