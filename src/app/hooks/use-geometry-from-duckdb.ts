@@ -5,6 +5,8 @@ import {
 	MaterialData,
 	TransformData,
 	GeometryInstance,
+} from "@/app/utils/types";
+import {
 	createThreeMaterial,
 	createTransformMatrix,
 	createBufferGeometryFromMesh,
