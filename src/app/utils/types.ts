@@ -224,14 +224,6 @@ export type AnalyticsReadinessLevels = (typeof analyticReadinessLevels)[number];
 export type AnalyticsReadinessTitle = (typeof analyticReadinessTitles)[number];
 
 // for geometrical data processing
-export type GeometryCacheData = {
-	vertices: VertexData[];
-	indices: IndexData[];
-	meshes: MeshData[];
-	materials: MaterialData[];
-	transforms: TransformData[];
-	instanceData: InstanceData[];
-};
 
 export type InstanceData = {
 	instance_index: number;
@@ -327,4 +319,13 @@ export type GeometryInstance = {
 	indexOffset: number;
 	transform: THREE.Matrix4;
 	material: THREE.MeshStandardMaterial;
+};
+
+export type GeometricalDataCache = {
+	vertices: VertexData[];
+	indices: IndexData[];
+	meshes: MeshData[];
+	materials: MaterialData[];
+	transforms: TransformData[];
+	instances: InstanceData[];
 };

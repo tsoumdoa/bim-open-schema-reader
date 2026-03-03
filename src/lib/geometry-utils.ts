@@ -1,4 +1,6 @@
 import {
+	FilteredGeometryResult,
+	GeometricalDataCache,
 	GeometryInstance,
 	IndexData,
 	InstanceData,
@@ -341,3 +343,32 @@ export function buildSceneFromInstances(
 
 	return { scene: group, instanceCount: instanceData.length };
 }
+
+export const buildFilteredScene = (
+	entityIndices: number[],
+	cache: GeometricalDataCache | null
+): FilteredGeometryResult => {
+	if (!cache) {
+		return { scene: null, instanceCount: 0, totalCount: 0 };
+	}
+
+	const entityIndexSet = new Set(entityIndices);
+
+	const filteredInstances = cache.instances.filter((inst) =>
+		entityIndexSet.has(inst.entity_index)
+	);
+
+	const { scene } = buildSceneFromInstances(
+		filteredInstances,
+		cache.vertices,
+		cache.indices,
+		cache.meshes,
+		cache.materials
+	);
+
+	return {
+		scene,
+		instanceCount: filteredInstances.length,
+		totalCount: new Set(filteredInstances.map((i) => i.entity_index)).size,
+	};
+};

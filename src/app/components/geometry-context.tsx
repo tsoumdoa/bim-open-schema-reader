@@ -6,13 +6,9 @@ import {
 	transformQuery,
 	vertexQuery,
 } from "../sql/util-geometry";
+import { GeometricalDataCache, GeometryContextValue } from "../utils/types";
 import {
-	FilteredGeometryResult,
-	GeometryCacheData,
-	GeometryContextValue,
-} from "../utils/types";
-import {
-	buildSceneFromInstances,
+	buildFilteredScene,
 	rowsToIndexData,
 	rowsToInstanceData,
 	rowsToMaterialData,
@@ -21,7 +17,8 @@ import {
 	rowsToVertexData,
 } from "@/lib/geometry-utils";
 import * as duckdb from "@duckdb/duckdb-wasm";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useQueries } from "@tanstack/react-query";
+import { createContext, useContext } from "react";
 
 const GeometryContext = createContext<GeometryContextValue | null>(null);
 
@@ -29,93 +26,83 @@ export function GeometryProvider(props: {
 	children: React.ReactNode;
 	conn: duckdb.AsyncDuckDBConnection;
 }) {
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<Error | null>(null);
-	const [cache, setCache] = useState<GeometryCacheData | null>(null);
+	const res = useQueries({
+		queries: [
+			{
+				queryKey: ["vertices"],
+				queryFn: async () => {
+					const res = await props.conn.query(vertexQuery);
+					return rowsToVertexData(res.toArray().map(Object.values));
+				},
+			},
+			{
+				queryKey: ["indices"],
+				queryFn: async () => {
+					const res = await props.conn.query(indexQuery);
+					return rowsToIndexData(res.toArray().map(Object.values));
+				},
+			},
+			{
+				queryKey: ["meshes"],
+				queryFn: async () => {
+					const res = await props.conn.query(meshQuery);
+					return rowsToMeshData(res.toArray().map(Object.values));
+				},
+			},
+			{
+				queryKey: ["materials"],
+				queryFn: async () => {
+					const res = await props.conn.query(materialQuery);
+					return rowsToMaterialData(res.toArray().map(Object.values));
+				},
+			},
+			{
+				queryKey: ["transforms"],
+				queryFn: async () => {
+					const res = await props.conn.query(transformQuery);
+					return rowsToTransformData(res.toArray().map(Object.values));
+				},
+			},
+			{
+				queryKey: ["instanceData"],
+				queryFn: async () => {
+					const res = await props.conn.query(instanceQuery);
+					return rowsToInstanceData(res.toArray().map(Object.values));
+				},
+			},
+		],
+	});
+	const loading = res.some((r) => r.isLoading);
+	const error = res.find((r) => r.error)?.error ?? null;
 
-	useEffect(() => {
-		if (!props.conn) return;
+	const [
+		verticesQuery,
+		indicesQuery,
+		meshesQuery,
+		materialsQuery,
+		transformsQuery,
+		instancesQuery,
+	] = res;
 
-		const fetchGeometry = async () => {
-			try {
-				setLoading(true);
-
-				const [
-					vertexRes,
-					indexRes,
-					meshRes,
-					materialRes,
-					transformRes,
-					instanceRes,
-				] = await Promise.all([
-					props.conn.query(vertexQuery),
-					props.conn.query(indexQuery),
-					props.conn.query(meshQuery),
-					props.conn.query(materialQuery),
-					props.conn.query(transformQuery),
-					props.conn.query(instanceQuery),
-				]);
-
-				const vertices = rowsToVertexData(
-					vertexRes.toArray().map(Object.values)
-				);
-				const indices = rowsToIndexData(indexRes.toArray().map(Object.values));
-				const meshes = rowsToMeshData(meshRes.toArray().map(Object.values));
-				const materials = rowsToMaterialData(
-					materialRes.toArray().map(Object.values)
-				);
-				const transforms = rowsToTransformData(
-					transformRes.toArray().map(Object.values)
-				);
-				const instanceData = rowsToInstanceData(
-					instanceRes.toArray().map(Object.values)
-				);
-
-				setCache({
-					vertices,
-					indices,
-					meshes,
-					materials,
-					transforms,
-					instanceData,
-				});
-				setError(null);
-			} catch (err) {
-				setError(err as Error);
-			} finally {
-				setLoading(false);
+	const cache: GeometricalDataCache | null =
+		verticesQuery.data &&
+			indicesQuery.data &&
+			meshesQuery.data &&
+			materialsQuery.data &&
+			transformsQuery.data &&
+			instancesQuery.data
+			? {
+				vertices: verticesQuery.data,
+				indices: indicesQuery.data,
+				meshes: meshesQuery.data,
+				materials: materialsQuery.data,
+				transforms: transformsQuery.data,
+				instances: instancesQuery.data,
 			}
-		};
+			: null;
 
-		fetchGeometry();
-	}, [props.conn]);
-
-	const getFilteredScene = (
-		entityIndices: number[]
-	): FilteredGeometryResult => {
-		if (!cache) {
-			return { scene: null, instanceCount: 0, totalCount: 0 };
-		}
-
-		const entityIndexSet = new Set(entityIndices);
-		const filteredInstances = cache.instanceData.filter((inst) =>
-			entityIndexSet.has(inst.entity_index)
-		);
-
-		const { scene } = buildSceneFromInstances(
-			filteredInstances,
-			cache.vertices,
-			cache.indices,
-			cache.meshes,
-			cache.materials
-		);
-
-		return {
-			scene,
-			instanceCount: filteredInstances.length,
-			totalCount: new Set(filteredInstances.map((i) => i.entity_index)).size,
-		};
-	};
+	const getFilteredScene = (entityIndices: number[]) =>
+		buildFilteredScene(entityIndices, cache);
 
 	return (
 		<GeometryContext.Provider value={{ loading, error, getFilteredScene }}>
