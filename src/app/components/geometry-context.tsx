@@ -1,5 +1,3 @@
-"use client";
-
 import {
 	indexQuery,
 	instanceQuery,
@@ -22,13 +20,14 @@ import {
 	rowsToTransformData,
 	rowsToVertexData,
 } from "@/lib/geometry-utils";
+import * as duckdb from "@duckdb/duckdb-wasm";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const GeometryContext = createContext<GeometryContextValue | null>(null);
 
 export function GeometryProvider(props: {
 	children: React.ReactNode;
-	conn: any;
+	conn: duckdb.AsyncDuckDBConnection;
 }) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
