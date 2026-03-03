@@ -169,9 +169,9 @@ export default function QueryDisplayItem(props: {
 	const [entityIndices, setEntityIndices] = useState<number[]>([]);
 
 	useEffect(() => {
-		if (displayExpanded !== -1) {
+		if (displayExpanded !== -1 || entityIndices.length === 0) {
 			setShowViewer(false);
-		} else if (entityIndices.length > 0) {
+		} else {
 			setShowViewer(true);
 		}
 	}, [displayExpanded, entityIndices]);
