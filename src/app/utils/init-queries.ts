@@ -58,6 +58,7 @@ export const createHelperViewsAndTables = () => sql`
 		Entities.LocalId,
 		Entities.GlobalId,
 		Entities."index" AS index,
+		Entities.Category AS category_entity_index,
 		Entities.Type AS instance_entity_index,
 		s_name.Strings AS name,
 		type_name.Strings AS category,
