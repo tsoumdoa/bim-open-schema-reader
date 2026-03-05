@@ -1,4 +1,4 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 // NOTE: Using CTE and PIVOT pattern exploration
 export const wallDoubleAndPointParameters = sql`

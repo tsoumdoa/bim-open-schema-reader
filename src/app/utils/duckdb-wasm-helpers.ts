@@ -1,4 +1,4 @@
-import { createBosTable, createHelperViewsAndTables } from "./queries";
+import { createBosTable, createHelperViewsAndTables } from "./init-queries";
 import { ParquetBlob } from "./types";
 import * as duckdb from "@duckdb/duckdb-wasm";
 

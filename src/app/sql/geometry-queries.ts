@@ -1,4 +1,4 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const renderAllGeometry = sql`
 	-- Renders all geometry in the 3D viewer

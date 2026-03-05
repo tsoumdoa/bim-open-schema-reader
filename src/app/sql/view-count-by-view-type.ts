@@ -1,4 +1,4 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const countByViewType = sql`
 	WITH

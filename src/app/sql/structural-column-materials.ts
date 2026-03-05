@@ -1,4 +1,4 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 // TODO: export length and volume of each column from revit and add to this...?
 export const structuralColumnMaterials = sql`

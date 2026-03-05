@@ -1,6 +1,6 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { cleanCategoryCount } from "../utils/clean-category-count";
-import { listCountByCategory } from "../utils/queries";
+import { listCountByCategory } from "../utils/init-queries";
 import { generalCategory, UseExpandDisplay } from "../utils/types";
 import DropDownMenu from "./data-category-list-dropdown";
 import DataReadinessIcon from "./data-readiness-icon";

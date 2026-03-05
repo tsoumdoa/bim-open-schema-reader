@@ -2,7 +2,7 @@ import { useExpandDisplay } from "../hooks/use-expand-display";
 import { useQuickExplorer } from "../hooks/use-quick-explorer";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { cleanCategoryCount } from "../utils/clean-category-count";
-import { listCountByCategory } from "../utils/queries";
+import { listCountByCategory } from "../utils/init-queries";
 import { BosFileType, UseExpandDisplay } from "../utils/types";
 import { AddQuery } from "./add-query-button";
 import ButtonWithConfirmation from "./button-with-confirmation";

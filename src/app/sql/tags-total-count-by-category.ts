@@ -1,4 +1,4 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 // NOTE: there seems to be no reliable way to match family type with family....
 export const tagsTotalCountByCategory = sql`

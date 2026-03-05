@@ -3,7 +3,7 @@ import { formatData } from "../utils/format";
 import {
 	listAllTableInfoWithColumnInfo,
 	summarizeTableInfo,
-} from "../utils/queries";
+} from "../utils/init-queries";
 import {
 	denormGeoTableNames,
 	denormTableNames,
