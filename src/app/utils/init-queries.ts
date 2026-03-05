@@ -58,7 +58,7 @@ export const createHelperViewsAndTables = () => sql`
 		Entities.LocalId,
 		Entities.GlobalId,
 		Entities."index" AS index,
-		Entities.name AS entity_name,
+		Entities.Type AS instance_entity_index,
 		s_name.Strings AS name,
 		type_name.Strings AS category,
 		s_path.Strings AS path_name,
@@ -92,9 +92,9 @@ export const createHelperViewsAndTables = () => sql`
 	CREATE
 	OR REPLACE VIEW denorm_string_params AS
 	SELECT
-		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (p.* EXCLUDE (Descriptor, "Value", index)) AS ${String.raw`'p_\0'`},
 		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
-		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
+		COLUMNS (d.* EXCLUDE (index, Units)) AS ${String.raw`'d_\0'`},
 	FROM
 		StringParameters p
 		JOIN Strings v USING (index)
@@ -104,9 +104,9 @@ export const createHelperViewsAndTables = () => sql`
 	CREATE
 	OR REPLACE VIEW denorm_points_params AS
 	SELECT
-		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (p.* EXCLUDE (Descriptor, "Value", index)) AS ${String.raw`'p_\0'`},
 		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
-		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
+		COLUMNS (d.* EXCLUDE (index, Units)) AS ${String.raw`'d_\0'`},
 	FROM
 		PointParameters p
 		JOIN Points v USING (index)
@@ -116,7 +116,7 @@ export const createHelperViewsAndTables = () => sql`
 	CREATE
 	OR REPLACE VIEW denorm_single_params AS
 	SELECT
-		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (p.* EXCLUDE (Descriptor, index)) AS ${String.raw`'p_\0'`},
 		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
 		SingleParameters p
@@ -126,7 +126,7 @@ export const createHelperViewsAndTables = () => sql`
 	CREATE
 	OR REPLACE VIEW denorm_integer_params AS
 	SELECT
-		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (p.* EXCLUDE (Descriptor, index)) AS ${String.raw`'p_\0'`},
 		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
 		IntegerParameters p
@@ -232,7 +232,6 @@ export const createHelperViewsAndTables = () => sql`
 		i.flags,
 		e.LocalId,
 		e.GlobalId,
-		e.entity_name,
 		e.category,
 		m.vertex_offset,
 		m.index_offset AS mesh_index_offset,
