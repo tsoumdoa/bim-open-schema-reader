@@ -1,7 +1,7 @@
 import {
-	denormDoubleParams,
-	denormDoubleParamsPivot,
-	denormDoubleParamsStats,
+	denormSingleParams,
+	denormSingleParamsPivot,
+	denormSingleParamsStats,
 	denormEntityParams,
 	denormEntityParamsPivot,
 	denormEntityParamsStats,
@@ -47,13 +47,13 @@ export function denormParamQueryBuilder(
 	switch (paramType) {
 		case "denorm_single_params":
 			if (queryType === "pivot") {
-				queryObj.sqlQuery = denormDoubleParamsPivot(categoryName);
+				queryObj.sqlQuery = denormSingleParamsPivot(categoryName);
 			}
 			if (queryType === "flatten") {
-				queryObj.sqlQuery = denormDoubleParams(categoryName);
+				queryObj.sqlQuery = denormSingleParams(categoryName);
 			}
 			if (queryType === "stats") {
-				queryObj.sqlQuery = denormDoubleParamsStats(categoryName);
+				queryObj.sqlQuery = denormSingleParamsStats(categoryName);
 			}
 
 			break;
