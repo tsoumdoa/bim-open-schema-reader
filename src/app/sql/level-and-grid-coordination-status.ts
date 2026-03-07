@@ -57,59 +57,58 @@ export const listGridWithCoredStatus = sql`
 			SELECT
 				e.index,
 				e.name,
-				dp2.strings AS grid_type,
-				e.project_name,
+				e.title,
+				dp2.v_Strings AS grid_type,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:StartPoint' THEN dp1.x
+						WHEN dp1.d_name = 'rvt:Grid:StartPoint' THEN dp1.v_X
 					END
 				) AS start_x,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:StartPoint' THEN dp1.y
+						WHEN dp1.d_name = 'rvt:Grid:StartPoint' THEN dp1.v_Y
 					END
 				) AS start_y,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:EndPoint' THEN dp1.x
+						WHEN dp1.d_name = 'rvt:Grid:EndPoint' THEN dp1.v_X
 					END
 				) AS end_x,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:EndPoint' THEN dp1.y
+						WHEN dp1.d_name = 'rvt:Grid:EndPoint' THEN dp1.v_Y
 					END
 				) AS end_y,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN dp1.x
+						WHEN dp1.d_name = 'rvt:Grid:CenterPoint' THEN dp1.v_X
 					END
 				) AS center_x,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN dp1.y
+						WHEN dp1.d_name = 'rvt:Grid:CenterPoint' THEN dp1.v_Y
 					END
 				) AS center_y,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN dp3.value
+						WHEN dp3.d_name = 'rvt:Grid:ArcRadius' THEN dp3.v_value
 					END
 				) AS arc_radius
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_points_params AS dp1 ON e.index = dp1.entity
-				INNER JOIN denorm_string_params AS dp2 ON e.index = dp2.entity
-				LEFT JOIN denorm_single_params AS dp3 ON e.index = dp3.entity
+				denorm_entities e
+				JOIN denorm_points_params dp1 ON e.index = dp1.p_Entity
+				JOIN denorm_string_params dp2 ON e.index = dp2.p_Entity
+				LEFT JOIN denorm_single_params dp3 ON e.index = dp3.p_Entity
 			WHERE
-				e.type LIKE 'Grids'
-				AND dp2.name LIKE 'rvt:Grid:Type'
+				e.type = 'Grids'
+				AND dp2.d_name = 'rvt:Grid:Type'
 			GROUP BY
 				e.index,
 				e.name,
-				dp2.strings,
-				e.project_name
+				e.title,
+				dp2.v_Strings
 		),
-		-- Compute normalized direction vectors for Linear grids
-		grid_with_vectors AS (
+		grid_vectors AS (
 			SELECT
 				*,
 				CASE
@@ -125,39 +124,38 @@ export const listGridWithCoredStatus = sql`
 			FROM
 				grid_per_model
 		),
-		-- Compare each model to the reference model
-		grid_with_comparison AS (
+		grid_compare AS (
 			SELECT
 				*,
-				FIRST (dir_x) OVER (
+				FIRST_VALUE (dir_x) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_dir_x,
-				FIRST (dir_y) OVER (
+				FIRST_VALUE (dir_y) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_dir_y,
-				FIRST (center_x) OVER (
+				FIRST_VALUE (center_x) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_center_x,
-				FIRST (center_y) OVER (
+				FIRST_VALUE (center_y) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_center_y,
-				FIRST (arc_radius) OVER (
+				FIRST_VALUE (arc_radius) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_arc_radius
 			FROM
-				grid_with_vectors
+				grid_vectors
 		),
-		grid_with_flags AS (
+		grid_flags AS (
 			SELECT
 				*,
 				CASE
@@ -173,32 +171,24 @@ export const listGridWithCoredStatus = sql`
 					END
 				END AS model_status
 			FROM
-				grid_with_comparison
-		),
-		-- Aggregate to get overall status and wrong models
-		grid_across_models AS (
-			SELECT
-				name,
-				CASE
-					WHEN (model_status = 'OK') THEN 'OK'
-					ELSE 'Uncoordinated'
-				END AS cord_status,
-				LIST (
-					DISTINCT CASE
-						WHEN model_status = 'Wrong' THEN project_name
-					END
-				) AS wrong_models,
-				LIST (DISTINCT project_name) AS models
-			FROM
-				grid_with_flags
-			GROUP BY
-				name,
-				model_status
+				grid_compare
 		)
 	SELECT
-		*
+		name,
+		CASE
+			WHEN BOOL_AND (model_status = 'OK') THEN 'OK'
+			ELSE 'Uncoordinated'
+		END AS cord_status,
+		LIST (DISTINCT title) AS models,
+		LIST (
+			DISTINCT CASE
+				WHEN model_status = 'Wrong' THEN title
+			END
+		) AS wrong_models
 	FROM
-		grid_across_models
+		grid_flags
+	GROUP BY
+		name
 	ORDER BY
 		name;
 `;

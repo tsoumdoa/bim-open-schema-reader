@@ -23,80 +23,95 @@ export const listLevels = sql`
 `;
 
 export const listGrids = sql`
+	WITH
+		grid_points AS (
+			SELECT
+				p_Entity,
+				MAX(
+					CASE
+						WHEN d_name = 'rvt:Grid:StartPoint' THEN ROUND(v_X * 304.8, 0)
+					END
+				) AS start_x,
+				MAX(
+					CASE
+						WHEN d_name = 'rvt:Grid:StartPoint' THEN ROUND(v_Y * 304.8, 0)
+					END
+				) AS start_y,
+				MAX(
+					CASE
+						WHEN d_name = 'rvt:Grid:EndPoint' THEN ROUND(v_X * 304.8, 0)
+					END
+				) AS end_x,
+				MAX(
+					CASE
+						WHEN d_name = 'rvt:Grid:EndPoint' THEN ROUND(v_Y * 304.8, 0)
+					END
+				) AS end_y,
+				MAX(
+					CASE
+						WHEN d_name = 'rvt:Grid:CenterPoint' THEN ROUND(v_X * 304.8, 0)
+					END
+				) AS center_x,
+				MAX(
+					CASE
+						WHEN d_name = 'rvt:Grid:CenterPoint' THEN ROUND(v_Y * 304.8, 0)
+					END
+				) AS center_y
+			FROM
+				denorm_points_params
+			WHERE
+				d_name IN (
+					'rvt:Grid:StartPoint',
+					'rvt:Grid:EndPoint',
+					'rvt:Grid:CenterPoint'
+				)
+			GROUP BY
+				p_Entity
+		),
+		grid_radius AS (
+			SELECT
+				p_Entity,
+				MAX(ROUND(v_value * 304.8, 0)) AS arc_radius
+			FROM
+				denorm_single_params
+			WHERE
+				d_name = 'rvt:Grid:ArcRadius'
+			GROUP BY
+				p_Entity
+		),
+		grid_type AS (
+			SELECT
+				p_Entity,
+				v_Strings AS grid_type
+			FROM
+				denorm_string_params
+			WHERE
+				d_name = 'rvt:Grid:Type'
+		)
 	SELECT
 		e.index,
 		e.name,
-		dp2.strings AS grid_type,
+		e.title,
+		gt.grid_type,
 		CASE
-			WHEN max(
-				CASE
-					WHEN dp1.name = 'rvt:Grid:StartPoint' THEN round(dp1.x * 304.8, 0)
-				END
-			) = max(
-				CASE
-					WHEN dp1.name = 'rvt:Grid:EndPoint' THEN round(dp1.x * 304.8, 0)
-				END
-			) THEN 'y'
-			WHEN max(
-				CASE
-					WHEN dp1.name = 'rvt:Grid:StartPoint' THEN round(dp1.y * 304.8, 0)
-				END
-			) = max(
-				CASE
-					WHEN dp1.name = 'rvt:Grid:EndPoint' THEN round(dp1.y * 304.8, 0)
-				END
-			) THEN 'x'
+			WHEN gp.start_x = gp.end_x THEN 'y'
+			WHEN gp.start_y = gp.end_y THEN 'x'
 			ELSE 'diagonal'
 		END AS grid_dir,
-		e.project_name,
-		max(
-			CASE
-				WHEN dp1.name = 'rvt:Grid:StartPoint' THEN round(dp1.x * 304.8, 0)
-			END
-		) AS start_x,
-		max(
-			CASE
-				WHEN dp1.name = 'rvt:Grid:StartPoint' THEN round(dp1.y * 304.8, 0)
-			END
-		) AS start_y,
-		max(
-			CASE
-				WHEN dp1.name = 'rvt:Grid:EndPoint' THEN round(dp1.x * 304.8, 0)
-			END
-		) AS end_x,
-		max(
-			CASE
-				WHEN dp1.name = 'rvt:Grid:EndPoint' THEN round(dp1.y * 304.8, 0)
-			END
-		) AS end_y,
-		max(
-			CASE
-				WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN round(dp1.x * 304.8, 0)
-			END
-		) AS center_x,
-		max(
-			CASE
-				WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN round(dp1.y * 304.8, 0)
-			END
-		) AS center_y,
-		max(
-			CASE
-				WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN round(dp3.value * 304.8, 0)
-			END
-		) AS arc_radius
+		gp.start_x,
+		gp.start_y,
+		gp.end_x,
+		gp.end_y,
+		gp.center_x,
+		gp.center_y,
+		gr.arc_radius
 	FROM
-		denorm_entities AS e
-		INNER JOIN denorm_points_params AS dp1 ON e.index = dp1.entity
-		INNER JOIN denorm_string_params AS dp2 ON e.index = dp2.entity
-		LEFT JOIN denorm_single_params AS dp3 ON e.index = dp3.entity
+		denorm_entities e
+		JOIN grid_points gp ON e.index = gp.p_Entity
+		JOIN grid_type gt ON e.index = gt.p_Entity
+		LEFT JOIN grid_radius gr ON e.index = gr.p_Entity
 	WHERE
-		e.type LIKE 'Grids'
-		AND dp2.name LIKE 'rvt:Grid:Type'
-	GROUP BY
-		e.index,
-		e.name,
-		dp2.strings,
-		e.project_name
+		e.type = 'Grids'
 	ORDER BY
 		e.name;
 `;
