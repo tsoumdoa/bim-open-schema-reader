@@ -24,7 +24,7 @@ export const wallDoubleAndPointParameters = sql`
 				LocalId,
 				name
 		),
-		double_data AS (
+		single_data AS (
 			SELECT
 				*
 			FROM
@@ -56,10 +56,10 @@ export const wallDoubleAndPointParameters = sql`
 					ELSE VALUE
 				END AS value_converted
 			FROM
-				double_data
+				single_data
 		),
-		pivot_double_data AS (
-			PIVOT converted /* or double_data */ ON name_1 IN (
+		pivot_single_data AS (
+			PIVOT converted /* or single_data */ ON name_1 IN (
 				'Area',
 				'Base Extension Distance',
 				'Base Offset',
@@ -84,7 +84,7 @@ export const wallDoubleAndPointParameters = sql`
 				pd.* EXCLUDE (LocalId, name)
 			FROM
 				pt_data_pivot AS pt
-				LEFT JOIN pivot_double_data AS pd ON pt.LocalId = pd.LocalId
+				LEFT JOIN pivot_single_data AS pd ON pt.LocalId = pd.LocalId
 		)
 	SELECT
 		*

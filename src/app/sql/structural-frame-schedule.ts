@@ -1,6 +1,6 @@
 import { sql } from "../utils/init-queries";
 
-// TODO: add double data
+// TODO: add single data
 export const structuralFrameSchedule = sql`
 	WITH
 		entity_data AS (
@@ -21,7 +21,7 @@ export const structuralFrameSchedule = sql`
 				LocalId,
 				name
 		),
-		double_data AS (
+		single_data AS (
 			SELECT
 				*
 			FROM
@@ -31,8 +31,8 @@ export const structuralFrameSchedule = sql`
 			WHERE
 				e.type = 'Structural Framing'
 		),
-		pivot_double_data AS (
-			PIVOT double_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,
+		pivot_single_data AS (
+			PIVOT single_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,
 			GROUP BY
 				LocalId,
 				name
@@ -70,7 +70,7 @@ export const structuralFrameSchedule = sql`
 			FROM
 				frame_instances AS ci
 				JOIN family_types f ON f.name = ci.name
-				JOIN pivot_double_data pd ON pd.LocalId = ci.LocalId
+				JOIN pivot_single_data pd ON pd.LocalId = ci.LocalId
 			GROUP BY
 				ci.name
 		)

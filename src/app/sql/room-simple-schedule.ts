@@ -2,7 +2,7 @@ import { sql } from "../utils/init-queries";
 
 export const simpleRoomSchedule = sql`
 	WITH
-		double_data AS (
+		single_data AS (
 			SELECT
 				*
 			FROM
@@ -12,8 +12,8 @@ export const simpleRoomSchedule = sql`
 			WHERE
 				e.type = 'Rooms'
 		),
-		pivot_double_data AS (
-			PIVOT double_data ON name_1 IN ("Volume", "Area", "Unbounded Height", "Perimeter") USING first (VALUE),
+		pivot_single_data AS (
+			PIVOT single_data ON name_1 IN ("Volume", "Area", "Unbounded Height", "Perimeter") USING first (VALUE),
 			-- first (Units) AS param_units
 			GROUP BY
 				LocalId,
@@ -52,7 +52,7 @@ export const simpleRoomSchedule = sql`
 				pdd.Volume * 0.0283168 volume_m3,
 			FROM
 				pivot_str_data AS psd
-				LEFT JOIN pivot_double_data AS pdd ON psd.LocalId = pdd.LocalId
+				LEFT JOIN pivot_single_data AS pdd ON psd.LocalId = pdd.LocalId
 		)
 	SELECT
 		*

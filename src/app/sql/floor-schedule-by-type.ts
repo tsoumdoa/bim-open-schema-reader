@@ -13,7 +13,7 @@ export const floorScheduleByType = sql`
 			WHERE
 				e.type = 'Floors'
 		),
-		double_data AS (
+		single_data AS (
 			SELECT
 				*
 			FROM
@@ -23,8 +23,8 @@ export const floorScheduleByType = sql`
 			WHERE
 				e.type = 'Floors'
 		),
-		pivot_double_data AS (
-			PIVOT double_data ON name_1 IN ('Thickness', 'Area', 'Volume') USING first (VALUE),
+		pivot_single_data AS (
+			PIVOT single_data ON name_1 IN ('Thickness', 'Area', 'Volume') USING first (VALUE),
 			GROUP BY
 				LocalId,
 				name
@@ -32,10 +32,10 @@ export const floorScheduleByType = sql`
 		joint_table AS (
 			SELECT DISTINCT
 				pt_data.*,
-				pivot_double_data.* EXCLUDE (LocalId, name),
+				pivot_single_data.* EXCLUDE (LocalId, name),
 			FROM
-				pivot_double_data
-				JOIN pt_data ON pivot_double_data.LocalId = pt_data.LocalId
+				pivot_single_data
+				JOIN pt_data ON pivot_single_data.LocalId = pt_data.LocalId
 		)
 	SELECT
 		name,

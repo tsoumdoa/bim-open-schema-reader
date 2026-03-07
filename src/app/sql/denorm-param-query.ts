@@ -2,7 +2,7 @@ import { sql } from "../utils/init-queries";
 
 export const denormSingleParams = (categoryName: string) => sql`
 	WITH
-		double_data AS (
+		single_data AS (
 			SELECT
 				*
 			FROM
@@ -14,14 +14,14 @@ export const denormSingleParams = (categoryName: string) => sql`
 	SELECT
 		* EXCLUDE (path_name, project_name, p_Entity)
 	FROM
-		double_data
+		single_data
 	ORDER BY
 		localid;
 `;
 
 export const denormSingleParamsPivot = (categoryName: string) => sql`
 	WITH
-		double_data AS (
+		single_data AS (
 			SELECT
 				*
 			FROM
@@ -31,8 +31,8 @@ export const denormSingleParamsPivot = (categoryName: string) => sql`
 			WHERE
 				e.type = '${categoryName}'
 		),
-		pivot_double_data AS (
-			PIVOT double_data ON name_1 -- IN ('Base Diameter')
+		pivot_single_data AS (
+			PIVOT single_data ON name_1 -- IN ('Base Diameter')
 			USING first (VALUE) AS param_value,
 			first (Units) AS param_units
 			GROUP BY
@@ -43,7 +43,7 @@ export const denormSingleParamsPivot = (categoryName: string) => sql`
 		*
 		--<param_name_in_returned_column>
 	FROM
-		pivot_double_data AS pdd
+		pivot_single_data AS pdd
 		--where <param_name_in_returned_column> is not null and <param_name_in_returned_column> != ''
 	ORDER BY
 		LocalId
@@ -51,7 +51,7 @@ export const denormSingleParamsPivot = (categoryName: string) => sql`
 
 export const denormSingleParamsStats = (categoryName: string) => sql`
   WITH
-    double_data AS (
+    single_data AS (
       SELECT
         e.LocalId,
         p.Name AS param_name,
@@ -74,7 +74,7 @@ export const denormSingleParamsStats = (categoryName: string) => sql`
           ELSE raw_value
         END AS norm_value
       FROM
-        double_data
+        single_data
     )
   SELECT
     param_name,

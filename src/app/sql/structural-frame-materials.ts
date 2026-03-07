@@ -21,7 +21,7 @@ export const structuralFrameMaterials = sql`
 				LocalId,
 				name
 		),
-		double_data AS (
+		single_data AS (
 			SELECT
 				*
 			FROM
@@ -31,8 +31,8 @@ export const structuralFrameMaterials = sql`
 			WHERE
 				e.type = 'Structural Framing'
 		),
-		pivot_double_data AS (
-			PIVOT double_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,
+		pivot_single_data AS (
+			PIVOT single_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,
 			GROUP BY
 				LocalId,
 				name
@@ -54,7 +54,7 @@ export const structuralFrameMaterials = sql`
 				pd.Volume_param_value AS total_volume
 			FROM
 				pivot_entity_data AS ci
-				JOIN pivot_double_data pd ON pd.LocalId = ci.LocalId
+				JOIN pivot_single_data pd ON pd.LocalId = ci.LocalId
 			WHERE
 				Family_param_value IS NOT NULL
 		),
