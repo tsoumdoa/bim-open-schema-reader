@@ -12,7 +12,7 @@ export const structuralFrameSchedule = sql`
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 				INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
 			WHERE
-				e.category = 'Structural Framing'
+				e.type = 'Structural Framing'
 		),
 		pivot_entity_data AS (
 			PIVOT entity_data ON name_1 USING first (name_3) AS param_value,
@@ -29,7 +29,7 @@ export const structuralFrameSchedule = sql`
 				INNER JOIN denorm_single_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Structural Framing'
+				e.type = 'Structural Framing'
 		),
 		pivot_double_data AS (
 			PIVOT double_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,

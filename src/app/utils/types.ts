@@ -80,6 +80,7 @@ export type QueryEditorState =
 	| "error"
 	| "canceled";
 export const denormTableNames = [
+	"denorm_documents",
 	"denorm_descriptors",
 	"denorm_entities",
 	"denorm_single_params",

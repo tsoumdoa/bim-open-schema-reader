@@ -51,55 +51,90 @@ export const createHelperViewsAndTables = () => sql`
 		(8, 'ConnectsTo'),
 		(9, 'HasConnector');
 
+	CREATE TABLE IF NOT EXISTS Enum_DiagnosticType (index INTEGER, DiagnosticType VARCHAR(20));
+
+	INSERT INTO
+		Enum_DiagnosticType (index, DiagnosticType)
+	VALUES
+		(0, 'RevitWarning'),
+		(1, 'RevitError'),
+		(2, 'ExporterWarning'),
+		(3, 'ExporterError'),
+		(4, 'ExporterInfo');
+
+	-- denormalize documents
+	CREATE
+	OR REPLACE VIEW denorm_documents AS
+	SELECT
+		d.index,
+		p.Strings AS path,
+		t.Strings AS title,
+	FROM
+		Documents d
+		LEFT OUTER JOIN Strings p ON d.Path = p."index"
+		LEFT OUTER JOIN Strings t ON d.Title = t."index";
+
+	-- denormalize diagonostics
+	CREATE
+	OR REPLACE VIEW denorm_diagnostics AS
+	SELECT
+		d.index,
+		d.Entity,
+		t.DiagnosticType AS type,
+		m.Strings AS message,
+	FROM
+		Diagnostics d
+		JOIN Strings m ON m."index" = d.Message
+		JOIN Enum_DiagnosticType t ON t.index = d.Type;
+
 	-- denormalize entities
 	CREATE
 	OR REPLACE VIEW denorm_entities AS
 	SELECT
-		Entities.LocalId,
-		Entities.GlobalId,
-		Entities."index" AS index,
-		Entities.Category AS category_entity_index,
-		Entities.Type AS instance_entity_index,
+		e.LocalId,
+		e.GlobalId,
+		e."index" AS index,
 		s_name.Strings AS name,
-		type_name.Strings AS category,
-		s_path.Strings AS path_name,
-		s_title.Strings AS project_name
+		type_name.Strings AS type,
+		e.category,
+		e.Type AS instance_entity_index,
+		dd.index AS doc_index,
+		dd.path,
+		dd.title
 	FROM
-		Entities
-		LEFT OUTER JOIN Strings AS s_name ON Entities."name" = s_name."index"
-		LEFT OUTER JOIN Entities AS instance_ent ON instance_ent."index" = Entities.Category
+		Entities e
+		LEFT OUTER JOIN Strings AS s_name ON e."name" = s_name."index"
+		LEFT OUTER JOIN Entities AS instance_ent ON instance_ent."index" = e.Category
 		LEFT OUTER JOIN Strings AS type_name ON instance_ent."name" = type_name."index"
-		LEFT OUTER JOIN Documents ON Entities.Document = Documents."index"
-		LEFT OUTER JOIN Strings AS s_path ON Documents.Path = s_path."index"
-		LEFT OUTER JOIN Strings AS s_title ON Documents.Title = s_title."index";
+		LEFT OUTER JOIN denorm_documents dd ON e.Document = dd."index";
 
 	-- denormalize descriptor
 	CREATE
 	OR REPLACE VIEW denorm_descriptors AS
 	SELECT
-		dsc.index AS index,
-		strName.Strings AS Name,
-		strUnit.Strings AS Units,
-		strGroup.Strings AS "Group",
-		strType.Strings AS Type
+		d.index AS index,
+		n.Strings AS name,
+		u.Strings AS units,
+		g.Strings AS "group",
+		t.Strings AS type
 	FROM
-		Descriptors AS dsc
-		LEFT OUTER JOIN Strings AS strName ON strName.index = dsc.Name
-		LEFT OUTER JOIN Strings AS strUnit ON strUnit.index = dsc.Units
-		LEFT OUTER JOIN Strings AS strGroup ON strGroup.index = dsc.Group
-		LEFT OUTER JOIN Strings AS strType ON strType.index = dsc.Type;
+		Descriptors d
+		LEFT OUTER JOIN Strings n ON n.index = d.Name
+		LEFT OUTER JOIN Strings u ON u.index = d.Units
+		LEFT OUTER JOIN Strings g ON g.index = d.Group
+		LEFT OUTER JOIN Strings t ON t.index = d.Type;
 
 	-- denormalize StringParameters
 	CREATE
 	OR REPLACE VIEW denorm_string_params AS
 	SELECT
-		COLUMNS (p.* EXCLUDE (Descriptor, "Value", index)) AS ${String.raw`'p_\0'`},
+		COLUMNS (p.* EXCLUDE (Descriptor, "Value")) AS ${String.raw`'p_\0'`},
 		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
 		COLUMNS (d.* EXCLUDE (index, Units)) AS ${String.raw`'d_\0'`},
 	FROM
 		StringParameters p
-		JOIN Strings v USING (index)
-		JOIN denorm_descriptors d USING (index);
+		LEFT OUTER JOIN Strings v ON v.index = p."Value"
+		LEFT OUTER JOIN denorm_descriptors d ON d.index = p.Descriptor;
 
 	-- denormalize PointParameters
 	CREATE
@@ -111,17 +146,18 @@ export const createHelperViewsAndTables = () => sql`
 	FROM
 		PointParameters p
 		JOIN Points v USING (index)
-		JOIN denorm_descriptors d USING (index);
+		JOIN denorm_descriptors d ON d.index = p.Descriptor;
 
 	-- denormalize Single Parameters
 	CREATE
 	OR REPLACE VIEW denorm_single_params AS
 	SELECT
-		COLUMNS (p.* EXCLUDE (Descriptor, index)) AS ${String.raw`'p_\0'`},
+		COLUMNS (p.* EXCLUDE (Descriptor, index, "Value")) AS ${String.raw`'p_\0'`},
+		p."Value" AS v_value,
 		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
 		SingleParameters p
-		JOIN denorm_descriptors d USING (index);
+		JOIN denorm_descriptors d ON d.index = p.Descriptor;
 
 	-- denormalize Integer Parameters
 	CREATE
@@ -131,7 +167,7 @@ export const createHelperViewsAndTables = () => sql`
 		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
 		IntegerParameters p
-		JOIN denorm_descriptors d USING (index);
+		JOIN denorm_descriptors d ON d.index = p.Descriptor;
 
 	-- denormalize Entity Parameters
 	CREATE
@@ -143,7 +179,7 @@ export const createHelperViewsAndTables = () => sql`
 	FROM
 		EntityParameters p
 		JOIN denorm_entities v USING (index)
-		JOIN denorm_descriptors d USING (index);
+		JOIN denorm_descriptors d ON d.index = p.Descriptor;
 
 	-- DENORM GEOMETRICAL DATA TABLES
 	-- denormalize geometry: VertexBuffer
@@ -282,7 +318,7 @@ export const listAllTableInfoWithColumnInfo = sql`
 
 export const listCountByCategory = sql`
 	SELECT
-		e.category AS paramname,
+		e.type AS paramname,
 		COUNT(DISTINCT e.index) AS count
 	FROM
 		denorm_entities AS e
@@ -291,7 +327,7 @@ export const listCountByCategory = sql`
 		LEFT OUTER JOIN descriptors AS dsp ON ep.descriptor = dsp.index
 		LEFT OUTER JOIN strings AS paramname ON dsp.name = paramname.index
 	GROUP BY
-		e.category
+		e.type
 	ORDER BY
 		paramname ASC;
 `;

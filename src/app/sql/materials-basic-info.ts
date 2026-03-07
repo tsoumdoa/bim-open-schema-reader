@@ -10,7 +10,7 @@ export const basicMaterialsInfo = sql`
 				INNER JOIN denorm_integer_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Materials'
+				e.type = 'Materials'
 		),
 		str_data AS (
 			SELECT
@@ -22,7 +22,7 @@ export const basicMaterialsInfo = sql`
 				INNER JOIN denorm_string_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Materials'
+				e.type = 'Materials'
 				AND p.Name = 'Name'
 		)
 	SELECT

@@ -11,7 +11,7 @@ export const wallDoubleAndPointParameters = sql`
 				INNER JOIN denorm_points_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Walls'
+				e.type = 'Walls'
 		),
 		pt_data_pivot AS (
 			PIVOT pt_data ON name_1 IN (
@@ -32,7 +32,7 @@ export const wallDoubleAndPointParameters = sql`
 				INNER JOIN denorm_single_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Walls'
+				e.type = 'Walls'
 		),
 		converted AS (
 			SELECT

@@ -20,7 +20,7 @@ export const wallElementBasicInfo = sql`
 				INNER JOIN strings AS p3 ON p2.name = p3.index
 				INNER JOIN denorm_descriptors AS p4 ON p0.descriptor = p4.index
 			WHERE
-				e.category LIKE 'Walls'
+				e.type LIKE 'Walls'
 				AND p3.strings IN (
 					'Unconnected Height',
 					'Base Offset',
@@ -52,7 +52,7 @@ export const wallElementBasicInfo = sql`
 				denorm_entities AS e
 				INNER JOIN denorm_entity_params AS p1 ON e.index = p1.entity
 			WHERE
-				e.category = 'Walls'
+				e.type = 'Walls'
 				AND p1.name = 'Family and Type'
 		),
 		wall_agg AS (

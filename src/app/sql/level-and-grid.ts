@@ -90,7 +90,7 @@ export const listGrids = sql`
 		INNER JOIN denorm_string_params AS dp2 ON e.index = dp2.entity
 		LEFT JOIN denorm_single_params AS dp3 ON e.index = dp3.entity
 	WHERE
-		e.category LIKE 'Grids'
+		e.type LIKE 'Grids'
 		AND dp2.name LIKE 'rvt:Grid:Type'
 	GROUP BY
 		e.index,

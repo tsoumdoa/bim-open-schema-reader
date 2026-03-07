@@ -21,7 +21,7 @@ export const countByViewFamily = sql`
 				denorm_entities AS e
 				INNER JOIN denorm_string_params AS p ON e.index = p.entity
 			WHERE
-				e.category = 'Views'
+				e.type = 'Views'
 		)
 	SELECT
 		CASE

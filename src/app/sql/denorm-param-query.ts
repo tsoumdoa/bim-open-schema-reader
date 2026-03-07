@@ -7,22 +7,12 @@ export const denormDoubleParams = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_single_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				INNER JOIN denorm_single_params AS p ON e.index = p.p_Entity
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		)
 	SELECT
-		LocalId,
-		name,
-		Name_1 AS param_name,
-		VALUE AS param_value,
-		Units,
-		"Group" AS param_group,
-		--project_name,
-		--GlobalId,
-		--category,
-		--path_name,
+		* EXCLUDE (path_name, project_name, p_Entity)
 	FROM
 		double_data
 	ORDER BY
@@ -36,10 +26,10 @@ export const denormDoubleParamsPivot = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_single_params AS p ON e.index = p.entity
+				INNER JOIN denorm_single_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		pivot_double_data AS (
 			PIVOT double_data ON name_1 -- IN ('Base Diameter')
@@ -68,10 +58,10 @@ export const denormDoubleParamsStats = (categoryName: string) => sql`
         p.VALUE AS raw_value,
       FROM
         denorm_entities AS e
-        INNER JOIN denorm_single_params AS p ON e.index = p.entity
+        INNER JOIN denorm_single_params AS p ON e.index = p.p_Entity
         INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
       WHEREdenorm_single_params
-        e.category = '${categoryName}'
+        e.type = '${categoryName}'
     ),
     norm AS (
       SELECT
@@ -113,11 +103,11 @@ export const denormEntityParams = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_entity_params AS p ON e.index = p.entity
+				INNER JOIN denorm_entity_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 				INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		)
 	SELECT
 		LocalId,
@@ -143,11 +133,11 @@ export const denormEntityParamsPivot = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_entity_params AS p ON e.index = p.entity
+				INNER JOIN denorm_entity_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 				INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		pivot_entity_data AS (
 			PIVOT entity_data ON name_1 --IN (<name_of_param_to_filter>)
@@ -177,11 +167,11 @@ export const denormEntityParamsStats = (categoryName: string) => sql`
 				e2.category AS param_category
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_entity_params AS p ON e.index = p.entity
+				INNER JOIN denorm_entity_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 				INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		norm AS (
 			SELECT
@@ -224,10 +214,10 @@ export const denormIntegerParams = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_integer_params AS p ON e.index = p.entity
+				INNER JOIN denorm_integer_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		)
 	SELECT
 		LocalId,
@@ -250,10 +240,10 @@ export const denormIntegerParamsPivot = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_integer_params AS p ON e.index = p.entity
+				INNER JOIN denorm_integer_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		pivot_int_data AS (
 			PIVOT int_data ON name_1 --IN (<name_of_param_to_filter>)
@@ -282,10 +272,10 @@ export const denormIntegerParamsStats = (categoryName: string) => sql`
 				p.VALUE AS raw_value
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_integer_params AS p ON e.index = p.entity
+				INNER JOIN denorm_integer_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		norm AS (
 			SELECT
@@ -325,10 +315,10 @@ export const denormPointsParams = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_points_params AS p ON e.index = p.entity
+				INNER JOIN denorm_points_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		)
 	SELECT
 		LocalId,
@@ -353,10 +343,10 @@ export const denormPointsParamsPivot = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_points_params AS p ON e.index = p.entity
+				INNER JOIN denorm_points_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		pt_data_pivot AS (
 			PIVOT pt_data ON name_1 --IN ('rvt:Element:Bounds.Max')
@@ -386,10 +376,10 @@ export const denormPointsParamsStats = (categoryName: string) => sql`
 				p.Z AS raw_z
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_points_params AS p ON e.index = p.entity
+				INNER JOIN denorm_points_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		norm AS (
 			SELECT
@@ -444,17 +434,17 @@ export const denormStringParams = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				INNER JOIN denorm_string_params AS p ON e.index = p.Entity
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		)
 	SELECT
-		LocalId,
-		name,
-		Name_1 AS param_name,
-		Strings AS param_value,
-		"GROUP" AS param_group,
+		*
+		-- LocalId,
+		-- name,
+		-- Name_1 AS param_name,
+		-- Strings AS param_value,
+		-- "GROUP" AS param_group,
 		--GlobalId,
 		--category,
 		--path_name,
@@ -471,10 +461,10 @@ export const denormStringParamsPivot = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
+				INNER JOIN denorm_string_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		pivot_str_data AS (
 			PIVOT str_data ON name_1 --IN (<name_of_param_to_filter>)
@@ -503,10 +493,10 @@ export const denormStringParamsStats = (categoryName: string) => sql`
 				p.Strings AS param_value,
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
+				INNER JOIN denorm_string_params AS p ON e.index = p.p_Entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = '${categoryName}'
+				e.type = '${categoryName}'
 		),
 		norm AS (
 			SELECT

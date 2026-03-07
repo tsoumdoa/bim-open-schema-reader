@@ -10,7 +10,7 @@ export const dwgSchedule = sql`
 				INNER JOIN denorm_single_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Rooms'
+				e.type = 'Rooms'
 		),
 		pivot_double_data AS (
 			PIVOT double_data ON name_1 IN ("Volume", "Area", "Unbounded Height") USING first (VALUE),
@@ -27,7 +27,7 @@ export const dwgSchedule = sql`
 				INNER JOIN denorm_string_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Rooms'
+				e.type = 'Rooms'
 		),
 		pivot_str_data AS (
 			PIVOT str_data ON name_1 IN (

@@ -12,7 +12,7 @@ export const structuralColumnMaterials = sql`
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 				INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
 			WHERE
-				e.category = 'Structural Columns'
+				e.type = 'Structural Columns'
 		),
 		pivot_entity_data AS (
 			PIVOT entity_data ON name_1 USING first (name_3) AS param_value,

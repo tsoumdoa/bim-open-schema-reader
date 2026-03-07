@@ -31,7 +31,7 @@ export const levelSchedule = sql`
 				INNER JOIN denorm_integer_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Levels'
+				e.type = 'Levels'
 		),
 		filtered_int_data AS (
 			SELECT

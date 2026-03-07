@@ -11,7 +11,7 @@ export const tagsTotalCountByCategory = sql`
 				INNER JOIN denorm_string_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category LIKE '% Tags'
+				e.type LIKE '% Tags'
 		),
 		instance_data AS (
 			SELECT DISTINCT

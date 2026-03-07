@@ -11,7 +11,7 @@ export const floorSchedule = sql`
 				INNER JOIN denorm_points_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Floors'
+				e.type = 'Floors'
 		),
 		double_data AS (
 			SELECT
@@ -21,7 +21,7 @@ export const floorSchedule = sql`
 				INNER JOIN denorm_single_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Floors'
+				e.type = 'Floors'
 		),
 		pivot_double_data AS (
 			PIVOT double_data ON name_1 IN ('Thickness', 'Area', 'Volume') USING first (VALUE),

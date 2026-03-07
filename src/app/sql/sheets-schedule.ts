@@ -10,7 +10,7 @@ export const sheetSchedule = sql`
 				INNER JOIN denorm_string_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Sheets'
+				e.type = 'Sheets'
 		),
 		pivot_str_data AS (
 			PIVOT str_data ON name_1 USING first (Strings),
@@ -26,7 +26,7 @@ export const sheetSchedule = sql`
 				INNER JOIN denorm_string_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Views'
+				e.type = 'Views'
 		),
 		views_on_sheets AS (
 			SELECT DISTINCT

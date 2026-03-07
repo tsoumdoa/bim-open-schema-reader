@@ -27,7 +27,7 @@ export const renderAllGeometry = sql`
 		mat.alpha,
 		mat.roughness,
 		mat.metallic,
-		e.category
+		e.type
 	FROM
 		denorm_geometry_elements i
 		LEFT OUTER JOIN denorm_meshes_view m ON i.mesh_index = m.index
@@ -71,7 +71,7 @@ export const renderWallsGeometry = sql`
 		LEFT OUTER JOIN denorm_materials_view mat ON i.material_index = mat.index
 		INNER JOIN denorm_entities e ON i.entity_index = e.index
 	WHERE
-		e.category = 'Walls'
+		e.type = 'Walls'
 	ORDER BY
 		i.instance_index;
 `;
@@ -109,7 +109,7 @@ export const renderFloorsGeometry = sql`
 		LEFT OUTER JOIN denorm_materials_view mat ON i.material_index = mat.index
 		INNER JOIN denorm_entities e ON i.entity_index = e.index
 	WHERE
-		e.category = 'Floors'
+		e.type = 'Floors'
 	ORDER BY
 		i.instance_index;
 `;
@@ -147,7 +147,7 @@ export const renderColumnsGeometry = sql`
 		LEFT OUTER JOIN denorm_materials_view mat ON i.material_index = mat.index
 		INNER JOIN denorm_entities e ON i.entity_index = e.index
 	WHERE
-		e.category = 'Structural Columns'
+		e.type = 'Structural Columns'
 	ORDER BY
 		i.instance_index;
 `;
@@ -185,7 +185,7 @@ export const renderDoorsGeometry = sql`
 		LEFT OUTER JOIN denorm_materials_view mat ON i.material_index = mat.index
 		INNER JOIN denorm_entities e ON i.entity_index = e.index
 	WHERE
-		e.category = 'Doors'
+		e.type = 'Doors'
 	ORDER BY
 		i.instance_index;
 `;
@@ -223,7 +223,7 @@ export const renderWindowsGeometry = sql`
 		LEFT OUTER JOIN denorm_materials_view mat ON i.material_index = mat.index
 		INNER JOIN denorm_entities e ON i.entity_index = e.index
 	WHERE
-		e.category = 'Windows'
+		e.type = 'Windows'
 	ORDER BY
 		i.instance_index;
 `;

@@ -11,7 +11,7 @@ export const countUnplacedViews = sql`
 				INNER JOIN denorm_string_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Views'
+				e.type = 'Views'
 				AND p.Name = 'Sheet Name'
 		)
 	SELECT
