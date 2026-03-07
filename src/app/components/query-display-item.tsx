@@ -180,9 +180,10 @@ export default function QueryDisplayItem(props: {
 		headers: string[],
 		rows: (string | number)[][]
 	) => {
-		const entityIndexColIndex = headers.findIndex(
-			(h) => h.toLowerCase() === "entity_index"
-		);
+		const entityIndexColIndex = headers.findIndex((h) => {
+			const name = h.toLowerCase();
+			return name === "entity_index" || name === "index";
+		});
 		if (entityIndexColIndex === -1) {
 			setEntityIndices([]);
 			return;
