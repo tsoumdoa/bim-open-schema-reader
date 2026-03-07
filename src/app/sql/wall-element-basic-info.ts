@@ -6,22 +6,19 @@ export const wallElementBasicInfo = sql`
 			SELECT
 				e.index,
 				e.name,
-				p3.strings AS prop_name,
-				p4.name AS point_name,
-				ROUND(p1.value * 304.8, 1) AS prop_value,
-				ROUND(p0.x * 304.8, 3) AS x,
-				ROUND(p0.y * 304.8, 3) AS y,
-				ROUND(p0.z * 304.8, 3) AS z
+				sp.d_name AS prop_name,
+				pp.d_name AS point_name,
+				ROUND(sp.v_value * 304.8, 1) AS prop_value,
+				ROUND(pp.v_X * 304.8, 3) AS x,
+				ROUND(pp.v_Y * 304.8, 3) AS y,
+				ROUND(pp.v_Z * 304.8, 3) AS z
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_points_params AS p0 ON e.index = p0.entity
-				INNER JOIN doubleparameters AS p1 ON e.index = p1.entity
-				INNER JOIN descriptors AS p2 ON p1.descriptor = p2.index
-				INNER JOIN strings AS p3 ON p2.name = p3.index
-				INNER JOIN denorm_descriptors AS p4 ON p0.descriptor = p4.index
+				denorm_entities e
+				LEFT JOIN denorm_points_params pp ON e.index = pp.p_Entity
+				LEFT JOIN denorm_single_params sp ON e.index = sp.p_Entity
 			WHERE
-				e.type LIKE 'Walls'
-				AND p3.strings IN (
+				e.type = 'Walls'
+				AND sp.d_name IN (
 					'Unconnected Height',
 					'Base Offset',
 					'Top Offset',
@@ -31,116 +28,111 @@ export const wallElementBasicInfo = sql`
 					'Top Extension Distance',
 					'Base Extension Distance'
 				)
-				AND p4.name IN (
-					'rvt:Element:Location.StartPoint',
-					'rvt:Element:Location.EndPoint',
-					'rvt:Element:Bounds.Min',
-					'rvt:Element:Bounds.Max'
+				AND pp.d_name IN (
+					'Rvt:Element:Location.StartPoint',
+					'Rvt:Element:Location.EndPoint',
+					'Rvt:Element:Bounds.Min',
+					'Rvt:Element:Bounds.Max'
 				)
 		),
 		entity_data AS (
 			SELECT
 				e.index,
 				e.name,
-				p1.name AS des_name,
-				p1.group AS des_group,
-				p1.type AS des_type,
-				p1.name_1 AS entity_name,
-				p1.category AS entity_category,
-				p1.index_1 AS entity_index
+				p.p_index AS entity_index
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_entity_params AS p1 ON e.index = p1.entity
+				denorm_entities e
+				JOIN denorm_entity_params p ON e.index = p.p_Entity
 			WHERE
 				e.type = 'Walls'
-				AND p1.name = 'Family and Type'
+				AND p.d_name = 'Family and Type'
 		),
 		wall_agg AS (
 			SELECT
 				wd.index,
 				wd.name,
-				MAX(wd.prop_value) FILTER (
+				MAX(prop_value) FILTER (
 					WHERE
-						wd.prop_name = 'Length'
+						prop_name = 'Length'
 				) AS length,
-				MAX(wd.prop_value) FILTER (
+				MAX(prop_value) FILTER (
 					WHERE
-						wd.prop_name = 'Unconnected Height'
+						prop_name = 'Unconnected Height'
 				) AS unconnected_height,
-				MAX(wd.prop_value) FILTER (
+				MAX(prop_value) FILTER (
 					WHERE
-						wd.prop_name = 'Area'
+						prop_name = 'Area'
 				) AS area,
-				MAX(wd.prop_value) FILTER (
+				MAX(prop_value) FILTER (
 					WHERE
-						wd.prop_name = 'Volume'
+						prop_name = 'Volume'
 				) AS volume,
-				MAX(wd.prop_value) FILTER (
+				MAX(prop_value) FILTER (
 					WHERE
-						wd.prop_name = 'Base Offset'
+						prop_name = 'Base Offset'
 				) AS base_offset,
-				MAX(wd.prop_value) FILTER (
+				MAX(prop_value) FILTER (
 					WHERE
-						wd.prop_name = 'Top Offset'
+						prop_name = 'Top Offset'
 				) AS top_offset,
-				MAX(wd.prop_value) FILTER (
+				MAX(prop_value) FILTER (
 					WHERE
-						wd.prop_name = 'Top Extension Distance'
+						prop_name = 'Top Extension Distance'
 				) AS top_extension_distance,
-				MAX(wd.prop_value) FILTER (
+				MAX(prop_value) FILTER (
 					WHERE
-						wd.prop_name = 'Base Extension Distance'
+						prop_name = 'Base Extension Distance'
 				) AS base_extension_distance,
-				MAX(wd.x) FILTER (
+				MAX(x) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Location.StartPoint'
+						point_name = 'Rvt:Element:Location.StartPoint'
 				) AS loc_start_pt_x,
-				MAX(wd.y) FILTER (
+				MAX(y) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Location.StartPoint'
+						point_name = 'Rvt:Element:Location.StartPoint'
 				) AS loc_start_pt_y,
-				MAX(wd.z) FILTER (
+				MAX(z) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Location.StartPoint'
+						point_name = 'Rvt:Element:Location.StartPoint'
 				) AS loc_start_pt_z,
-				MAX(wd.x) FILTER (
+				MAX(x) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Location.EndPoint'
+						point_name = 'Rvt:Element:Location.EndPoint'
 				) AS loc_end_pt_x,
-				MAX(wd.y) FILTER (
+				MAX(y) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Location.EndPoint'
+						point_name = 'Rvt:Element:Location.EndPoint'
 				) AS loc_end_pt_y,
-				MAX(wd.z) FILTER (
+				MAX(z) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Location.EndPoint'
+						point_name = 'Rvt:Element:Location.EndPoint'
 				) AS loc_end_pt_z,
-				MAX(wd.x) FILTER (
+				MAX(x) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Bounds.Min'
+						point_name = 'Rvt:Element:Bounds.Min'
 				) AS bounds_min_x,
-				MAX(wd.y) FILTER (
+				MAX(y) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Bounds.Min'
+						point_name = 'Rvt:Element:Bounds.Min'
 				) AS bounds_min_y,
-				MAX(wd.z) FILTER (
+				MAX(z) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Bounds.Min'
+						point_name = 'Rvt:Element:Bounds.Min'
 				) AS bounds_min_z,
-				MAX(wd.x) FILTER (
+				MAX(x) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Bounds.Max'
+						point_name = 'Rvt:Element:Bounds.Max'
 				) AS bounds_max_x,
-				MAX(wd.y) FILTER (
+				MAX(y) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Bounds.Max'
+						point_name = 'Rvt:Element:Bounds.Max'
 				) AS bounds_max_y,
-				MAX(wd.z) FILTER (
+				MAX(z) FILTER (
 					WHERE
-						wd.point_name = 'rvt:Element:Bounds.Max'
+						point_name = 'Rvt:Element:Bounds.Max'
 				) AS bounds_max_z
 			FROM
-				wall_data AS wd
+				wall_data wd
 			GROUP BY
 				wd.index,
 				wd.name
@@ -151,21 +143,19 @@ export const wallElementBasicInfo = sql`
 				FIRST (e1.name) AS family_name,
 				LIST (e2.name) AS names,
 				LIST (e3.name) AS materials,
-				LIST (ROUND(dp.value * 304.8, 1)) AS thicknesses,
+				LIST (ROUND(dp.v_value * 304.8, 1)) AS thicknesses,
 				LIST (e2.category) AS categories,
-				ROUND(SUM(dp.value * 304.8), 1) AS total_thickness
+				ROUND(SUM(dp.v_value * 304.8), 1) AS total_thickness
 			FROM
-				denorm_entities AS e1
-				LEFT JOIN relations AS rls1 ON e1.index = rls1.entitya
-				LEFT JOIN denorm_entities AS e2 ON rls1.entityb = e2.index
-				LEFT JOIN doubleparameters AS dp ON rls1.entityb = dp.entity
-				LEFT JOIN descriptors AS dsp ON dp.descriptor = dsp.index
-				LEFT JOIN strings AS str1 ON dsp.name = str1.index
-				LEFT JOIN relations AS rls2 ON rls1.entityb = rls2.entitya
-				LEFT JOIN denorm_entities AS e3 ON rls2.entityb = e3.index
+				denorm_entities e1
+				LEFT JOIN relations r1 ON e1.index = r1.entityA
+				LEFT JOIN denorm_entities e2 ON r1.entityB = e2.index
+				LEFT JOIN denorm_single_params dp ON r1.entityB = dp.p_Entity
+				LEFT JOIN relations r2 ON r1.entityB = r2.entityA
+				LEFT JOIN denorm_entities e3 ON r2.entityB = e3.index
 			WHERE
-				e1.category LIKE 'Walls'
-				AND rls1.relationtype = 6
+				e1.type = 'Walls'
+				AND r1.relationType = 6
 			GROUP BY
 				e1.index
 		)
@@ -199,9 +189,9 @@ export const wallElementBasicInfo = sql`
 		wbu.categories AS layer_categories,
 		wbu.total_thickness
 	FROM
-		wall_agg AS wa
-		LEFT JOIN entity_data AS ed ON wa.index = ed.index
-		LEFT JOIN wall_build_up AS wbu ON ed.entity_index = wbu.entity_index
+		wall_agg wa
+		LEFT JOIN entity_data ed ON wa.index = ed.index
+		LEFT JOIN wall_build_up wbu ON ed.entity_index = wbu.entity_index
 	ORDER BY
 		wa.index;
 `;
