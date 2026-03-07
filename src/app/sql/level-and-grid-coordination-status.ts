@@ -2,78 +2,51 @@ import { sql } from "../utils/init-queries";
 
 export const listLevelWithCoredStatus = sql`
 	WITH
-		level_per_model AS (
+		level_data AS (
 			SELECT
 				p.name,
-				p.project_name, -- convert to mm and round
-				ROUND(r0.value * 304.8, 0) AS elevation
+				p.title,
+				ROUND(r0.v_value * 304.8, 0) AS elevation
 			FROM
-				denorm_entities AS p
-				INNER JOIN denorm_string_params AS r2 ON p.index = r2.entity
-				INNER JOIN denorm_single_params AS r0 ON p.index = r0.entity
+				denorm_entities p
+				JOIN denorm_single_params r0 ON p.index = r0.p_Entity
 			WHERE
-				p.category LIKE 'Levels'
-				AND r0.name LIKE 'Elevation'
-			GROUP BY
-				p.name,
-				p.project_name,
-				r0.value
+				p.type = 'Levels'
+				AND r0.d_name = 'Elevation'
 		),
-		-- Add reference elevation for each level (first model in group)
-		level_with_reference AS (
+		level_ref AS (
 			SELECT
-				*,
-				FIRST (elevation) OVER (
+				name,
+				title,
+				elevation,
+				FIRST_VALUE (elevation) OVER (
 					PARTITION BY
 						name
 				) AS ref_elevation
 			FROM
-				level_per_model
-		),
-		-- Mark each model as OK or Wrong
-		level_with_flags AS (
-			SELECT
-				*,
-				CASE
-					WHEN elevation = ref_elevation THEN 'OK'
-					ELSE 'Wrong'
-				END AS model_status
-			FROM
-				level_with_reference
-		),
-		-- Aggregate to get one row per level name
-		level_across_models AS (
-			SELECT
-				name,
-				ref_elevation,
-				CASE
-					WHEN BOOL_AND (model_status = 'OK') THEN 'OK'
-					ELSE 'Uncoordinated level'
-				END AS cord_status,
-				LIST (DISTINCT project_name) AS models,
-				LIST (
-					DISTINCT CASE
-						WHEN model_status = 'Wrong' THEN project_name
-					END
-				) AS wrong_models,
-				LIST (DISTINCT elevation) AS elevations
-			FROM
-				level_with_flags
-			GROUP BY
-				name,
-				ref_elevation
+				level_data
 		)
 	SELECT
 		name,
-		cord_status,
 		ref_elevation,
-		wrong_models,
 		CASE
-			WHEN cord_status = 'Uncoordinated level' THEN elevations
-		END AS mismatched_elevations,
-		models
+			WHEN BOOL_AND (elevation = ref_elevation) THEN 'OK'
+			ELSE 'Uncoordinated level'
+		END AS cord_status,
+		LIST (DISTINCT title) AS models,
+		LIST (
+			DISTINCT CASE
+				WHEN elevation <> ref_elevation THEN title
+			END
+		) AS wrong_models,
+		CASE
+			WHEN NOT BOOL_AND (elevation = ref_elevation) THEN LIST (DISTINCT elevation)
+		END AS mismatched_elevations
 	FROM
-		level_across_models
+		level_ref
+	GROUP BY
+		name,
+		ref_elevation
 	ORDER BY
 		ref_elevation DESC;
 `;
