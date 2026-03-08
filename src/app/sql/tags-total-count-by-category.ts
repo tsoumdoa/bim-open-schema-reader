@@ -5,11 +5,14 @@ export const tagsTotalCountByCategory = sql`
 	WITH
 		str_data AS (
 			SELECT
-				*
+				e.LocalId,
+				e.name,
+				e.category,
+				p.d_name,
+				p.v_Strings
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_string_params p ON e.index = p.p_Entity
 			WHERE
 				e.type LIKE '% Tags'
 		),
@@ -17,46 +20,45 @@ export const tagsTotalCountByCategory = sql`
 			SELECT DISTINCT
 				LocalId,
 				name,
-				Name_1 AS instance_param_name,
-				Strings AS instance_param_value,
+				d_name AS instance_param_name,
+				v_Strings AS instance_param_value,
 				category AS instance_category
 			FROM
 				str_data
 			WHERE
-				instance_param_name = 'Family Name'
-				AND instance_param_value = ''
+				d_name = 'Family Name'
+				AND v_Strings = ''
 		),
 		family_data AS (
 			SELECT DISTINCT
 				LocalId,
 				name,
-				Name_1 AS family_param_name,
-				Strings AS family_param_value,
+				d_name AS family_param_name,
+				v_Strings AS family_param_value,
 				category AS family_category
 			FROM
 				str_data
 			WHERE
-				family_param_name = 'Family Name'
-				AND family_param_value != ''
+				d_name = 'Family Name'
+				AND v_Strings <> ''
 		),
 		family_of_instance AS (
 			SELECT
 				*
 			FROM
-				instance_data AS id
-				LEFT JOIN family_data AS fd ON id.name = fd.name -- this is checking family type name only..
+				instance_data id
+				LEFT JOIN family_data fd ON id.name = fd.name
 			WHERE
-				instance_category = family_category
+				id.instance_category = fd.family_category
 		)
-	SELECT DISTINCT
+	SELECT
 		family_category,
-		count(DISTINCT LocalId) AS tag_count, -- it should count(*) but there are duplicate
-		list (DISTINCT family_param_value)
+		COUNT(DISTINCT LocalId) AS tag_count,
+		LIST (DISTINCT family_param_value)
 	FROM
 		family_of_instance
 	GROUP BY
-		--family_param_value,
-		family_category,
+		family_category
 	ORDER BY
 		tag_count DESC;
 `;

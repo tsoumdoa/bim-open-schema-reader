@@ -4,11 +4,14 @@ export const tagsTotalCountByType = sql`
 	WITH
 		str_data AS (
 			SELECT
-				*
+				e.LocalId,
+				e.name,
+				e.category,
+				p.d_name,
+				p.v_Strings
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_string_params p ON e.index = p.p_Entity
 			WHERE
 				e.type LIKE '% Tags'
 		),
@@ -16,43 +19,41 @@ export const tagsTotalCountByType = sql`
 			SELECT DISTINCT
 				LocalId,
 				name,
-				Name_1 AS instance_param_name,
-				Strings AS instance_param_value,
+				d_name AS instance_param_name,
+				v_Strings AS instance_param_value,
 				category AS instance_category
 			FROM
 				str_data
 			WHERE
-				instance_param_name = 'Family Name'
-				AND instance_param_value = ''
+				d_name = 'Family Name'
+				AND v_Strings = ''
 		),
 		family_data AS (
 			SELECT DISTINCT
 				LocalId,
 				name,
-				Name_1 AS family_param_name,
-				Strings AS family_param_value,
+				d_name AS family_param_name,
+				v_Strings AS family_param_value,
 				category AS family_category
 			FROM
 				str_data
 			WHERE
-				family_param_name = 'Family Name'
-				AND family_param_value != ''
+				d_name = 'Family Name'
+				AND v_Strings <> ''
 		),
 		family_of_instance AS (
 			SELECT
 				*
 			FROM
-				instance_data AS id
-				LEFT JOIN family_data AS fd ON id.name = fd.name -- this is checking family type name only..
+				instance_data id
+				LEFT JOIN family_data fd ON id.name = fd.name
 			WHERE
-				instance_category = family_category
+				id.instance_category = fd.family_category
 		)
-	SELECT DISTINCT
+	SELECT
 		family_param_value,
 		name,
-		family_category,
-		-- count(*) AS tag_count, -- not reliable for now
-		--list(DISTINCT name) AS type_names
+		family_category
 	FROM
 		family_of_instance
 	GROUP BY
@@ -61,6 +62,4 @@ export const tagsTotalCountByType = sql`
 		family_category
 	ORDER BY
 		family_param_value;
-
-	--   tag_count DESC;
 `;
