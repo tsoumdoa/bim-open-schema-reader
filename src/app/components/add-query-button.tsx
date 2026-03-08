@@ -121,14 +121,14 @@ export function AddQuery(props: {
 					</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="gap-1 px-6 pt-6 pb-2 sm:max-w-[500px]">
+			<DialogContent className="gap-1 px-6 pt-6 pb-2 sm:max-w-125">
 				<DialogHeader>
 					<DialogTitle> Query Selector</DialogTitle>
 					<DialogDescription className="text-xs text-neutral-500">
 						Select a query from the list below to add.
 					</DialogDescription>
 				</DialogHeader>
-				<Command className="rounded-lg border shadow-md md:min-w-[450px]">
+				<Command className="rounded-lg border shadow-md md:min-w-112.5">
 					<CommandInput placeholder="Type a query or search..." />
 					<CommandList className="max-h-[min(60vh,900px)]">
 						<CommandEmpty>No results found.</CommandEmpty>

@@ -285,7 +285,8 @@ export const queriesSelectorList: QueriesSelector[] = [
 	rooms,
 	cadLinks,
 	floors,
-	structure,
+	// structure, //TODO: completely broken for now, can't fix till the next
+	// exporter release
 ];
 
 export const denormParamQueryBuilderName: {
