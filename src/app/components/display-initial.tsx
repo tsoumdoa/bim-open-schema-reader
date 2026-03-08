@@ -14,7 +14,6 @@ import {
 	DropzoneContent,
 	DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone";
-import { useQuery } from "@tanstack/react-query";
 import { Shield, Zap, Eye, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
