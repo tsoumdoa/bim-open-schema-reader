@@ -78,7 +78,7 @@ const schema: TableSchema = {
 	],
 	Descriptors: ["Name", "Units", "Group", "Type", "index"],
 	Documents: ["Title", "Path", "index"],
-	DoubleParameters: ["Entity", "Descriptor", "Value", "index"],
+	SingleParameters: ["Entity", "Descriptor", "Value", "index"],
 	Entities: ["LocalId", "GlobalId", "Document", "Name", "Category", "index"],
 	EntityParameters: ["Entity", "Descriptor", "Value", "index"],
 	Enum_Parameter: ["index", "ParameterType"],
