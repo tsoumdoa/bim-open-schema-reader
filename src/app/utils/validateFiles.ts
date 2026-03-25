@@ -3,10 +3,8 @@ import { validFileNames, BosFileType, validFileNamesWithGeo } from "./types";
 export function validateEntries(entries: string[]): BosFileType {
 	let hasGeo = false;
 
-	if (entries.length !== 12 && entries.length !== 18) return "INVALID";
-	if (entries.length === 18) hasGeo = true;
-
-	//NOTE: override for compatibility for now
+	if (entries.length !== 9 && entries.length !== 15) return "INVALID";
+	if (entries.length === 15) hasGeo = true;
 
 	const set = new Set(entries);
 
