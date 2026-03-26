@@ -54,7 +54,7 @@ const schema: TableSchema = {
 		"d_group",
 		"d_type",
 	],
-	denorm_single_params: [
+	denorm_number_params: [
 		"p_Entity",
 		"v_value",
 		"d_name",

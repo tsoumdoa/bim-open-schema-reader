@@ -15,7 +15,7 @@ export const wallElementBasicInfo = sql`
 			FROM
 				denorm_entities e
 				LEFT JOIN denorm_points_params pp ON e.index = pp.p_Entity
-				LEFT JOIN denorm_single_params sp ON e.index = sp.p_Entity
+				LEFT JOIN denorm_number_params sp ON e.index = sp.p_Entity
 			WHERE
 				e.type = 'Walls'
 				AND sp.d_name IN (
@@ -150,7 +150,7 @@ export const wallElementBasicInfo = sql`
 				denorm_entities e1
 				LEFT JOIN relations r1 ON e1.index = r1.entityA
 				LEFT JOIN denorm_entities e2 ON r1.entityB = e2.index
-				LEFT JOIN denorm_single_params dp ON r1.entityB = dp.p_Entity
+				LEFT JOIN denorm_number_params dp ON r1.entityB = dp.p_Entity
 				LEFT JOIN relations r2 ON r1.entityB = r2.entityA
 				LEFT JOIN denorm_entities e3 ON r2.entityB = e3.index
 			WHERE

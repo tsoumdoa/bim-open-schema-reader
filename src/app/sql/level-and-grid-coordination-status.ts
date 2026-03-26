@@ -9,7 +9,7 @@ export const listLevelWithCoredStatus = sql`
 				ROUND(r0.v_value * 304.8, 0) AS elevation
 			FROM
 				denorm_entities p
-				JOIN denorm_single_params r0 ON p.index = r0.p_Entity
+				JOIN denorm_number_params r0 ON p.index = r0.p_Entity
 			WHERE
 				p.type = 'Levels'
 				AND r0.d_name = 'Elevation'
@@ -98,7 +98,7 @@ export const listGridWithCoredStatus = sql`
 				denorm_entities e
 				JOIN denorm_points_params dp1 ON e.index = dp1.p_Entity
 				JOIN denorm_string_params dp2 ON e.index = dp2.p_Entity
-				LEFT JOIN denorm_single_params dp3 ON e.index = dp3.p_Entity
+				LEFT JOIN denorm_number_params dp3 ON e.index = dp3.p_Entity
 			WHERE
 				e.type = 'Grids'
 				AND dp2.d_name = 'rvt:Grid:Type'

@@ -7,7 +7,7 @@ export const denormSingleParams = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_single_params AS p ON e.index = p.p_Entity
+				INNER JOIN denorm_number_params AS p ON e.index = p.p_Entity
 			WHERE
 				e.type = '${categoryName}'
 		)
@@ -26,7 +26,7 @@ export const denormSingleParamsPivot = (categoryName: string) => sql`
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_single_params AS p ON e.index = p.p_Entity
+				INNER JOIN denorm_number_params AS p ON e.index = p.p_Entity
 			WHERE
 				e.type = '${categoryName}'
 		),
@@ -56,7 +56,7 @@ export const denormSingleParamsStats = (categoryName: string) => sql`
         p.v_value AS raw_value,
       FROM
         denorm_entities AS e
-        INNER JOIN denorm_single_params AS p ON e.index = p.p_Entity
+        INNER JOIN denorm_number_params AS p ON e.index = p.p_Entity
       WHERE e.type = '${categoryName}'
     ),
     norm AS (

@@ -11,7 +11,7 @@ export const levelSchedule = sql`
 				ROUND(r0.v_value * 304.8, 0) AS elevation
 			FROM
 				denorm_entities p
-				JOIN denorm_single_params r0 ON p.index = r0.p_Entity
+				JOIN denorm_number_params r0 ON p.index = r0.p_Entity
 			WHERE
 				p.type = 'Levels'
 				AND r0.d_name = 'Elevation'

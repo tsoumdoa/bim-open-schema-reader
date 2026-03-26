@@ -9,7 +9,7 @@ export const listLevels = sql`
 	FROM
 		denorm_entities AS p
 		INNER JOIN denorm_string_params AS r2 ON p.index = r2.entity
-		INNER JOIN denorm_single_params AS r0 ON p.index = r0.entity
+		INNER JOIN denorm_number_params AS r0 ON p.index = r0.entity
 	WHERE
 		p.category LIKE 'Levels'
 		AND r0.name LIKE 'Elevation'
@@ -73,7 +73,7 @@ export const listGrids = sql`
 				p_Entity,
 				MAX(ROUND(v_value * 304.8, 0)) AS arc_radius
 			FROM
-				denorm_single_params
+				denorm_number_params
 			WHERE
 				d_name = 'rvt:Grid:ArcRadius'
 			GROUP BY

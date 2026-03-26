@@ -13,7 +13,7 @@ export const listWallBuildUps = sql`
 		denorm_entities e1
 		LEFT JOIN relations r1 ON e1.index = r1.entityA
 		LEFT JOIN denorm_entities e2 ON r1.entityB = e2.index
-		LEFT JOIN denorm_single_params dp ON r1.entityB = dp.p_Entity
+		LEFT JOIN denorm_number_params dp ON r1.entityB = dp.p_Entity
 		AND dp.d_name = 'Width'
 		LEFT JOIN relations r2 ON r1.entityB = r2.entityA
 		LEFT JOIN denorm_entities e3 ON r2.entityB = e3.index

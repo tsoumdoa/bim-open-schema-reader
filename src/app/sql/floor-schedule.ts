@@ -21,7 +21,7 @@ export const floorSchedule = sql`
 				p.v_value
 			FROM
 				denorm_entities e
-				JOIN denorm_single_params p ON e.index = p.p_Entity
+				JOIN denorm_number_params p ON e.index = p.p_Entity
 			WHERE
 				e.type = 'Floors'
 		),

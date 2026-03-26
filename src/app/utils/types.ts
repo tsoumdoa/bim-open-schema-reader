@@ -74,7 +74,7 @@ export const denormTableNames = [
 	"denorm_documents",
 	"denorm_descriptors",
 	"denorm_entities",
-	"denorm_single_params",
+	"denorm_number_params",
 	"denorm_entity_params",
 	"denorm_integer_params",
 	"denorm_points_params",

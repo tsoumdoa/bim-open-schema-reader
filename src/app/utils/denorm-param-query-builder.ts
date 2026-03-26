@@ -45,7 +45,7 @@ export function denormParamQueryBuilder(
 	};
 	denormParamQueryBuilder;
 	switch (paramType) {
-		case "denorm_single_params":
+		case "denorm_number_params":
 			if (queryType === "pivot") {
 				queryObj.sqlQuery = denormSingleParamsPivot(categoryName);
 			}

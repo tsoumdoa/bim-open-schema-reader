@@ -41,15 +41,20 @@ export const createHelperViewsAndTables = () => sql`
 		Enum_RelationType (index, RelationType)
 	VALUES
 		(0, 'PartOf'),
-		(1, 'ElementOf'),
+		(1, 'MemberOf'),
 		(2, 'ContainedIn'),
-		(3, 'InstanceOf'),
-		(4, 'HostedBy'),
-		(5, 'ChildOf'),
-		(6, 'HasLayer'),
-		(7, 'HasMaterial'),
-		(8, 'ConnectsTo'),
-		(9, 'HasConnector');
+		(3, 'HostedBy'),
+		(4, 'ChildOf'),
+		(5, 'HasLayer'),
+		(6, 'HasMaterial'),
+		(7, 'ConnectsTo'),
+		(8, 'HasConnector'),
+		(9, 'BoundedBy'),
+		(10, 'TraverseTo'),
+		(11, 'Voids'),
+		(12, 'Fills'),
+		(13, 'Covers'),
+		(14, 'Serves');
 
 	CREATE TABLE IF NOT EXISTS Enum_DiagnosticType (index INTEGER, DiagnosticType VARCHAR(20));
 
@@ -116,68 +121,112 @@ export const createHelperViewsAndTables = () => sql`
 		n.Strings AS name,
 		u.Strings AS units,
 		g.Strings AS "group",
-		t.Strings AS type
+		t.ParameterType AS type
 	FROM
 		Descriptors d
 		LEFT OUTER JOIN Strings n ON n.index = d.Name
 		LEFT OUTER JOIN Strings u ON u.index = d.Units
 		LEFT OUTER JOIN Strings g ON g.index = d.Group
-		LEFT OUTER JOIN Strings t ON t.index = d.Type;
+		LEFT OUTER JOIN Enum_Parameter t ON t.index = d.Type;
 
 	-- denormalize StringParameters
 	CREATE
 	OR REPLACE VIEW denorm_string_params AS
+	WITH
+		string_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'String'
+		)
 	SELECT
 		COLUMNS (p.* EXCLUDE (Descriptor, "Value")) AS ${String.raw`'p_\0'`},
 		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
 		COLUMNS (d.* EXCLUDE (index, Units)) AS ${String.raw`'d_\0'`},
 	FROM
-		StringParameters p
-		LEFT OUTER JOIN Strings v ON v.index = p."Value"
-		LEFT OUTER JOIN denorm_descriptors d ON d.index = p.Descriptor;
+		Parameters p
+		JOIN string_descriptors d ON d.index = p.Descriptor
+		JOIN Strings v ON v.index = p."Value";
 
 	-- denormalize PointParameters
 	CREATE
 	OR REPLACE VIEW denorm_points_params AS
+	WITH
+		point_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'Point'
+		)
 	SELECT
 		COLUMNS (p.* EXCLUDE (Descriptor, "Value", index)) AS ${String.raw`'p_\0'`},
 		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
 		COLUMNS (d.* EXCLUDE (index, Units)) AS ${String.raw`'d_\0'`},
 	FROM
-		PointParameters p
-		JOIN Points v USING (index)
-		JOIN denorm_descriptors d ON d.index = p.Descriptor;
+		Parameters p
+		JOIN point_descriptors d ON d.index = p.Descriptor
+		JOIN Points v ON v.index = p."Value";
 
-	-- denormalize Single Parameters
 	CREATE
-	OR REPLACE VIEW denorm_single_params AS
+	OR REPLACE VIEW denorm_number_params AS
+	WITH
+		number_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'Double' --NOTE: looks sus.. should it not be Number...?
+		)
 	SELECT
 		COLUMNS (p.* EXCLUDE (Descriptor, index, "Value")) AS ${String.raw`'p_\0'`},
 		p."Value" AS v_value,
 		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
-		SingleParameters p
-		JOIN denorm_descriptors d ON d.index = p.Descriptor;
+		Parameters p
+		JOIN number_descriptors d ON d.index = p.Descriptor;
 
 	-- denormalize Integer Parameters
 	CREATE
 	OR REPLACE VIEW denorm_integer_params AS
+	WITH
+		int_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'Int'
+		)
 	SELECT
 		COLUMNS (p.* EXCLUDE (Descriptor, index)) AS ${String.raw`'p_\0'`},
 		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
-		IntegerParameters p
-		JOIN denorm_descriptors d ON d.index = p.Descriptor;
+		Parameters p
+		JOIN int_descriptors d ON d.index = p.Descriptor;
 
 	-- denormalize Entity Parameters
 	CREATE
 	OR REPLACE VIEW denorm_entity_params AS
+	WITH
+		entity_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'Entity'
+		)
 	SELECT
 		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
 		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
 		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
 	FROM
-		EntityParameters p
+		Parameters p
 		JOIN denorm_entities v USING (index)
 		JOIN denorm_descriptors d ON d.index = p.Descriptor;
 
@@ -338,12 +387,3 @@ export const summarizeTableInfo = (tableName: string) => sql`
 	FROM
 		${tableName};
 `;
-
-// example with string literal
-// export const listAllTableInfo = (tableName: string) => sql`
-//   SELECT
-//     *
-//   FROM
-//     information_schema.tables;
-//     where table_name = ${tableName};
-// `;
