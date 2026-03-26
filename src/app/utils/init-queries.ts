@@ -371,7 +371,7 @@ export const listCountByCategory = sql`
 		COUNT(DISTINCT e.index) AS count
 	FROM
 		denorm_entities AS e
-		LEFT OUTER JOIN entityparameters AS ep ON e.index = ep.entity
+		LEFT OUTER JOIN Parameters AS ep ON e.index = ep.entity
 		LEFT OUTER JOIN denorm_entities AS e2 ON ep.value = e2.index
 		LEFT OUTER JOIN descriptors AS dsp ON ep.descriptor = dsp.index
 		LEFT OUTER JOIN strings AS paramname ON dsp.name = paramname.index
