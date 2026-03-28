@@ -1,4 +1,4 @@
-import { useGeometry } from "../components/geometry-context";
+import { useGeometryFromParquetCtx } from "../components/geometry-from-parquet-context";
 import { useMemo, useState } from "react";
 import * as THREE from "three";
 
@@ -15,7 +15,7 @@ interface UseGeometryFilterResult {
 export function useGeometryFilter(
 	entityIndices: number[]
 ): UseGeometryFilterResult {
-	const { getFilteredScene, loading, error } = useGeometry();
+	const { getFilteredScene, loading, error } = useGeometryFromParquetCtx();
 	const [showAll, setShowAll] = useState(false);
 
 	const toggleShowAll = () => setShowAll((prev) => !prev);

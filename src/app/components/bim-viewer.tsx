@@ -1,6 +1,6 @@
 "use client";
 
-import { useGeometry } from "./geometry-context";
+import { useGeometryFromParquetCtx } from "./geometry-from-parquet-context";
 import { useGeometryFilter } from "@/app/hooks/use-geometry-filter";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,7 @@ function Scene({ scene }: { scene: THREE.Group | null }) {
 }
 
 export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
-	const { loading, error } = useGeometry();
+	const { loading, error } = useGeometryFromParquetCtx();
 	const {
 		scene,
 		totalEntityCount,

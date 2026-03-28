@@ -98,6 +98,9 @@ importers:
       hast-util-to-jsx-runtime:
         specifier: ^2.3.6
         version: 2.3.6
+      hyparquet:
+        specifier: ^1.25.1
+        version: 1.25.1
       lucide-react:
         specifier: ^0.541.0
         version: 0.541.0(react@19.2.1)
@@ -2354,6 +2357,9 @@ packages:
 
   html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
+
+  hyparquet@1.25.1:
+    resolution: {integrity: sha512-CXcN/u6RdQqsK8IphUptpAEqY8IzgwzHY+MuXX+2wpoWTumfxPVr6JYbbywsNsiAl9aEbM5sRtxkwRBa22b49w==}
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -5852,6 +5858,8 @@ snapshots:
   hls.js@1.6.15: {}
 
   html-void-elements@3.0.0: {}
+
+  hyparquet@1.25.1: {}
 
   ieee754@1.2.1: {}
 
