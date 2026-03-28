@@ -3,7 +3,6 @@ import { useImportParquet } from "../hooks/use-import-parquet";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import { BosFileType, ParquetBlob } from "../utils/types";
 import DashboardContainer from "./dashboard-container";
-import { GeometryProvider } from "./geometry-context";
 import { GeometryProviderFromParquet } from "./geometry-from-parquet-context";
 import QueryObjProvider from "./query-obj-provider";
 import { SimpleErrMessage } from "./simple-err-message";

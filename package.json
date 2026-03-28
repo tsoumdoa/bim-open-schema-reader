@@ -41,7 +41,6 @@
     "cmdk": "^1.1.1",
     "esbuild": "^0.25.12",
     "hast-util-to-jsx-runtime": "^2.3.6",
-    "hyparquet": "^1.25.1",
     "lucide-react": "^0.541.0",
     "nanoid": "^5.1.7",
     "next": "16.2.1",

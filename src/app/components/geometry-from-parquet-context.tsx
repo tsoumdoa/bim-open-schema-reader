@@ -1,7 +1,6 @@
 import { ParquetBlob, GeometryContextValue } from "@/app/utils/types";
 import {
 	FilteredGeometryResult,
-	GeometryInstance,
 	InstanceData,
 	VertexData,
 	IndexData,
@@ -13,7 +12,6 @@ import {
 import { buildFilteredScene } from "@/lib/geometry-utils";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { createContext, useContext, useState, useEffect } from "react";
-import * as THREE from "three";
 
 const VERTEX_MULTIPLIER = 10000.0;
 const MATERIAL_DIVISOR = 255.0;
