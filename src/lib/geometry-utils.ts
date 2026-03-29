@@ -11,6 +11,66 @@ import {
 } from "@/app/utils/types";
 import * as THREE from "three";
 
+export class GeometryObjectCache {
+	private geometryCache = new Map<number, THREE.BufferGeometry>();
+	private materialCache = new Map<number, THREE.MeshStandardMaterial>();
+	private transformCache = new Map<number, THREE.Matrix4>();
+
+	clear(): void {
+		this.geometryCache.clear();
+		this.materialCache.clear();
+		this.transformCache.clear();
+	}
+
+	getGeometry(
+		meshIndex: number,
+		meshData: MeshData,
+		vertices: VertexData[],
+		indices: IndexData[],
+		nextMeshData: MeshData | null
+	): THREE.BufferGeometry {
+		const cached = this.geometryCache.get(meshIndex);
+		if (cached) return cached;
+
+		const geometry = createBufferGeometryFromMesh(
+			vertices,
+			indices,
+			meshData,
+			nextMeshData
+		);
+		this.geometryCache.set(meshIndex, geometry);
+		return geometry;
+	}
+
+	getMaterial(
+		materialIndex: number,
+		mat: MaterialData
+	): THREE.MeshStandardMaterial {
+		const cached = this.materialCache.get(materialIndex);
+		if (cached) return cached;
+
+		const material = createThreeMaterial(mat);
+		this.materialCache.set(materialIndex, material);
+		return material;
+	}
+
+	getTransform(transformIndex: number, t: TransformData): THREE.Matrix4 {
+		const cached = this.transformCache.get(transformIndex);
+		if (cached) return cached;
+
+		const matrix = createTransformMatrix(t);
+		this.transformCache.set(transformIndex, matrix);
+		return matrix;
+	}
+}
+
+const geometryObjectCache = new GeometryObjectCache();
+
+export function clearGeometryObjectCache(): void {
+	geometryObjectCache.clear();
+	batchCache.clear();
+}
+
 export function createThreeMaterial(
 	mat: MaterialData
 ): THREE.MeshStandardMaterial {
@@ -147,34 +207,47 @@ export function batchInstancesByMaterialAndGeometry(
 	return Array.from(batchMap.values());
 }
 
-export function convertZUpToYUp(group: THREE.Group): void {
-	group.rotation.x = -Math.PI / 2;
+function computeInstanceSetKey(instanceIndices: number[]): string {
+	return instanceIndices
+		.slice()
+		.sort((a, b) => a - b)
+		.join(",");
 }
 
-export function buildSceneFromInstances(
+const batchCache = new Map<string, BatchedGeometry[]>();
+const MAX_BATCH_CACHE_SIZE = 20;
+
+function getCachedBatches(
 	instanceData: InstanceData[],
 	vertices: VertexData[],
 	indices: IndexData[],
 	meshes: MeshData[],
 	materials: MaterialData[]
-): { scene: THREE.Group | null; instanceCount: number } {
+): BatchedGeometry[] {
+	const key = computeInstanceSetKey(instanceData.map((i) => i.instance_index));
+	const cached = batchCache.get(key);
+	if (cached) return cached;
+
 	const geometryMap = new Map<number, THREE.BufferGeometry>();
 	const materialMap = new Map<number, THREE.MeshStandardMaterial>();
 
 	for (const mat of materials) {
-		materialMap.set(mat.index, createThreeMaterial(mat));
+		materialMap.set(mat.index, geometryObjectCache.getMaterial(mat.index, mat));
 	}
 
 	for (let i = 0; i < meshes.length; i++) {
 		const mesh = meshes[i];
 		const nextMesh = meshes[i + 1] || null;
-		const geometry = createBufferGeometryFromMesh(
-			vertices,
-			indices,
-			mesh,
-			nextMesh
+		geometryMap.set(
+			mesh.index,
+			geometryObjectCache.getGeometry(
+				mesh.index,
+				mesh,
+				vertices,
+				indices,
+				nextMesh
+			)
 		);
-		geometryMap.set(mesh.index, geometry);
 	}
 
 	const geometryInstances: GeometryInstance[] = [];
@@ -217,8 +290,11 @@ export function buildSceneFromInstances(
 			category: "",
 			vertexOffset: inst.vertex_offset,
 			indexOffset: inst.index_offset,
-			transform: createTransformMatrix(transform),
-			material: createThreeMaterial(material),
+			transform: geometryObjectCache.getTransform(
+				inst.transform_index,
+				transform
+			),
+			material: geometryObjectCache.getMaterial(inst.material_index, material),
 		});
 	}
 
@@ -226,6 +302,34 @@ export function buildSceneFromInstances(
 		geometryInstances,
 		geometryMap,
 		materialMap
+	);
+
+	if (batchCache.size >= MAX_BATCH_CACHE_SIZE) {
+		const firstKey = batchCache.keys().next().value;
+		if (firstKey) batchCache.delete(firstKey);
+	}
+	batchCache.set(key, batches);
+
+	return batches;
+}
+
+export function convertZUpToYUp(group: THREE.Group): void {
+	group.rotation.x = -Math.PI / 2;
+}
+
+export function buildSceneFromInstances(
+	instanceData: InstanceData[],
+	vertices: VertexData[],
+	indices: IndexData[],
+	meshes: MeshData[],
+	materials: MaterialData[]
+): { scene: THREE.Group | null; instanceCount: number } {
+	const batches = getCachedBatches(
+		instanceData,
+		vertices,
+		indices,
+		meshes,
+		materials
 	);
 
 	const group = new THREE.Group();

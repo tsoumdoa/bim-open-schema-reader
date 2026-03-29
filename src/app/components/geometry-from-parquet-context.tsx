@@ -9,7 +9,10 @@ import {
 	TransformData,
 	GeometricalDataCache,
 } from "@/app/utils/types";
-import { buildFilteredScene } from "@/lib/geometry-utils";
+import {
+	buildFilteredScene,
+	clearGeometryObjectCache,
+} from "@/lib/geometry-utils";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import { createContext, useContext, useState, useEffect } from "react";
 
@@ -188,6 +191,7 @@ export function GeometryProviderFromParquet(props: {
 		const load = async () => {
 			try {
 				setLoading(true);
+				clearGeometryObjectCache();
 
 				const data = await loadGeometryDataFromDuckDB(
 					props.conn,
