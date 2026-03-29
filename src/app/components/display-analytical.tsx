@@ -3,6 +3,7 @@ import { useImportParquet } from "../hooks/use-import-parquet";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import { BosFileType, ParquetBlob } from "../utils/types";
 import DashboardContainer from "./dashboard-container";
+import { ExpandDisplayProvider } from "./expand-display-context";
 import { GeometryProviderFromParquet } from "./geometry-from-parquet-context";
 import QueryObjProvider from "./query-obj-provider";
 import { SimpleErrMessage } from "./simple-err-message";
@@ -62,10 +63,12 @@ export default function AnalyticalDisplay(props: {
 			>
 				<QueryObjProvider useQueryObjects={useQueryObj}>
 					<DbProvider parquetFileEntries={props.parquetFileEntries}>
-						<DashboardContainer
-							fileName={props.fileName}
-							bosFileType={props.bosFileType}
-						/>
+						<ExpandDisplayProvider>
+							<DashboardContainer
+								fileName={props.fileName}
+								bosFileType={props.bosFileType}
+							/>
+						</ExpandDisplayProvider>
 					</DbProvider>
 				</QueryObjProvider>
 			</DuckDbProvider>
