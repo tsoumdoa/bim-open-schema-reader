@@ -183,22 +183,35 @@ export function GeometryProviderFromParquet(props: {
 	const [cache, setCache] = useState<GeometricalDataCache | null>(null);
 
 	useEffect(() => {
+		let cancelled = false;
+
 		const load = async () => {
 			try {
 				setLoading(true);
+
 				const data = await loadGeometryDataFromDuckDB(
 					props.conn,
 					props.parquetFileEntries
 				);
+
+				if (cancelled) return;
+
 				setCache(data);
 				setError(null);
 			} catch (err) {
+				if (cancelled) return;
 				setError(err as Error);
 			} finally {
+				if (cancelled) return;
 				setLoading(false);
 			}
 		};
+
 		load();
+
+		return () => {
+			cancelled = true;
+		};
 	}, [props.conn, props.parquetFileEntries]);
 
 	const getFilteredScene = (entityIndices: number[]): FilteredGeometryResult =>
