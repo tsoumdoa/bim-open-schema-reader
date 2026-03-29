@@ -87,6 +87,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 				)}
 			</div>
 			<Canvas
+				frameloop="demand"
 				shadows
 				gl={{
 					antialias: true,

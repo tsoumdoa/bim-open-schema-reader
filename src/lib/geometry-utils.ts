@@ -174,24 +174,13 @@ export function batchInstancesByMaterialAndGeometry(
 	materials: Map<number, THREE.MeshStandardMaterial>
 ): BatchedGeometry[] {
 	const batchMap = new Map<string, BatchedGeometry>();
-	const materialUuidMap = new Map<number, string>();
-	const geometryUuidMap = new Map<number, string>();
 
 	for (const inst of instances) {
 		const geom = geometries.get(inst.meshIndex);
 		const mat = materials.get(inst.materialIndex);
 		if (!geom || !mat) continue;
 
-		if (!geometryUuidMap.has(inst.meshIndex)) {
-			geometryUuidMap.set(inst.meshIndex, geom.uuid);
-		}
-		if (!materialUuidMap.has(inst.materialIndex)) {
-			materialUuidMap.set(inst.materialIndex, mat.uuid);
-		}
-
-		const geomUuid = geometryUuidMap.get(inst.meshIndex)!;
-		const matUuid = materialUuidMap.get(inst.materialIndex)!;
-		const key = `${geomUuid}-${matUuid}`;
+		const key = `${inst.meshIndex}-${inst.materialIndex}`;
 		let batch = batchMap.get(key);
 		if (!batch) {
 			batch = {
@@ -215,7 +204,7 @@ function computeInstanceSetKey(instanceIndices: number[]): string {
 }
 
 const batchCache = new Map<string, BatchedGeometry[]>();
-const MAX_BATCH_CACHE_SIZE = 20;
+const MAX_BATCH_CACHE_SIZE = 100;
 
 function getCachedBatches(
 	instanceData: InstanceData[],
@@ -353,6 +342,7 @@ export function buildSceneFromInstances(
 			}
 
 			instancedMesh.matrixAutoUpdate = false;
+			instancedMesh.frustumCulled = true;
 			group.add(instancedMesh);
 		}
 	}
