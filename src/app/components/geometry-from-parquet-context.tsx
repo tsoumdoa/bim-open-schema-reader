@@ -41,36 +41,10 @@ async function loadGeometryDataFromDuckDB(
 			conn.query(instanceQuery),
 		]);
 
-	console.log(
-		"[Geometry] vertexRes schema:",
-		vertexRes.schema.fields.map((f) => f.name)
-	);
-	console.log(
-		"[Geometry] indexRes schema:",
-		indexRes.schema.fields.map((f) => f.name)
-	);
-	console.log(
-		"[Geometry] meshRes schema:",
-		meshRes.schema.fields.map((f) => f.name)
-	);
-	console.log(
-		"[Geometry] materialRes schema:",
-		materialRes.schema.fields.map((f) => f.name)
-	);
-	console.log(
-		"[Geometry] transformRes schema:",
-		transformRes.schema.fields.map((f) => f.name)
-	);
-	console.log(
-		"[Geometry] instanceRes schema:",
-		instanceRes.schema.fields.map((f) => f.name)
-	);
-
 	const xArray = vertexRes.getChild("x")!.toArray() as Float64Array;
 	const yArray = vertexRes.getChild("y")!.toArray() as Float64Array;
 	const zArray = vertexRes.getChild("z")!.toArray() as Float64Array;
 	const vertexCount = xArray.length;
-	console.log("[Geometry] vertexCount:", vertexCount);
 
 	const vertices: VertexData[] = new Array(vertexCount);
 	for (let i = 0; i < vertexCount; i++) {
@@ -194,15 +168,6 @@ async function loadGeometryDataFromDuckDB(
 			metallic: materials[mai]?.metallic ?? 0,
 		};
 	}
-
-	console.log("[Geometry] Data counts:", {
-		vertices: vertices.length,
-		indices: indices.length,
-		meshes: meshes.length,
-		materials: materials.length,
-		transforms: transforms.length,
-		instances: instances.length,
-	});
 
 	return { vertices, indices, meshes, materials, transforms, instances };
 }
