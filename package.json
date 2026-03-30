@@ -48,7 +48,7 @@
     "react-dom": "19.1.0",
     "react-dropzone": "^14.4.1",
     "shiki": "^3.23.0",
-    "sql-formatter": "^15.7.2",
+    "sql-formatter": "^15.7.3",
     "tailwind-merge": "^3.5.0",
     "three": "^0.182.0"
   },
@@ -60,7 +60,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.182.0",
-    "baseline-browser-mapping": "^2.10.10",
+    "baseline-browser-mapping": "^2.10.12",
     "eslint": "^9.39.4",
     "eslint-config-next": "15.5.0",
     "prettier": "^3.8.1",
