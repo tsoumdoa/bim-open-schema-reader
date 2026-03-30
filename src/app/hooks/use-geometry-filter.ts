@@ -31,12 +31,14 @@ export function useGeometryFilter(
 			};
 		}
 
-		const indicesToShow = showAll ? entityIndices : entityIndices.slice(0, 100);
+		const indicesToShow = showAll
+			? entityIndices
+			: entityIndices.slice(0, 30000);
 		const { scene, instanceCount } = getFilteredScene(indicesToShow);
 
 		const totalEntityCount = new Set(entityIndices).size;
 		const visibleEntityCount = new Set(indicesToShow).size;
-		const isTruncated = totalEntityCount > 100 && !showAll;
+		const isTruncated = totalEntityCount > 30000 && !showAll;
 
 		return {
 			scene,

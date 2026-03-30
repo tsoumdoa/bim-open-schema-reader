@@ -217,32 +217,6 @@ export type AnalyticsReadinessTitle = (typeof analyticReadinessTitles)[number];
 
 // for geometrical data processing
 
-export type InstanceData = {
-	instance_index: number;
-	entity_index: number;
-	material_index: number;
-	mesh_index: number;
-	transform_index: number;
-	vertex_offset: number;
-	index_offset: number;
-	tx: number;
-	ty: number;
-	tz: number;
-	qx: number;
-	qy: number;
-	qz: number;
-	qw: number;
-	sx: number;
-	sy: number;
-	sz: number;
-	red: number;
-	green: number;
-	blue: number;
-	alpha: number;
-	roughness: number;
-	metallic: number;
-};
-
 export type FilteredGeometryResult = {
 	scene: THREE.Group | null;
 	instanceCount: number;
@@ -253,48 +227,6 @@ export type GeometryContextValue = {
 	loading: boolean;
 	error: Error | null;
 	getFilteredScene: (entityIndices: number[]) => FilteredGeometryResult;
-};
-
-export type VertexData = {
-	index: number;
-	x: number;
-	y: number;
-	z: number;
-};
-
-export type IndexData = {
-	index: number;
-	index_value: number;
-};
-
-export type MeshData = {
-	index: number;
-	vertex_offset: number;
-	index_offset: number;
-};
-
-export type MaterialData = {
-	index: number;
-	red: number;
-	green: number;
-	blue: number;
-	alpha: number;
-	roughness: number;
-	metallic: number;
-};
-
-export type TransformData = {
-	index: number;
-	tx: number;
-	ty: number;
-	tz: number;
-	qx: number;
-	qy: number;
-	qz: number;
-	qw: number;
-	sx: number;
-	sy: number;
-	sz: number;
 };
 
 export type GeometryInstance = {
@@ -313,11 +245,27 @@ export type GeometryInstance = {
 	material: THREE.MeshStandardMaterial;
 };
 
-export type GeometricalDataCache = {
-	vertices: VertexData[];
-	indices: IndexData[];
-	meshes: MeshData[];
-	materials: MaterialData[];
-	transforms: TransformData[];
-	instances: InstanceData[];
-};
+export interface GeometricalDataCache {
+	positions: Float32Array;
+	normals: Float32Array;
+	uvs: Float32Array;
+	indices: Uint32Array;
+	meshVertexOffset: Uint32Array;
+	meshVertexCount: Uint32Array;
+	meshIndexOffset: Uint32Array;
+	meshIndexCount: Uint32Array;
+	materialBaseColor: Float32Array;
+	materialRoughness: Float32Array;
+	materialMetallic: Float32Array;
+	transforms: Float32Array;
+	instanceMeshIndex: Uint32Array;
+	instanceMaterialIndex: Uint32Array;
+	instanceTransformIndex: Uint32Array;
+	instanceEntityIndex: Uint32Array;
+	vertexCount: number;
+	indexCount: number;
+	meshCount: number;
+	materialCount: number;
+	transformCount: number;
+	instanceCount: number;
+}

@@ -74,7 +74,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 						Show All ({totalEntityCount})
 					</Button>
 				)}
-				{!isTruncated && totalEntityCount > 100 && (
+				{!isTruncated && totalEntityCount > 30000 && (
 					<Button
 						variant="secondary"
 						size="sm"
