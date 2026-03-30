@@ -68,7 +68,6 @@ const geometryObjectCache = new GeometryObjectCache();
 
 export function clearGeometryObjectCache(): void {
 	geometryObjectCache.clear();
-	batchCache.clear();
 }
 
 export function createThreeMaterial(
@@ -132,36 +131,6 @@ export function createBufferGeometryFromMesh(
 	return geometry;
 }
 
-export function buildInstancedMesh(
-	geometry: THREE.BufferGeometry,
-	material: THREE.MeshStandardMaterial,
-	instances: GeometryInstance[]
-): THREE.InstancedMesh {
-	const instancedMesh = new THREE.InstancedMesh(
-		geometry,
-		material,
-		instances.length
-	);
-	instancedMesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
-
-	for (let i = 0; i < instances.length; i++) {
-		instancedMesh.setMatrixAt(i, instances[i].transform);
-	}
-
-	instancedMesh.matrixAutoUpdate = false;
-	return instancedMesh;
-}
-
-export function createSingleMesh(
-	geometry: THREE.BufferGeometry,
-	transform: THREE.Matrix4
-): THREE.Mesh {
-	const mesh = new THREE.Mesh(geometry);
-	mesh.matrixAutoUpdate = false;
-	mesh.matrix.copy(transform);
-	return mesh;
-}
-
 export interface BatchedGeometry {
 	geometry: THREE.BufferGeometry;
 	material: THREE.MeshStandardMaterial;
@@ -180,7 +149,7 @@ export function batchInstancesByMaterialAndGeometry(
 		const mat = materials.get(inst.materialIndex);
 		if (!geom || !mat) continue;
 
-		const key = `${inst.meshIndex}-${inst.materialIndex}`;
+		const key = `${inst.materialIndex}`;
 		let batch = batchMap.get(key);
 		if (!batch) {
 			batch = {
@@ -196,27 +165,83 @@ export function batchInstancesByMaterialAndGeometry(
 	return Array.from(batchMap.values());
 }
 
-function computeInstanceSetKey(instanceIndices: number[]): string {
-	return instanceIndices
-		.slice()
-		.sort((a, b) => a - b)
-		.join(",");
+function mergeGeometriesForBatch(
+	instances: GeometryInstance[],
+	geometries: Map<number, THREE.BufferGeometry>
+): THREE.BufferGeometry {
+	let totalVertexCount = 0;
+	let totalIndexCount = 0;
+
+	for (const inst of instances) {
+		const geom = geometries.get(inst.meshIndex);
+		if (!geom) continue;
+		totalVertexCount += geom.attributes.position.count;
+		totalIndexCount += geom.index ? geom.index.count : 0;
+	}
+
+	const mergedPositions = new Float32Array(totalVertexCount * 3);
+	const mergedIndices = new Uint32Array(totalIndexCount);
+	let vertexOffset = 0;
+	let indexOffset = 0;
+	let indexVertexOffset = 0;
+
+	const positionAttr = new THREE.BufferAttribute(mergedPositions, 3);
+	const indexAttr = new THREE.BufferAttribute(mergedIndices, 1);
+
+	for (const inst of instances) {
+		const geom = geometries.get(inst.meshIndex);
+		if (!geom) continue;
+
+		const positions = geom.attributes.position.array as Float32Array;
+		const vertexCount = geom.attributes.position.count;
+
+		const transformedPositions = new Float32Array(vertexCount * 3);
+		for (let i = 0; i < vertexCount; i++) {
+			const v = new THREE.Vector3(
+				positions[i * 3],
+				positions[i * 3 + 1],
+				positions[i * 3 + 2]
+			);
+			v.applyMatrix4(inst.transform);
+			transformedPositions[i * 3] = v.x;
+			transformedPositions[i * 3 + 1] = v.y;
+			transformedPositions[i * 3 + 2] = v.z;
+		}
+
+		mergedPositions.set(transformedPositions, vertexOffset * 3);
+		vertexOffset += vertexCount;
+
+		if (geom.index) {
+			const indices = geom.index.array as Uint32Array;
+			const indexCount = geom.index.count;
+			for (let i = 0; i < indexCount; i++) {
+				mergedIndices[indexOffset + i] = indices[i] + indexVertexOffset;
+			}
+			indexOffset += indexCount;
+		}
+
+		indexVertexOffset += vertexCount;
+	}
+
+	const mergedGeometry = new THREE.BufferGeometry();
+	mergedGeometry.setAttribute("position", positionAttr);
+	mergedGeometry.setIndex(indexAttr);
+	mergedGeometry.computeVertexNormals();
+
+	return mergedGeometry;
 }
 
-const batchCache = new Map<string, BatchedGeometry[]>();
-const MAX_BATCH_CACHE_SIZE = 100;
+export function convertZUpToYUp(group: THREE.Group): void {
+	group.rotation.x = -Math.PI / 2;
+}
 
-function getCachedBatches(
+export function buildSceneFromInstances(
 	instanceData: InstanceData[],
 	vertices: VertexData[],
 	indices: IndexData[],
 	meshes: MeshData[],
 	materials: MaterialData[]
-): BatchedGeometry[] {
-	const key = computeInstanceSetKey(instanceData.map((i) => i.instance_index));
-	const cached = batchCache.get(key);
-	if (cached) return cached;
-
+): { scene: THREE.Group | null; instanceCount: number } {
 	const geometryMap = new Map<number, THREE.BufferGeometry>();
 	const materialMap = new Map<number, THREE.MeshStandardMaterial>();
 
@@ -293,58 +318,15 @@ function getCachedBatches(
 		materialMap
 	);
 
-	if (batchCache.size >= MAX_BATCH_CACHE_SIZE) {
-		const firstKey = batchCache.keys().next().value;
-		if (firstKey) batchCache.delete(firstKey);
-	}
-	batchCache.set(key, batches);
-
-	return batches;
-}
-
-export function convertZUpToYUp(group: THREE.Group): void {
-	group.rotation.x = -Math.PI / 2;
-}
-
-export function buildSceneFromInstances(
-	instanceData: InstanceData[],
-	vertices: VertexData[],
-	indices: IndexData[],
-	meshes: MeshData[],
-	materials: MaterialData[]
-): { scene: THREE.Group | null; instanceCount: number } {
-	const batches = getCachedBatches(
-		instanceData,
-		vertices,
-		indices,
-		meshes,
-		materials
-	);
-
 	const group = new THREE.Group();
 
 	for (const batch of batches) {
-		if (batch.instances.length === 1) {
-			const mesh = new THREE.Mesh(batch.geometry, batch.instances[0].material);
-			mesh.matrixAutoUpdate = false;
-			mesh.matrix.copy(batch.instances[0].transform);
-			group.add(mesh);
-		} else {
-			const instancedMesh = new THREE.InstancedMesh(
-				batch.geometry,
-				batch.material,
-				batch.instances.length
-			);
-			instancedMesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
-
-			for (let i = 0; i < batch.instances.length; i++) {
-				instancedMesh.setMatrixAt(i, batch.instances[i].transform);
-			}
-
-			instancedMesh.matrixAutoUpdate = false;
-			instancedMesh.frustumCulled = true;
-			group.add(instancedMesh);
-		}
+		const mergedGeometry = mergeGeometriesForBatch(
+			batch.instances,
+			geometryMap
+		);
+		const mesh = new THREE.Mesh(mergedGeometry, batch.material);
+		group.add(mesh);
 	}
 
 	convertZUpToYUp(group);
