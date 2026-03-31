@@ -35,6 +35,8 @@ export const denormSingleParamsPivot = (categoryName: string) => sql`
 			first (d_units) AS param_units
 			GROUP BY
 				LocalId,
+				index,
+				instance_entity_index,
 				name
 		)
 	SELECT
@@ -127,6 +129,8 @@ export const denormEntityParamsPivot = (categoryName: string) => sql`
 			first (Category) AS param_category
 			GROUP BY
 				LocalId,
+				index,
+				instance_entity_index,
 				name
 		)
 	SELECT
@@ -216,6 +220,8 @@ export const denormIntegerParamsPivot = (categoryName: string) => sql`
 			PIVOT int_data ON d_name USING first (p_Value)
 			GROUP BY
 				LocalId,
+				index,
+				instance_entity_index,
 				name
 		)
 	SELECT
@@ -309,6 +315,8 @@ export const denormPointsParamsPivot = (categoryName: string) => sql`
 			first (v_z) AS z,
 			GROUP BY
 				LocalId,
+				index,
+				instance_entity_index,
 				name
 		)
 	SELECT
@@ -414,6 +422,8 @@ export const denormStringParamsPivot = (categoryName: string) => sql`
 			PIVOT str_data ON d_name USING first (v_Strings)
 			GROUP BY
 				LocalId,
+				index,
+				instance_entity_index,
 				name
 		)
 	SELECT
