@@ -40,7 +40,7 @@ function TableSummary(props: { name: string }) {
 	);
 }
 
-function mergeNameAndType(names: string | number, types: string | number) {
+function mergeNameAndType(names: unknown, types: unknown) {
 	//bad bad bad but i know what i'm doing
 	//@ts-ignore
 	const nameArray = names.toArray() as string[];
@@ -86,7 +86,7 @@ function AccordionDisplay(props: {
 	);
 }
 
-function RowDisplay(props: { rows: (string | number)[][] }) {
+function RowDisplay(props: { rows: unknown[][] }) {
 	return props.rows.map((row, i) => (
 		<React.Fragment key={`table-row-${i} `}>
 			<TableSummary name={row[0] as string} />

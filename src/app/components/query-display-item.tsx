@@ -176,10 +176,7 @@ export default function QueryDisplayItem(props: {
 		}
 	}, [displayExpanded, entityIndices]);
 
-	const handleQueryResults = (
-		headers: string[],
-		rows: (string | number)[][]
-	) => {
+	const handleQueryResults = (headers: string[], rows: unknown[][]) => {
 		const entityIndexColIndex = headers.findIndex((h) => {
 			const name = h.toLowerCase();
 			return name === "entity_index" || name === "index";

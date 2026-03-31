@@ -1,7 +1,7 @@
 import { findCategoryGroup } from "./categorize-categories";
 import { GeneralCategoryObj } from "./types";
 
-export function cleanCategoryCount(rows: (string | number)[][]) {
+export function cleanCategoryCount(rows: unknown[][]) {
 	const categoryGroupMap = new Map<string, [GeneralCategoryObj, number][]>();
 	for (const row of rows) {
 		const categoryObj = findCategoryGroup(row[0] as string);

@@ -11,7 +11,7 @@ export default function QueryResultDisplayTable(props: {
 	lockScroll: boolean;
 	fileDownloadName: string;
 	useQueryViewerAndEditorHook: UseQueryViewerAndEditor;
-	onResultsAvailable?: (headers: string[], rows: (string | number)[][]) => void;
+	onResultsAvailable?: (headers: string[], rows: unknown[][]) => void;
 }) {
 	const {
 		handleCancelQueryRef,

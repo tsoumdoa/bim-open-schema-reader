@@ -132,7 +132,7 @@ export function DataTable<TData, TValue>(props: {
 
 	const columns = props.runDuckDbQuery.headers.map((header, i) => {
 		return {
-			accessorFn: (row: (string | number)[]) => row[i],
+			accessorFn: (row: unknown[]) => row[i],
 			header: header,
 			cell: (info: any) => {
 				return formatData(info.getValue());
