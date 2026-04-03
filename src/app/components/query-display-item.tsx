@@ -205,7 +205,6 @@ export default function QueryDisplayItem(props: {
 			className={`${!isFocused() ? "opacity-35" : ""} flex w-full flex-col gap-y-2`}
 			key={`${props.index}-${props.queryObject.id}`}
 		>
-			count: {entityIndices.length}
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
 				{showTitle ? (
 					<span>
