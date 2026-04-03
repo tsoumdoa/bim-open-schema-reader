@@ -24,7 +24,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Menu } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
 
 function AboutMenuItem(props: { queryObject: QueryObject }) {
 	return (
@@ -165,38 +165,47 @@ export default function QueryDisplayItem(props: {
 	const showTitle =
 		queryDisplayState === "viewer" || queryDisplayState === "hidden";
 
-	const [showViewer, setShowViewer] = useState(false);
 	const [entityIndices, setEntityIndices] = useState<number[]>([]);
 
-	useEffect(() => {
-		if (displayExpanded !== -1 || entityIndices.length === 0) {
-			setShowViewer(false);
-		} else {
-			setShowViewer(true);
-		}
-	}, [displayExpanded, entityIndices]);
+	const showViewer = displayExpanded === -1 && entityIndices.length > 0;
 
-	const handleQueryResults = (headers: string[], rows: unknown[][]) => {
-		const entityIndexColIndex = headers.findIndex((h) => {
-			const name = h.toLowerCase();
-			return name === "entity_index" || name === "index";
-		});
-		if (entityIndexColIndex === -1) {
-			setEntityIndices([]);
-			return;
-		}
-		const indices = rows
-			.map((row) => Number(row[entityIndexColIndex]))
-			.filter((idx) => !isNaN(idx));
-		const uniqueIndices = [...new Set(indices)];
-		setEntityIndices(uniqueIndices);
-	};
+	const handleQueryResults = useCallback(
+		(headers: string[], rows: unknown[][]) => {
+			const entityIndexColIndex = headers.findIndex((h) => {
+				const name = h.toLowerCase();
+				return name === "entity_index" || name === "index";
+			});
+
+			if (entityIndexColIndex === -1) {
+				setEntityIndices((prev) => (prev.length === 0 ? prev : []));
+				return;
+			}
+
+			const indices = rows
+				.map((row) => Number(row[entityIndexColIndex]))
+				.filter((idx) => !Number.isNaN(idx));
+
+			const uniqueIndices = [...new Set(indices)];
+
+			setEntityIndices((prev) => {
+				if (
+					prev.length === uniqueIndices.length &&
+					prev.every((value, i) => value === uniqueIndices[i])
+				) {
+					return prev;
+				}
+				return uniqueIndices;
+			});
+		},
+		[]
+	);
 
 	return (
 		<div
 			className={`${!isFocused() ? "opacity-35" : ""} flex w-full flex-col gap-y-2`}
 			key={`${props.index}-${props.queryObject.id}`}
 		>
+			count: {entityIndices.length}
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
 				{showTitle ? (
 					<span>
@@ -223,12 +232,11 @@ export default function QueryDisplayItem(props: {
 					removeObject={props.removeObject}
 				/>
 			</div>
-
-			{showViewer && entityIndices.length > 0 && (
+			<Activity mode={showViewer ? "visible" : "hidden"}>
 				<div className="h-100 w-full border-b border-gray-200">
 					<BimViewer entityIndices={entityIndices} />
 				</div>
-			)}
+			</Activity>
 			{queryDisplayState !== "hidden" && (
 				<SqlQueryCodeBlock
 					queryObject={props.queryObject}
@@ -237,7 +245,6 @@ export default function QueryDisplayItem(props: {
 					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
 				/>
 			)}
-
 			<div className="w-full min-w-0 overflow-auto">
 				<QueryResultDisplayTable
 					index={props.index}

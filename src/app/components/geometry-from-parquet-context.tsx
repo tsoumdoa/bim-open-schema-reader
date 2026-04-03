@@ -2,10 +2,8 @@ import {
 	ParquetBlob,
 	GeometryContextValue,
 	GeometricalDataCache,
-	FilteredGeometryResult,
 } from "@/app/utils/types";
 import {
-	buildFilteredScene,
 	clearGeometryObjectCache,
 	loadGeometryDataFromDuckDB,
 } from "@/lib/geometry-utils";
@@ -62,13 +60,8 @@ export function GeometryProviderFromParquet(props: {
 		};
 	}, [props.conn, props.parquetFileEntries]);
 
-	const getFilteredScene = (entityIndices: number[]): FilteredGeometryResult =>
-		buildFilteredScene(entityIndices, cache);
-
 	return (
-		<GeometryFromParquetContext.Provider
-			value={{ loading, error, getFilteredScene }}
-		>
+		<GeometryFromParquetContext.Provider value={{ loading, error, cache }}>
 			{props.children}
 		</GeometryFromParquetContext.Provider>
 	);

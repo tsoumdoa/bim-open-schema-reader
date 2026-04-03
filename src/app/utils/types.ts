@@ -226,7 +226,7 @@ export type FilteredGeometryResult = {
 export type GeometryContextValue = {
 	loading: boolean;
 	error: Error | null;
-	getFilteredScene: (entityIndices: number[]) => FilteredGeometryResult;
+	cache: GeometricalDataCache | null;
 };
 
 export type GeometryInstance = {

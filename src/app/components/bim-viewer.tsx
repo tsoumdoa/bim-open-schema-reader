@@ -10,6 +10,7 @@ import {
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Box, Layers } from "lucide-react";
+import { memo } from "react";
 import * as THREE from "three";
 
 function Scene({ scene }: { scene: THREE.Group | null }) {
