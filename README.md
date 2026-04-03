@@ -34,3 +34,8 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 
 - Open an issue to discuss ideas
 - Keep PRs focused and include a brief description and screenshots if UI-related
+
+## TODO before 3D viewr release
+
+- [ ] better viewer UI
+- [ ] expand 3d viewr

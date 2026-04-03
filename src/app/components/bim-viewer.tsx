@@ -9,8 +9,7 @@ import {
 	Environment,
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Box, Layers } from "lucide-react";
-import { memo } from "react";
+import { Box, Ghost } from "lucide-react";
 import * as THREE from "three";
 
 function Scene({ scene }: { scene: THREE.Group | null }) {
@@ -24,14 +23,14 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 	const {
 		scene,
 		totalEntityCount,
-		visibleEntityCount,
-		isTruncated,
-		toggleShowAll,
+		ghostCount,
+		ghostOthers,
+		toggleGhostOthers,
 	} = useGeometryFilter(entityIndices);
 
 	if (loading) {
 		return (
-			<div className="flex h-64 w-full items-center justify-center bg-gray-100">
+			<div className="flex h-16 w-full items-center justify-center bg-gray-100">
 				<div className="text-gray-500">Loading geometry...</div>
 			</div>
 		);
@@ -45,9 +44,9 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		);
 	}
 
-	if (!scene || visibleEntityCount === 0) {
+	if (!scene || totalEntityCount === 0) {
 		return (
-			<div className="flex h-16 w-full items-center justify-center border-b border-gray-200 bg-gray-50">
+			<div className="flex h-16 w-full items-center justify-center bg-gray-50">
 				<div className="text-sm text-gray-500">
 					No geometry found for these entities
 				</div>
@@ -56,37 +55,31 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 	}
 
 	return (
-		<div className="relative w-full h-full">
+		<div className="relative w-full h-100">
 			<div className="absolute top-2 left-2 z-10 flex gap-2">
 				<div className="bg-black/70 text-white px-3 py-1.5 rounded text-sm flex items-center gap-2">
 					<Box className="h-4 w-4" />
-					{isTruncated
-						? `Showing ${visibleEntityCount} of ${totalEntityCount} entities`
-						: `${totalEntityCount} entities`}
+					{ghostOthers ? (
+						<span>
+							{totalEntityCount.toLocaleString()} selected (
+							{ghostCount.toLocaleString()} ghosts)
+						</span>
+					) : (
+						`${totalEntityCount.toLocaleString()} entities`
+					)}
 				</div>
-				{isTruncated && (
-					<Button
-						variant="secondary"
-						size="sm"
-						onClick={toggleShowAll}
-						className="gap-1.5"
-					>
-						<Layers className="h-4 w-4" />
-						Show All ({totalEntityCount})
-					</Button>
-				)}
-				{!isTruncated && totalEntityCount > 30000 && (
-					<Button
-						variant="secondary"
-						size="sm"
-						onClick={toggleShowAll}
-						className="gap-1.5"
-					>
-						<Layers className="h-4 w-4" />
-						Show Top 100
-					</Button>
-				)}
 			</div>
+			{entityIndices.length > 0 && (
+				<Button
+					variant={ghostOthers ? "default" : "secondary"}
+					size="sm"
+					onClick={toggleGhostOthers}
+					className="absolute bottom-2 right-2 z-10 gap-1.5"
+				>
+					<Ghost className="h-4 w-4" />
+					{ghostOthers ? "Hide Ghosts" : "Ghost Others"}
+				</Button>
+			)}
 			<Canvas
 				frameloop="demand"
 				shadows

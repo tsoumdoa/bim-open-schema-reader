@@ -218,6 +218,89 @@ function mergeGeometriesForBatch(
 	return mergedGeometry;
 }
 
+function buildGhostGeometry(
+	ghostInstanceIndices: number[],
+	cache: GeometricalDataCache,
+	geometryMap: Map<number, THREE.BufferGeometry>
+): THREE.BufferGeometry {
+	let totalVertexCount = 0;
+	let totalIndexCount = 0;
+
+	for (const instIdx of ghostInstanceIndices) {
+		const meshIndex = cache.instanceMeshIndex[instIdx];
+		const geom = geometryMap.get(meshIndex);
+		if (!geom) continue;
+		totalVertexCount += geom.attributes.position.count;
+		totalIndexCount += geom.index ? geom.index.count : 0;
+	}
+
+	const mergedPositions = new Float32Array(totalVertexCount * 3);
+	const mergedIndices = new Uint32Array(totalIndexCount);
+	let vertexOffset = 0;
+	let indexOffset = 0;
+	let indexVertexOffset = 0;
+
+	for (const instIdx of ghostInstanceIndices) {
+		const meshIndex = cache.instanceMeshIndex[instIdx];
+		const geom = geometryMap.get(meshIndex);
+		if (!geom) continue;
+
+		const positions = geom.attributes.position.array as Float32Array;
+		const vertexCount = geom.attributes.position.count;
+
+		const transformIndex = cache.instanceTransformIndex[instIdx];
+		const transformMatrix = new THREE.Matrix4();
+		transformMatrix.fromArray(cache.transforms, transformIndex * 16);
+
+		const transformedPositions = new Float32Array(vertexCount * 3);
+		for (let i = 0; i < vertexCount; i++) {
+			const px = positions[i * 3];
+			const py = positions[i * 3 + 1];
+			const pz = positions[i * 3 + 2];
+
+			transformedPositions[i * 3] =
+				transformMatrix.elements[0] * px +
+				transformMatrix.elements[4] * py +
+				transformMatrix.elements[8] * pz +
+				transformMatrix.elements[12];
+			transformedPositions[i * 3 + 1] =
+				transformMatrix.elements[1] * px +
+				transformMatrix.elements[5] * py +
+				transformMatrix.elements[9] * pz +
+				transformMatrix.elements[13];
+			transformedPositions[i * 3 + 2] =
+				transformMatrix.elements[2] * px +
+				transformMatrix.elements[6] * py +
+				transformMatrix.elements[10] * pz +
+				transformMatrix.elements[14];
+		}
+
+		mergedPositions.set(transformedPositions, vertexOffset * 3);
+		vertexOffset += vertexCount;
+
+		if (geom.index) {
+			const indices = geom.index.array as Uint32Array;
+			const indexCount = geom.index.count;
+			for (let i = 0; i < indexCount; i++) {
+				mergedIndices[indexOffset + i] = indices[i] + indexVertexOffset;
+			}
+			indexOffset += indexCount;
+		}
+
+		indexVertexOffset += vertexCount;
+	}
+
+	const mergedGeometry = new THREE.BufferGeometry();
+	mergedGeometry.setAttribute(
+		"position",
+		new THREE.BufferAttribute(mergedPositions, 3)
+	);
+	mergedGeometry.setIndex(new THREE.BufferAttribute(mergedIndices, 1));
+	mergedGeometry.computeVertexNormals();
+
+	return mergedGeometry;
+}
+
 export function convertZUpToYUp(group: THREE.Group): void {
 	group.rotation.x = -Math.PI / 2;
 }
@@ -311,6 +394,94 @@ export const buildFilteredScene = (
 		scene,
 		instanceCount: filteredInstanceIndices.length,
 		totalCount: filteredEntities.size,
+	};
+};
+
+export interface GhostedSceneResult {
+	scene: THREE.Group | null;
+	selectedCount: number;
+	ghostCount: number;
+	totalCount: number;
+}
+
+const surfaceMaterial = new THREE.MeshPhysicalMaterial({
+	color: new THREE.Color(0.4, 0.4, 0.4),
+	transparent: true,
+	opacity: 0.6,
+	depthWrite: true,
+	transmission: 0.15,
+	roughness: 0.75,
+	metalness: 0,
+});
+
+const wireMaterial = new THREE.MeshBasicMaterial({
+	color: new THREE.Color(0.8, 0.8, 0.8),
+	wireframe: true,
+	transparent: true,
+	opacity: 0.95,
+	depthWrite: true,
+});
+
+export const buildGhostedScene = (
+	entityIndices: number[],
+	cache: GeometricalDataCache | null
+): GhostedSceneResult => {
+	if (!cache) {
+		return { scene: null, selectedCount: 0, ghostCount: 0, totalCount: 0 };
+	}
+
+	const entityIndexSet = new Set(entityIndices);
+	const selectedInstanceIndices: number[] = [];
+	const ghostInstanceIndices: number[] = [];
+	const selectedEntities = new Set<number>();
+
+	for (let i = 0; i < cache.instanceCount; i++) {
+		const entityIndex = cache.instanceEntityIndex[i];
+		if (entityIndexSet.has(entityIndex)) {
+			selectedInstanceIndices.push(i);
+			selectedEntities.add(entityIndex);
+		} else {
+			ghostInstanceIndices.push(i);
+		}
+	}
+
+	const { scene: selectedScene } = buildSceneFromInstances(
+		selectedInstanceIndices,
+		cache
+	);
+
+	if (!selectedScene) {
+		return {
+			scene: null,
+			selectedCount: 0,
+			ghostCount: ghostInstanceIndices.length,
+			totalCount: selectedEntities.size,
+		};
+	}
+
+	const geometryMap = new Map<number, THREE.BufferGeometry>();
+	for (let i = 0; i < cache.meshCount; i++) {
+		geometryMap.set(i, geometryObjectCache.getGeometry(i, cache));
+	}
+
+	const ghostGeometry = buildGhostGeometry(
+		ghostInstanceIndices,
+		cache,
+		geometryMap
+	);
+
+	const surfaceMesh = new THREE.Mesh(ghostGeometry, surfaceMaterial);
+	const wireMesh = new THREE.Mesh(ghostGeometry, wireMaterial);
+	selectedScene.add(surfaceMesh);
+	selectedScene.add(wireMesh);
+
+	convertZUpToYUp(selectedScene);
+
+	return {
+		scene: selectedScene,
+		selectedCount: selectedInstanceIndices.length,
+		ghostCount: ghostInstanceIndices.length,
+		totalCount: selectedEntities.size,
 	};
 };
 

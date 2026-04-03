@@ -1,5 +1,5 @@
 import { useGeometryFromParquetCtx } from "../components/geometry-from-parquet-context";
-import { buildFilteredScene } from "@/lib/geometry-utils";
+import { buildFilteredScene, buildGhostedScene } from "@/lib/geometry-utils";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 
@@ -7,39 +7,38 @@ interface UseGeometryFilterResult {
 	scene: THREE.Group | null;
 	instanceCount: number;
 	totalEntityCount: number;
-	visibleEntityCount: number;
-	isTruncated: boolean;
-	showAll: boolean;
-	toggleShowAll: () => void;
+	ghostCount: number;
+	ghostOthers: boolean;
+	toggleGhostOthers: () => void;
 }
 
 interface ComputedResult {
 	scene: THREE.Group | null;
 	instanceCount: number;
 	totalEntityCount: number;
-	visibleEntityCount: number;
-	isTruncated: boolean;
+	ghostCount: number;
 }
 
 export function useGeometryFilter(
 	entityIndices: number[]
 ): UseGeometryFilterResult {
 	const { cache, loading, error } = useGeometryFromParquetCtx();
-	const [showAll, setShowAll] = useState(false);
+	const [ghostOthers, setGhostOthers] = useState(false);
 
 	const lastResultRef = useRef<ComputedResult | null>(null);
 	const lastInputsRef = useRef<{
 		entityIndices: number[];
-		showAll: boolean;
+		ghostOthers: boolean;
 		cache: unknown;
 	} | null>(null);
 
-	const toggleShowAll = () => setShowAll((prev) => !prev);
+	const toggleGhostOthers = () => setGhostOthers((prev) => !prev);
 
 	const inputsMatch =
+		lastResultRef.current !== null &&
 		lastInputsRef.current !== null &&
 		lastInputsRef.current.entityIndices === entityIndices &&
-		lastInputsRef.current.showAll === showAll &&
+		lastInputsRef.current.ghostOthers === ghostOthers &&
 		lastInputsRef.current.cache === cache;
 
 	if (loading || error || entityIndices.length === 0) {
@@ -47,32 +46,40 @@ export function useGeometryFilter(
 			scene: null,
 			instanceCount: 0,
 			totalEntityCount: 0,
-			visibleEntityCount: 0,
-			isTruncated: false,
+			ghostCount: 0,
 		};
 	} else if (!inputsMatch) {
-		const indicesToShow = showAll
-			? entityIndices
-			: entityIndices.slice(0, 30000);
-		const { scene, instanceCount } = buildFilteredScene(indicesToShow, cache);
-
 		const totalEntityCount = new Set(entityIndices).size;
-		const visibleEntityCount = new Set(indicesToShow).size;
-		const isTruncated = totalEntityCount > 30000 && !showAll;
 
-		lastResultRef.current = {
-			scene,
-			instanceCount,
-			totalEntityCount,
-			visibleEntityCount,
-			isTruncated,
-		};
-		lastInputsRef.current = { entityIndices, showAll, cache };
+		if (ghostOthers) {
+			const { scene, selectedCount, ghostCount } = buildGhostedScene(
+				entityIndices,
+				cache
+			);
+
+			lastResultRef.current = {
+				scene,
+				instanceCount: selectedCount,
+				totalEntityCount,
+				ghostCount,
+			};
+			lastInputsRef.current = { entityIndices, ghostOthers, cache };
+		} else {
+			const { scene, instanceCount } = buildFilteredScene(entityIndices, cache);
+
+			lastResultRef.current = {
+				scene,
+				instanceCount,
+				totalEntityCount,
+				ghostCount: 0,
+			};
+			lastInputsRef.current = { entityIndices, ghostOthers, cache };
+		}
 	}
 
 	return {
 		...lastResultRef.current!,
-		showAll,
-		toggleShowAll,
+		ghostOthers,
+		toggleGhostOthers,
 	};
 }

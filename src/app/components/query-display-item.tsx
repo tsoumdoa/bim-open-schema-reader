@@ -167,8 +167,6 @@ export default function QueryDisplayItem(props: {
 
 	const [entityIndices, setEntityIndices] = useState<number[]>([]);
 
-	const showViewer = displayExpanded === -1 && entityIndices.length > 0;
-
 	const handleQueryResults = useCallback(
 		(headers: string[], rows: unknown[][]) => {
 			const entityIndexColIndex = headers.findIndex((h) => {
@@ -231,11 +229,7 @@ export default function QueryDisplayItem(props: {
 					removeObject={props.removeObject}
 				/>
 			</div>
-			<Activity mode={showViewer ? "visible" : "hidden"}>
-				<div className="h-100 w-full border-b border-gray-200">
-					<BimViewer entityIndices={entityIndices} />
-				</div>
-			</Activity>
+			<BimViewer entityIndices={entityIndices} />
 			{queryDisplayState !== "hidden" && (
 				<SqlQueryCodeBlock
 					queryObject={props.queryObject}
