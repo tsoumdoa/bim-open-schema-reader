@@ -1,25 +1,21 @@
-import { QueryObjectCtx, UseQueryObjects } from "../utils/types";
+import { useQueryObjects } from "../hooks/use-query-objects";
+import { UseQueryObjects } from "../utils/types";
 import { createContext, useContext } from "react";
 
-const DbContext = createContext<QueryObjectCtx | null>(null);
+const QueryObjCtx = createContext<UseQueryObjects | null>(null);
 
-export default function QueryObjProvider(props: {
-	useQueryObjects: UseQueryObjects;
-	children: React.ReactNode;
-}) {
+export default function QueryObjProvider(props: { children: React.ReactNode }) {
+	const queryObjInstance = useQueryObjects();
+
 	return (
-		<DbContext.Provider
-			value={{
-				useQueryObjects: props.useQueryObjects,
-			}}
-		>
+		<QueryObjCtx.Provider value={queryObjInstance}>
 			{props.children}
-		</DbContext.Provider>
+		</QueryObjCtx.Provider>
 	);
 }
 
 export function useQueryObjCtx() {
-	const ctx = useContext(DbContext);
+	const ctx = useContext(QueryObjCtx);
 	if (!ctx) {
 		throw new Error("useQueryObjCtx must be used within a QueryObjProvider");
 	}

@@ -2,7 +2,7 @@ import { useQuickExplorer } from "../hooks/use-quick-explorer";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { cleanCategoryCount } from "../utils/clean-category-count";
 import { listCountByCategory } from "../utils/init-queries";
-import { BosFileType } from "../utils/types";
+import { BosFileType, QueryObject } from "../utils/types";
 import { AddQuery } from "./add-query-button";
 import ButtonWithConfirmation from "./button-with-confirmation";
 import QueryDisplayItem from "./query-display-item";
@@ -13,7 +13,7 @@ import { DataReadinessFilterProvider } from "./use-data-readiness-filter";
 import { useDuckDb } from "./use-db";
 import { Badge } from "@/components/ui/badge";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { createPortal } from "react-dom";
 
 function DashboardHeader(props: {
@@ -37,41 +37,39 @@ function DashboardHeader(props: {
 }
 
 function DashboardMain() {
-	const { useQueryObjects } = useQueryObjCtx();
-	const { queryObjects, removeQuery, updateQueryTitle, updateQuery } =
-		useQueryObjects;
-	const prevLenRef = useRef<number>(queryObjects.length);
+	const {
+		queryObjects,
+		selectedQueryId,
+		removeQuery,
+		updateQueryTitle,
+		updateQuery,
+	} = useQueryObjCtx();
 
-	useEffect(() => {
-		const prevLen = prevLenRef.current;
-		const currLen = queryObjects.length;
-		if (currLen > prevLen) {
-			requestAnimationFrame(() => {
-				window.scrollTo({
-					top: document.documentElement.scrollHeight,
-					behavior: "smooth",
-				});
-			});
-		}
-		prevLenRef.current = currLen;
-	}, [queryObjects.length]);
+	const selectedQuery = queryObjects.find(
+		(q: QueryObject) => q.id === selectedQueryId
+	);
+	const selectedIndex = queryObjects.findIndex(
+		(q: QueryObject) => q.id === selectedQueryId
+	);
 
 	return (
 		<div className="flex h-full min-h-0 max-w-full flex-1 flex-col gap-y-2 pr-2 pl-6">
-			{queryObjects.length > 0 &&
-				queryObjects.map((q, i) => {
-					return (
-						<div key={q.id}>
-							<QueryDisplayItem
-								queryObject={q}
-								removeObject={removeQuery}
-								index={i}
-								updateQueryTitle={updateQueryTitle}
-								updateQuery={updateQuery}
-							/>
-						</div>
-					);
-				})}
+			{selectedQuery ? (
+				<QueryDisplayItem
+					key={selectedQuery.id}
+					queryObject={selectedQuery}
+					removeObject={removeQuery}
+					index={selectedIndex}
+					updateQueryTitle={updateQueryTitle}
+					updateQuery={updateQuery}
+				/>
+			) : (
+				queryObjects.length === 0 && (
+					<div className="flex h-full items-center justify-center text-sm text-gray-500">
+						No query selected. Click a query in the sidebar to view it.
+					</div>
+				)
+			)}
 		</div>
 	);
 }
@@ -82,8 +80,7 @@ export default function DashboardContainer(props: {
 }) {
 	const disableShortcutRef = useRef<boolean>(true); // NOTE: shortcut need to be disabled cuz the quick explorer view is open at start
 	const { isActive, setIsActive } = useQuickExplorer(disableShortcutRef);
-	const { useQueryObjects } = useQueryObjCtx();
-	const { addQuery, deleteAll, queryObjects } = useQueryObjects;
+	const { addQuery, deleteAll, queryObjects } = useQueryObjCtx();
 	const objLength = queryObjects.length;
 
 	const { conn } = useDuckDb();

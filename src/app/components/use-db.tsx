@@ -8,7 +8,7 @@ export function DuckDbProvider(props: {
 	db: duckdb.AsyncDuckDB;
 	c: duckdb.AsyncDuckDBConnection;
 	bosFileType: BosFileType;
-	useQueryObjects: UseQueryObjects;
+	useQueryObjects?: UseQueryObjects;
 	children: React.ReactNode;
 }) {
 	return (

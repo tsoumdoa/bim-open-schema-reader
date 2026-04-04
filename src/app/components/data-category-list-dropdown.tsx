@@ -22,8 +22,7 @@ export default function DropDownMenu(props: {
 	disableShortcutRef?: RefObject<boolean>;
 	children: React.ReactNode;
 }) {
-	const { useQueryObjects } = useQueryObjCtx();
-	const { addQueries, addQuery } = useQueryObjects;
+	const { addQueries, addQuery } = useQueryObjCtx();
 
 	const handleClick = (
 		tableName: DenormTableName,
