@@ -1,7 +1,7 @@
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { cleanCategoryCount } from "../utils/clean-category-count";
 import { listCountByCategory } from "../utils/init-queries";
-import { generalCategory, UseExpandDisplay } from "../utils/types";
+import { generalCategory } from "../utils/types";
 import DropDownMenu from "./data-category-list-dropdown";
 import DataReadinessIcon from "./data-readiness-icon";
 import FilterByDataReadiness from "./filter-by-data-readiness";
@@ -10,14 +10,11 @@ import { useDuckDb } from "./use-db";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 
-export default function ListDataByCategories(props: {
-	useExpandDisplay: UseExpandDisplay;
-}) {
+export default function ListDataByCategories() {
 	const { conn } = useDuckDb();
 	const { rows } = useRunDuckDbQuery(conn, listCountByCategory);
 	const [focused, setFocused] = useState("");
 	const categoryGroupMap = cleanCategoryCount(rows);
-	const { setDisplayExpanded } = props.useExpandDisplay;
 	const { isSelected } = useDataReadinessFilter();
 	return (
 		<div className="flex flex-col text-xs ">
@@ -72,9 +69,7 @@ export default function ListDataByCategories(props: {
 
 												<td className="px-1 text-left tracking-tight">
 													<DropDownMenu
-														onClose={() => {
-															setDisplayExpanded(-1);
-														}}
+														onClose={() => {}}
 														categoryName={(row[0].categoryName as string) || ""}
 														setFocused={setFocused}
 														indexKey={`${categoryIndex}-${groupIndex}`}

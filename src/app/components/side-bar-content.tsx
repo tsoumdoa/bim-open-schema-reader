@@ -1,4 +1,3 @@
-import { UseExpandDisplay } from "../utils/types";
 import { DisplayTableInfo } from "./display-table-info";
 import ListDataByCategories from "./list-data-by-categories";
 import ListQueriesInSidebar from "./list-queries-in-sidebar";
@@ -25,7 +24,7 @@ function AccordionDisplay(props: {
 		</Accordion>
 	);
 }
-function SideBarContent(props: { useExpandDisplay: UseExpandDisplay }) {
+function SideBarContent() {
 	return (
 		<div className="space-y-1">
 			<div className="text-sm font-bold text-gray-900">
@@ -35,20 +34,20 @@ function SideBarContent(props: { useExpandDisplay: UseExpandDisplay }) {
 				<DisplayTableInfo />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Add Query by Category">
-				<ListDataByCategories useExpandDisplay={props.useExpandDisplay} />
+				<ListDataByCategories />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Query">
-				<ListQueriesInSidebar useExpandDisplay={props.useExpandDisplay} />
+				<ListQueriesInSidebar />
 			</AccordionDisplay>
 		</div>
 	);
 }
 
-export default function SideBar(props: { useExpandDisplay: UseExpandDisplay }) {
+export default function SideBar() {
 	return (
 		<Sidebar className="h-full">
 			<div className="overflow-auto p-2">
-				<SideBarContent useExpandDisplay={props.useExpandDisplay} />
+				<SideBarContent />
 			</div>
 		</Sidebar>
 	);

@@ -1,12 +1,10 @@
-import { useExpandDisplay } from "../hooks/use-expand-display";
 import { useQuickExplorer } from "../hooks/use-quick-explorer";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { cleanCategoryCount } from "../utils/clean-category-count";
 import { listCountByCategory } from "../utils/init-queries";
-import { BosFileType, UseExpandDisplay } from "../utils/types";
+import { BosFileType } from "../utils/types";
 import { AddQuery } from "./add-query-button";
 import ButtonWithConfirmation from "./button-with-confirmation";
-import GoBackToTop from "./go-back-to-top";
 import QueryDisplayItem from "./query-display-item";
 import { useQueryObjCtx } from "./query-obj-provider";
 import { QuickExplorer } from "./quick-explorer-overlay";
@@ -38,12 +36,10 @@ function DashboardHeader(props: {
 	);
 }
 
-function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
+function DashboardMain() {
 	const { useQueryObjects } = useQueryObjCtx();
 	const { queryObjects, removeQuery, updateQueryTitle, updateQuery } =
 		useQueryObjects;
-	const useExpDis = props.useExpandDisplay;
-	const { queryItemRefs, displayExpanded } = useExpDis;
 	const prevLenRef = useRef<number>(queryObjects.length);
 
 	useEffect(() => {
@@ -65,25 +61,17 @@ function DashboardMain(props: { useExpandDisplay: UseExpandDisplay }) {
 			{queryObjects.length > 0 &&
 				queryObjects.map((q, i) => {
 					return (
-						<div
-							ref={(el) => {
-								queryItemRefs.current[i] = el;
-							}}
-							key={q.id}
-						>
+						<div key={q.id}>
 							<QueryDisplayItem
 								queryObject={q}
 								removeObject={removeQuery}
 								index={i}
-								useExpandDisplay={useExpDis}
 								updateQueryTitle={updateQueryTitle}
 								updateQuery={updateQuery}
 							/>
 						</div>
 					);
 				})}
-
-			{displayExpanded === -1 && <GoBackToTop />}
 		</div>
 	);
 }
@@ -92,13 +80,8 @@ export default function DashboardContainer(props: {
 	fileName: string;
 	bosFileType: BosFileType;
 }) {
-	const useExpDis = useExpandDisplay();
-	const { setDisplayExpanded } = useExpDis;
 	const disableShortcutRef = useRef<boolean>(true); // NOTE: shortcut need to be disabled cuz the quick explorer view is open at start
-	const { isActive, setIsActive } = useQuickExplorer(
-		setDisplayExpanded,
-		disableShortcutRef
-	);
+	const { isActive, setIsActive } = useQuickExplorer(disableShortcutRef);
 	const { useQueryObjects } = useQueryObjCtx();
 	const { addQuery, deleteAll, queryObjects } = useQueryObjects;
 	const objLength = queryObjects.length;
@@ -110,7 +93,7 @@ export default function DashboardContainer(props: {
 	return (
 		<SidebarProvider className="h-full min-h-0 w-full">
 			<DataReadinessFilterProvider>
-				<SideBar useExpandDisplay={useExpDis} />
+				<SideBar />
 				<main className="relative h-full w-full min-w-0 flex flex-col">
 					<DashboardHeader
 						fileName={props.fileName}
@@ -118,11 +101,10 @@ export default function DashboardContainer(props: {
 					/>
 
 					<div className="flex-1 overflow-auto">
-						<DashboardMain useExpandDisplay={useExpDis} />
+						<DashboardMain />
 						<div className="px-5 pb-5 gap-x-2 flex">
 							<AddQuery
 								addQuery={addQuery}
-								setDisplayExpanded={setDisplayExpanded}
 								disableShortcutRef={disableShortcutRef}
 							/>
 							{objLength > 2 && (

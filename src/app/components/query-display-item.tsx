@@ -1,10 +1,6 @@
 import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { formatForFileDownload } from "../utils/format";
-import {
-	QueryDisplayState,
-	QueryObject,
-	UseExpandDisplay,
-} from "../utils/types";
+import { QueryDisplayState, QueryObject } from "../utils/types";
 import { BimViewer } from "./bim-viewer";
 import QueryResultDisplayTable from "./query-result-display";
 import SqlQueryCodeBlock from "./sql-code-block";
@@ -101,7 +97,6 @@ export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
 	index: number;
-	useExpandDisplay: UseExpandDisplay;
 	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
 	updateQuery: (queryObject: QueryObject, newQuery: string) => void;
 }) {
@@ -115,7 +110,6 @@ export default function QueryDisplayItem(props: {
 		setQueryDisplayState,
 		setQueryTitleState,
 	} = useQueryViewerAndEditorHook;
-	const { displayExpanded, setDisplayExpanded } = props.useExpandDisplay;
 	const [titleInputValue, setTitleInputValue] = useState(
 		props.queryObject.queryTitle
 	);
@@ -138,13 +132,6 @@ export default function QueryDisplayItem(props: {
 			: props.queryObject.queryTitle
 	);
 
-	const isFocused = () => {
-		if (displayExpanded === -1) {
-			return true;
-		}
-		return displayExpanded === props.index;
-	};
-
 	const handleShowSqlQuery = () => {
 		setQueryDisplayState("hidden");
 		if (queryDisplayState === "hidden") {
@@ -152,15 +139,7 @@ export default function QueryDisplayItem(props: {
 		} else {
 			setQueryDisplayState("hidden");
 		}
-
-		setDisplayExpanded(-1);
 	};
-
-	useEffect(() => {
-		if (displayExpanded !== -1) {
-			setQueryDisplayState("hidden");
-		}
-	}, [displayExpanded]);
 
 	const showTitle =
 		queryDisplayState === "viewer" || queryDisplayState === "hidden";
@@ -200,7 +179,7 @@ export default function QueryDisplayItem(props: {
 
 	return (
 		<div
-			className={`${!isFocused() ? "opacity-35" : ""} flex w-full flex-col gap-y-2`}
+			className="flex w-full flex-col gap-y-2"
 			key={`${props.index}-${props.queryObject.id}`}
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
@@ -241,9 +220,6 @@ export default function QueryDisplayItem(props: {
 			<div className="w-full min-w-0 overflow-auto">
 				<QueryResultDisplayTable
 					index={props.index}
-					displayExpanded={displayExpanded}
-					setDisplayExpanded={setDisplayExpanded}
-					lockScroll={!isFocused()}
 					fileDownloadName={fileDownloadName}
 					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
 					onResultsAvailable={handleQueryResults}

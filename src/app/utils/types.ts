@@ -1,4 +1,3 @@
-import { useExpandDisplay } from "../hooks/use-expand-display";
 import useFilterByDataReadiness from "../hooks/use-filter-by-data-readiness";
 import { useKeywordFilter } from "../hooks/use-keyword-filter";
 import { useQueryObjects } from "../hooks/use-query-objects";
@@ -135,7 +134,6 @@ export type UseRunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type RunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type QueryObjects = QueryObject[];
 export type UseQueryObjects = ReturnType<typeof useQueryObjects>;
-export type UseExpandDisplay = ReturnType<typeof useExpandDisplay>;
 export type UseFilterByDataReadiness = ReturnType<
 	typeof useFilterByDataReadiness
 >;

@@ -28,7 +28,6 @@ import { RefObject, useEffect, useState } from "react";
 
 export function AddQuery(props: {
 	addQuery: (queryObject: QueryObject) => void;
-	setDisplayExpanded: (b: number) => void;
 	disableShortcutRef: RefObject<boolean>;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -58,21 +57,19 @@ export function AddQuery(props: {
 				e.preventDefault();
 				if (!isOpen) {
 					setIsOpen(true);
-					props.setDisplayExpanded(-1);
 				}
 				return;
 			}
 
 			if (addNewCustomQueryShortcut) {
 				e.preventDefault();
-				props.setDisplayExpanded(-1);
 				handleCreateCustomQuery();
 				return;
 			}
 		};
 		document.addEventListener("keydown", onKeyDown);
 		return () => document.removeEventListener("keydown", onKeyDown);
-	}, [isOpen, props.setDisplayExpanded]);
+	}, [isOpen]);
 
 	const handleAddCommand = (
 		queryCategory: string,
@@ -112,7 +109,6 @@ export function AddQuery(props: {
 					className="w-fit"
 					onClick={() => {
 						setIsOpen(true);
-						props.setDisplayExpanded(-1);
 					}}
 				>
 					Add Query{" "}

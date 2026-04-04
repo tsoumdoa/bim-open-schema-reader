@@ -6,9 +6,6 @@ import { useEffect, useRef } from "react";
 
 export default function QueryResultDisplayTable(props: {
 	index: number;
-	displayExpanded: number;
-	setDisplayExpanded: (b: number) => void;
-	lockScroll: boolean;
 	fileDownloadName: string;
 	useQueryViewerAndEditorHook: UseQueryViewerAndEditor;
 	onResultsAvailable?: (headers: string[], rows: unknown[][]) => void;
@@ -61,13 +58,9 @@ export default function QueryResultDisplayTable(props: {
 
 	if (isSuccess && rows.length > 0) {
 		return (
-			<div
-				className={`flex h-full flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"} max-w-[120rem]`}
-			>
+			<div className="flex h-full flex-col gap-y-2 overflow-auto max-w-[120rem]">
 				<DataTable
 					index={props.index}
-					displayExpanded={props.displayExpanded}
-					setDisplayExpanded={props.setDisplayExpanded}
 					fileDownloadName={props.fileDownloadName}
 					runDuckDbQuery={runDuckDbQuery}
 				/>
