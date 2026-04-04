@@ -9,6 +9,7 @@ interface UseGeometryFilterResult {
 	totalEntityCount: number;
 	ghostCount: number;
 	ghostOthers: boolean;
+	availableEntityCount: number;
 	toggleGhostOthers: () => void;
 }
 
@@ -17,6 +18,7 @@ interface ComputedResult {
 	instanceCount: number;
 	totalEntityCount: number;
 	ghostCount: number;
+	availableEntityCount: number;
 }
 
 export function useGeometryFilter(
@@ -47,9 +49,13 @@ export function useGeometryFilter(
 			instanceCount: 0,
 			totalEntityCount: 0,
 			ghostCount: 0,
+			availableEntityCount: cache ? new Set(cache.instanceEntityIndex).size : 0,
 		};
 	} else if (!inputsMatch) {
 		const totalEntityCount = new Set(entityIndices).size;
+		const availableEntityCount = cache
+			? new Set(cache.instanceEntityIndex).size
+			: 0;
 
 		if (ghostOthers) {
 			const { scene, selectedCount, ghostCount } = buildGhostedScene(
@@ -62,6 +68,7 @@ export function useGeometryFilter(
 				instanceCount: selectedCount,
 				totalEntityCount,
 				ghostCount,
+				availableEntityCount,
 			};
 			lastInputsRef.current = { entityIndices, ghostOthers, cache };
 		} else {
@@ -72,6 +79,7 @@ export function useGeometryFilter(
 				instanceCount,
 				totalEntityCount,
 				ghostCount: 0,
+				availableEntityCount,
 			};
 			lastInputsRef.current = { entityIndices, ghostOthers, cache };
 		}

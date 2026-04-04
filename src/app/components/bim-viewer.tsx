@@ -25,6 +25,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		totalEntityCount,
 		ghostCount,
 		ghostOthers,
+		availableEntityCount,
 		toggleGhostOthers,
 	} = useGeometryFilter(entityIndices);
 
@@ -69,7 +70,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 					)}
 				</div>
 			</div>
-			{entityIndices.length > 0 && (
+			{entityIndices.length > 0 && totalEntityCount < availableEntityCount && (
 				<Button
 					variant={ghostOthers ? "default" : "secondary"}
 					size="sm"
