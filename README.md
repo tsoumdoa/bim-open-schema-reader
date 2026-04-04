@@ -38,3 +38,4 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 ## Current limitations
 
 - glass material is not rendered properly...
+- z-fighiting so hard
