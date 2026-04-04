@@ -4,7 +4,6 @@ import { cleanCategoryCount } from "../utils/clean-category-count";
 import { listCountByCategory } from "../utils/init-queries";
 import { BosFileType, QueryObject } from "../utils/types";
 import { AddQuery } from "./add-query-button";
-import ButtonWithConfirmation from "./button-with-confirmation";
 import QueryDisplayItem from "./query-display-item";
 import { useQueryObjCtx } from "./query-obj-provider";
 import { QuickExplorer } from "./quick-explorer-overlay";
@@ -19,6 +18,8 @@ import { createPortal } from "react-dom";
 function DashboardHeader(props: {
 	fileName: string;
 	bosFileType: BosFileType;
+	addQuery: (queryObject: QueryObject) => void;
+	disableShortcutRef: React.RefObject<boolean>;
 }) {
 	return (
 		<div className="sticky top-0 z-50 flex flex-row items-center justify-start gap-x-1 bg-white px-2">
@@ -32,6 +33,12 @@ function DashboardHeader(props: {
 			>
 				{props.bosFileType === "GEO" ? "Geometry Data" : "Non Geometry Data"}
 			</Badge>
+			<div className="ml-auto flex items-center">
+				<AddQuery
+					addQuery={props.addQuery}
+					disableShortcutRef={props.disableShortcutRef}
+				/>
+			</div>
 		</div>
 	);
 }
@@ -53,7 +60,7 @@ function DashboardMain() {
 	);
 
 	return (
-		<div className="flex h-full min-h-0 max-w-full flex-1 flex-col gap-y-2 pr-2 pl-6">
+		<div className="  pr-4 pl-4">
 			{selectedQuery ? (
 				<QueryDisplayItem
 					key={selectedQuery.id}
@@ -65,7 +72,7 @@ function DashboardMain() {
 				/>
 			) : (
 				queryObjects.length === 0 && (
-					<div className="flex h-full items-center justify-center text-sm text-gray-500">
+					<div className="text-sm text-gray-500 m-auto">
 						No query selected. Click a query in the sidebar to view it.
 					</div>
 				)
@@ -90,26 +97,17 @@ export default function DashboardContainer(props: {
 	return (
 		<SidebarProvider className="h-full min-h-0 w-full">
 			<DataReadinessFilterProvider>
-				<SideBar />
+				<SideBar deleteAll={deleteAll} objLength={objLength} />
 				<main className="relative h-full w-full min-w-0 flex flex-col">
 					<DashboardHeader
 						fileName={props.fileName}
 						bosFileType={props.bosFileType}
+						addQuery={addQuery}
+						disableShortcutRef={disableShortcutRef}
 					/>
 
 					<div className="flex-1 overflow-auto">
 						<DashboardMain />
-						<div className="px-5 pb-5 gap-x-2 flex">
-							<AddQuery
-								addQuery={addQuery}
-								disableShortcutRef={disableShortcutRef}
-							/>
-							{objLength > 2 && (
-								<ButtonWithConfirmation action={deleteAll}>
-									Delete All Queries
-								</ButtonWithConfirmation>
-							)}
-						</div>
 					</div>
 				</main>
 				{isActive &&

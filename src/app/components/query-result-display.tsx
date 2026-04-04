@@ -58,7 +58,7 @@ export default function QueryResultDisplayTable(props: {
 
 	if (isSuccess && rows.length > 0) {
 		return (
-			<div className="flex h-full flex-col gap-y-2 overflow-auto max-w-[120rem]">
+			<div className="flex h-full flex-col gap-y-2 overflow-auto ">
 				<DataTable
 					index={props.index}
 					fileDownloadName={props.fileDownloadName}

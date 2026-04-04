@@ -105,8 +105,8 @@ export function AddQuery(props: {
 		>
 			<DialogTrigger asChild>
 				<Button
-					variant="outline"
-					className="w-fit"
+					variant="ghost"
+					className="w-fit h-5 my-1 hover:bg-transparent hover:cursor-pointer"
 					onClick={() => {
 						setIsOpen(true);
 					}}

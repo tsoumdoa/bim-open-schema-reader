@@ -1,6 +1,9 @@
 import { useQueryObjCtx } from "./query-obj-provider";
 
-export default function ListQueriesInSidebar() {
+export default function ListQueriesInSidebar(props: {
+	deleteAll: () => void;
+	objLength: number;
+}) {
 	const { queryObjects, selectedQueryId, setSelectedQueryId } =
 		useQueryObjCtx();
 
@@ -23,6 +26,14 @@ export default function ListQueriesInSidebar() {
 					</button>
 				);
 			})}
+			{props.objLength > 2 && (
+				<button
+					onClick={props.deleteAll}
+					className="mt-1 w-full pl-2  font-semibold text-left text-xs text-zinc-400 hover:text-red-400 transition-colors duration-150"
+				>
+					Delete All
+				</button>
+			)}
 		</div>
 	);
 }

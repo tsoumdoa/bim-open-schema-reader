@@ -46,7 +46,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 
 	if (!scene || totalEntityCount === 0) {
 		return (
-			<div className="flex h-16 w-full items-center justify-center bg-gray-50">
+			<div className="flex h-10 w-full items-center justify-center bg-gray-50">
 				<div className="text-sm text-gray-500">
 					No geometry found for these entities
 				</div>

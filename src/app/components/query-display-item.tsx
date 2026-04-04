@@ -179,7 +179,7 @@ export default function QueryDisplayItem(props: {
 
 	return (
 		<div
-			className="flex w-full flex-col gap-y-2"
+			className="flex w-full flex-col "
 			key={`${props.index}-${props.queryObject.id}`}
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
@@ -209,6 +209,7 @@ export default function QueryDisplayItem(props: {
 				/>
 			</div>
 			<BimViewer entityIndices={entityIndices} />
+			<div className="py-1" />
 			{queryDisplayState !== "hidden" && (
 				<SqlQueryCodeBlock
 					queryObject={props.queryObject}
@@ -217,15 +218,12 @@ export default function QueryDisplayItem(props: {
 					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
 				/>
 			)}
-			<div className="w-full min-w-0 overflow-auto">
-				<QueryResultDisplayTable
-					index={props.index}
-					fileDownloadName={fileDownloadName}
-					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
-					onResultsAvailable={handleQueryResults}
-				/>
-			</div>
-			<Separator className="my-4" />
+			<QueryResultDisplayTable
+				index={props.index}
+				fileDownloadName={fileDownloadName}
+				useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
+				onResultsAvailable={handleQueryResults}
+			/>
 		</div>
 	);
 }

@@ -29,18 +29,11 @@ function DataTableBody<TData, TValue>(props: {
 	index: number;
 	table: TableType<TData>;
 	pageSize: number;
-	tableContainerRef: React.RefObject<HTMLDivElement | null>;
 	columnDef: ColumnDef<TData, TValue>[];
 }) {
-	const {
-		index,
-		table,
-		pageSize,
-		tableContainerRef,
-		columnDef: columns,
-	} = props;
+	const { table, pageSize, columnDef: columns } = props;
 	return (
-		<div className="overflow-auto max-h-80" ref={tableContainerRef}>
+		<div>
 			<Table className="w-fit overflow-auto">
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (
@@ -162,7 +155,6 @@ export function DataTable<TData, TValue>(props: {
 				index={index}
 				table={table}
 				pageSize={pageSize}
-				tableContainerRef={tableContainerRef}
 				columnDef={columns}
 			/>
 			<DataTableFooter

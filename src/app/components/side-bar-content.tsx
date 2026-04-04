@@ -24,11 +24,11 @@ function AccordionDisplay(props: {
 		</Accordion>
 	);
 }
-function SideBarContent() {
+function SideBarContent(props: { deleteAll: () => void; objLength: number }) {
 	return (
 		<div className="space-y-1">
 			<div className="text-sm font-bold text-gray-900">
-				Open BIM Schema Reader
+				BIM Open Schema Reader
 			</div>
 			<AccordionDisplay accordionTitle="Schema Tables">
 				<DisplayTableInfo />
@@ -37,17 +37,26 @@ function SideBarContent() {
 				<ListDataByCategories />
 			</AccordionDisplay>
 			<AccordionDisplay accordionTitle="Query">
-				<ListQueriesInSidebar />
+				<ListQueriesInSidebar
+					deleteAll={props.deleteAll}
+					objLength={props.objLength}
+				/>
 			</AccordionDisplay>
 		</div>
 	);
 }
 
-export default function SideBar() {
+export default function SideBar(props: {
+	deleteAll: () => void;
+	objLength: number;
+}) {
 	return (
 		<Sidebar className="h-full">
 			<div className="overflow-auto p-2">
-				<SideBarContent />
+				<SideBarContent
+					deleteAll={props.deleteAll}
+					objLength={props.objLength}
+				/>
 			</div>
 		</Sidebar>
 	);
