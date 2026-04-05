@@ -149,8 +149,6 @@ export function DisplayTableInfo() {
 			<AccordionDisplay accordionTitle="misc">
 				<RowDisplay rows={misc} />
 			</AccordionDisplay>
-			<Separator className="my-2 bg-neutral-500" />
-			<Separator className="mt-2 mb-1.0 bg-neutral-500" />
 		</div>
 	);
 }
