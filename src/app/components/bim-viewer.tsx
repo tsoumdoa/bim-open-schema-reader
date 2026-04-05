@@ -4,6 +4,8 @@ import { useGeometryFromParquetCtx } from "./geometry-from-parquet-context";
 import { useGeometryFilter } from "@/app/hooks/use-geometry-filter";
 import { Button } from "@/components/ui/button";
 import {
+	GizmoHelper,
+	GizmoViewcube,
 	OrbitControls,
 	PerspectiveCamera,
 	Environment,
@@ -92,6 +94,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 			>
 				<PerspectiveCamera makeDefault position={[50, 50, 50]} fov={50} />
 				<OrbitControls
+					makeDefault
 					enableDamping
 					dampingFactor={0.05}
 					rotateSpeed={0.5}
@@ -112,6 +115,12 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 
 				<Environment preset="city" />
 				<gridHelper args={[1000, 100]} />
+
+				<GizmoHelper alignment="top-right" margin={[50, 50]}>
+					<group scale={0.8}>
+						<GizmoViewcube />
+					</group>
+				</GizmoHelper>
 			</Canvas>
 		</div>
 	);
