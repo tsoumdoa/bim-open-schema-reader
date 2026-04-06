@@ -9,7 +9,9 @@ import {
 	QueryDisplayState,
 	QueryEditorState,
 	QueryObject,
+	UseEditor,
 	UseQueryViewerAndEditor,
+	UseRunDuckDbQuery,
 } from "../utils/types";
 import { useQueryObjCtx } from "./query-obj-provider";
 import { Button } from "@/components/ui/button";
@@ -166,27 +168,21 @@ function CancelButton(props: {
 }
 
 function QueryEditorHeader(props: {
+	editor: UseEditor;
 	displayState: EditorDisplayState;
-	handleCopy: () => void;
-	handleCancelDraftMode: () => void;
-	handleSave: () => void;
-	handleSetToDraftMode: () => void;
-	handleRunButtonClick: () => void;
-	handleCancelQuery: () => void;
-	copied: boolean;
 	queryDisplayState: QueryDisplayState;
 	queryEditorState: QueryEditorState;
 }) {
+	const { editor, displayState } = props;
 	const {
-		displayState,
 		handleCopy,
 		handleCancelDraftMode,
 		handleSave,
 		handleSetToDraftMode,
-		handleRunButtonClick,
-		handleCancelQuery,
+		handleRun,
 		copied,
-	} = props;
+		handleCancelQuery,
+	} = editor;
 	const {
 		displayStale,
 		displayError,
@@ -213,7 +209,7 @@ function QueryEditorHeader(props: {
 			)}
 			{displayRunButton && (
 				<RunButton
-					handleRunButtonClick={handleRunButtonClick}
+					handleRunButtonClick={handleRun}
 					isEditing={isEditing}
 					isRunning={isRunning}
 				/>
@@ -240,30 +236,28 @@ function QueryEditorHeader(props: {
 }
 
 export default function SqlQueryCodeBlock(props: {
+	runDuckDbQuery: UseRunDuckDbQuery;
 	queryObject: QueryObject;
 	useQueryViewerAndEditorHook: UseQueryViewerAndEditor;
 }) {
 	const { updateQueryTitle, updateQuery } = useQueryObjCtx();
-	const {
-		handleCopy,
-		handleCancelDraftMode,
-		handleSave,
-		handleSetToDraftMode,
-		handleRunButtonClick,
-		handleCancelQuery,
-		lineLength,
-		onChange,
-		copied,
-		draftSql,
-		nodes,
-		setDraftSql,
-		displayState,
-	} = useEditor(
+
+	const editor = useEditor(
+		props.runDuckDbQuery,
 		props.queryObject,
 		props.useQueryViewerAndEditorHook,
 		updateQueryTitle,
 		updateQuery
 	);
+	const {
+		handleRun,
+		lineLength,
+		draftSql,
+		setDraftSql,
+		displayState,
+		onChange,
+		nodes,
+	} = editor;
 	const { isEditing, isRunning } = displayState;
 
 	return (
@@ -284,18 +278,12 @@ export default function SqlQueryCodeBlock(props: {
 					)}{" "}
 				</span>
 				<QueryEditorHeader
+					editor={editor}
 					displayState={displayState}
-					handleCopy={handleCopy}
-					handleCancelDraftMode={handleCancelDraftMode}
-					handleSave={handleSave}
-					handleSetToDraftMode={handleSetToDraftMode}
-					handleRunButtonClick={handleRunButtonClick}
-					handleCancelQuery={handleCancelQuery}
 					queryDisplayState={
 						props.useQueryViewerAndEditorHook.queryDisplayState
 					}
 					queryEditorState={props.useQueryViewerAndEditorHook.queryEditorState}
-					copied={copied}
 				/>
 			</div>
 			{isEditing ? (
@@ -306,7 +294,7 @@ export default function SqlQueryCodeBlock(props: {
 					extensions={[
 						sql({}),
 						makeKeymap({
-							onRun: handleRunButtonClick,
+							onRun: handleRun,
 							onFormat: () => {
 								if (!isRunning) {
 									const formatted = runFormat(draftSql);

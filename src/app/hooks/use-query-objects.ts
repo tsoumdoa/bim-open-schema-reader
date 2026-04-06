@@ -39,22 +39,25 @@ export function useQueryObjects() {
 	};
 
 	const updateQueryTitle = (queryObject: QueryObject, newTitle: string) => {
-		const newQueryObjects = queryObjects.map((q) => {
-			if (q.id === queryObject.id) {
-				return { ...q, queryTitle: newTitle, isCustom: true };
-			}
-			return q;
-		});
-		setQueryObjects(newQueryObjects);
+		setQueryObjects((prev) =>
+			prev.map((q) => {
+				if (q.id === queryObject.id) {
+					return { ...q, queryTitle: newTitle, isCustom: true };
+				}
+				return q;
+			})
+		);
 	};
+
 	const updateQuery = (queryObject: QueryObject, newQuery: string) => {
-		const newQueryObjects = queryObjects.map((q) => {
-			if (q.id === queryObject.id) {
-				return { ...q, sqlQuery: newQuery };
-			}
-			return q;
-		});
-		setQueryObjects(newQueryObjects);
+		setQueryObjects((prev) =>
+			prev.map((q) => {
+				if (q.id === queryObject.id) {
+					return { ...q, sqlQuery: newQuery };
+				}
+				return q;
+			})
+		);
 	};
 
 	const deleteAll = () => {

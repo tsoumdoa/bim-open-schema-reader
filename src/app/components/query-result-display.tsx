@@ -1,39 +1,18 @@
-import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
-import { UseQueryViewerAndEditor } from "../utils/types";
+import { UseQueryViewerAndEditor, UseRunDuckDbQuery } from "../utils/types";
 import { DataTable } from "./data-table";
-import { useDuckDb } from "./use-db";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 export default function QueryResultDisplayTable(props: {
+	runDuckDbQuery: UseRunDuckDbQuery;
 	index: number;
 	fileDownloadName: string;
 	useQueryViewerAndEditorHook: UseQueryViewerAndEditor;
 	onResultsAvailable?: (headers: string[], rows: unknown[][]) => void;
 }) {
-	const {
-		handleCancelQueryRef,
-		setQueryEditorState,
-		newSqlQuery,
-		formatedQuery,
-	} = props.useQueryViewerAndEditorHook;
-	const { conn } = useDuckDb();
-	const runDuckDbQuery = useRunDuckDbQuery(conn, formatedQuery);
-	const { cancelQuery, isLoading, isSuccess, error, run, rows, headers } =
-		runDuckDbQuery;
+	const { handleCancelQueryRef } = props.useQueryViewerAndEditorHook;
+	const { cancelQuery, isLoading, isSuccess, error, rows, headers } =
+		props.runDuckDbQuery;
 	handleCancelQueryRef.current = { cancelQuery };
-
-	const rerunTrigeredRef = useRef(false);
-
-	// this is for rerun query
-	useEffect(() => {
-		if (rerunTrigeredRef.current) {
-			if (isSuccess) {
-				setQueryEditorState("rerun");
-			} else {
-				setQueryEditorState("error");
-			}
-		}
-	}, [isSuccess, error]);
 
 	// this is for geometry data
 	useEffect(() => {
@@ -41,14 +20,6 @@ export default function QueryResultDisplayTable(props: {
 			props.onResultsAvailable(headers, rows);
 		}
 	}, [isSuccess, rows, headers, props.onResultsAvailable]);
-
-	//running query when the sql query is changed
-	useEffect(() => {
-		if (newSqlQuery !== formatedQuery) {
-			rerunTrigeredRef.current = true;
-		}
-		run(newSqlQuery);
-	}, [newSqlQuery]);
 
 	if (error) {
 		return (
@@ -65,7 +36,7 @@ export default function QueryResultDisplayTable(props: {
 				<DataTable
 					index={props.index}
 					fileDownloadName={props.fileDownloadName}
-					runDuckDbQuery={runDuckDbQuery}
+					runDuckDbQuery={props.runDuckDbQuery}
 				/>
 			</div>
 		);

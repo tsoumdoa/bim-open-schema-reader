@@ -1,3 +1,4 @@
+import useEditor from "../hooks/use-editor";
 import useFilterByDataReadiness from "../hooks/use-filter-by-data-readiness";
 import { useKeywordFilter } from "../hooks/use-keyword-filter";
 import { useQueryObjects } from "../hooks/use-query-objects";
@@ -270,3 +271,4 @@ export interface GeometricalDataCache {
 }
 
 export type EditorDisplayState = ReturnType<typeof getEditorState>;
+export type UseEditor = ReturnType<typeof useEditor>;

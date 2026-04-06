@@ -1,9 +1,14 @@
 import { getEditorState } from "../utils/editor-display-state";
 import { highlightAndFormatSql, runFormat } from "../utils/shared";
-import { QueryObject, UseQueryViewerAndEditor } from "../utils/types";
+import {
+	QueryObject,
+	UseQueryViewerAndEditor,
+	UseRunDuckDbQuery,
+} from "../utils/types";
 import { JSX, useCallback, useLayoutEffect, useState } from "react";
 
 export default function useEditor(
+	runDuckDbQuery: UseRunDuckDbQuery,
 	queryObject: QueryObject,
 	useQueryViewerAndEditorHook: UseQueryViewerAndEditor,
 	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void,
@@ -11,24 +16,21 @@ export default function useEditor(
 ) {
 	const {
 		handleCancelQueryRef,
-		sqlQuery,
 		draftSql,
 		queryDisplayState,
 		queryState,
 		queryEditorState,
-		setSqlQuery,
 		setDraftSql,
-		setNewSqlQuery,
 		setQueryDisplayState,
 		setQueryState,
 		setQueryEditorState,
 		queryTitleState,
-		newSqlQuery,
 	} = useQueryViewerAndEditorHook;
 
 	const [copied, setCopied] = useState(false);
 	const [nodes, setNodes] = useState<JSX.Element>();
 	const [lineLength, setLineLength] = useState(0);
+	const { run, isSuccess } = runDuckDbQuery;
 
 	const onChange = useCallback(
 		(val: string) => {
@@ -36,7 +38,7 @@ export default function useEditor(
 			setQueryState("edited");
 			setDraftSql(val);
 
-			if (sqlQuery === val) {
+			if (draftSql === val) {
 				setQueryState("original");
 			} else {
 				setQueryState("edited");
@@ -44,19 +46,19 @@ export default function useEditor(
 
 			setLineLength(val.split("\n").length);
 		},
-		[sqlQuery, setDraftSql, setQueryEditorState, setQueryState]
+		[setDraftSql, setQueryEditorState, setQueryState]
 	);
 
 	useLayoutEffect(() => {
-		highlightAndFormatSql(newSqlQuery, false).then(({ jsx, lineLength }) => {
+		highlightAndFormatSql(draftSql, false).then(({ jsx, lineLength }) => {
 			setNodes(jsx);
 			setLineLength(lineLength);
 		});
-	}, [newSqlQuery]);
+	}, [draftSql]);
 
 	const handleCopy = async () => {
 		try {
-			await navigator.clipboard.writeText(newSqlQuery);
+			await navigator.clipboard.writeText(draftSql);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
 		} catch (err) {
@@ -65,22 +67,14 @@ export default function useEditor(
 	};
 
 	const handleCancelDraftMode = () => {
-		setDraftSql(sqlQuery);
 		setQueryDisplayState("viewer");
 		setQueryEditorState("initial");
 	};
 
 	const handleSave = () => {
-		if (draftSql !== sqlQuery) {
-			const formatedQuery = runFormat(draftSql);
-			setQueryState("edited");
-			setSqlQuery(formatedQuery);
-			setNewSqlQuery(formatedQuery);
-			updateQuery(queryObject, formatedQuery);
-		} else {
-			const formatedQuery = runFormat(sqlQuery);
-			setNewSqlQuery(formatedQuery);
-		}
+		updateQuery(queryObject, runFormat(draftSql));
+		setQueryState("edited");
+
 		//NOTE: add * if the query is edited but the title is not edited
 		const lastChar = queryObject.queryTitle.slice(-1);
 		if (
@@ -97,16 +91,24 @@ export default function useEditor(
 	};
 
 	const handleSetToDraftMode = () => {
-		setDraftSql(sqlQuery);
+		setDraftSql(queryObject.sqlQuery);
 		setQueryDisplayState("editor");
 	};
 
-	const handleRunButtonClick = () => {
-		setNewSqlQuery(draftSql);
+	const handleRun = async () => {
+		setDraftSql(runFormat(draftSql));
+		await run(draftSql);
+
+		if (isSuccess) {
+			setQueryEditorState("rerun");
+		} else {
+			setQueryEditorState("error");
+		}
 	};
 
 	const handleCancelQuery = () => {
 		handleCancelQueryRef.current?.cancelQuery();
+		setDraftSql(queryObject.sqlQuery);
 		if (queryEditorState !== "error") {
 			setQueryEditorState("stale");
 		}
@@ -122,7 +124,7 @@ export default function useEditor(
 		handleCancelDraftMode,
 		handleSave,
 		handleSetToDraftMode,
-		handleRunButtonClick,
+		handleRun,
 		handleCancelQuery,
 		copied,
 		nodes,
