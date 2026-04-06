@@ -1,9 +1,11 @@
 import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { formatForFileDownload } from "../utils/format";
-import { QueryDisplayState, QueryObject } from "../utils/types";
+import {
+	QueryDisplayState,
+	QueryObject,
+} from "../utils/types";
 import { BimViewer } from "./bim-viewer";
-import QueryResultDisplayTable from "./query-result-display";
-import SqlQueryCodeBlock from "./sql-code-block";
+import { useQueryObjCtx } from "./query-obj-provider";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -13,14 +15,14 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Menu } from "lucide-react";
-import { Activity, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import CodeBlockAndResultDisplay from "./codeblock-and-result-display";
 
 function AboutMenuItem(props: { queryObject: QueryObject }) {
 	return (
@@ -97,9 +99,8 @@ export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
 	index: number;
-	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
-	updateQuery: (queryObject: QueryObject, newQuery: string) => void;
 }) {
+	//TODO:
 	const useQueryViewerAndEditorHook = useQueryViewerAndEditor(
 		props.queryObject.queryTitle,
 		props.queryObject.sqlQuery
@@ -110,6 +111,10 @@ export default function QueryDisplayItem(props: {
 		setQueryDisplayState,
 		setQueryTitleState,
 	} = useQueryViewerAndEditorHook;
+
+	const { updateQueryTitle } = useQueryObjCtx();
+
+	// handle title input change
 	const [titleInputValue, setTitleInputValue] = useState(
 		props.queryObject.queryTitle
 	);
@@ -120,7 +125,7 @@ export default function QueryDisplayItem(props: {
 		setTitleInputValue(newTitle);
 		if (newTitle !== props.queryObject.queryTitle) {
 			setQueryTitleState("edited");
-			props.updateQueryTitle(props.queryObject, newTitle);
+			updateQueryTitle(props.queryObject, newTitle);
 		} else {
 			setQueryTitleState("original");
 		}
@@ -209,21 +214,15 @@ export default function QueryDisplayItem(props: {
 				/>
 			</div>
 			<BimViewer entityIndices={entityIndices} />
-			<div className="py-1" />
-			{queryDisplayState !== "hidden" && (
-				<SqlQueryCodeBlock
-					queryObject={props.queryObject}
-					updateQueryTitle={props.updateQueryTitle}
-					updateQuery={props.updateQuery}
-					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
-				/>
-			)}
-			<QueryResultDisplayTable
+			<CodeBlockAndResultDisplay
 				index={props.index}
+				queryObject={props.queryObject}
 				fileDownloadName={fileDownloadName}
+				queryDisplayState={queryDisplayState}
+				handleQueryResults={handleQueryResults}
 				useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
-				onResultsAvailable={handleQueryResults}
 			/>
 		</div>
 	);
 }
+

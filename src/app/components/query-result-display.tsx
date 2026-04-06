@@ -24,6 +24,7 @@ export default function QueryResultDisplayTable(props: {
 
 	const rerunTrigeredRef = useRef(false);
 
+	// this is for rerun query
 	useEffect(() => {
 		if (rerunTrigeredRef.current) {
 			if (isSuccess) {
@@ -34,12 +35,14 @@ export default function QueryResultDisplayTable(props: {
 		}
 	}, [isSuccess, error]);
 
+	// this is for geometry data
 	useEffect(() => {
 		if (props.onResultsAvailable && isSuccess && rows.length > 0) {
 			props.onResultsAvailable(headers, rows);
 		}
 	}, [isSuccess, rows, headers, props.onResultsAvailable]);
 
+	//running query when the sql query is changed
 	useEffect(() => {
 		if (newSqlQuery !== formatedQuery) {
 			rerunTrigeredRef.current = true;

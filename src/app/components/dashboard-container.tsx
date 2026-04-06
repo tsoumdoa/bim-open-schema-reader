@@ -44,13 +44,7 @@ function DashboardHeader(props: {
 }
 
 function DashboardMain() {
-	const {
-		queryObjects,
-		selectedQueryId,
-		removeQuery,
-		updateQueryTitle,
-		updateQuery,
-	} = useQueryObjCtx();
+	const { queryObjects, selectedQueryId, removeQuery } = useQueryObjCtx();
 
 	const selectedQuery = queryObjects.find(
 		(q: QueryObject) => q.id === selectedQueryId
@@ -67,8 +61,6 @@ function DashboardMain() {
 					queryObject={selectedQuery}
 					removeObject={removeQuery}
 					index={selectedIndex}
-					updateQueryTitle={updateQueryTitle}
-					updateQuery={updateQuery}
 				/>
 			) : (
 				queryObjects.length === 0 && (

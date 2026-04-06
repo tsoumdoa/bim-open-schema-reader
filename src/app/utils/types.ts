@@ -3,6 +3,7 @@ import { useKeywordFilter } from "../hooks/use-keyword-filter";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
+import { getEditorState } from "./editor-display-state";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import * as THREE from "three";
 
@@ -267,3 +268,5 @@ export interface GeometricalDataCache {
 	transformCount: number;
 	instanceCount: number;
 }
+
+export type EditorDisplayState = ReturnType<typeof getEditorState>;
