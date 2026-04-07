@@ -170,7 +170,10 @@ export function AddQuery(props: {
 					<Button
 						type="submit"
 						variant="outline"
-						onClick={props.onQuickExplorerOpen}
+						onClick={() => {
+							setIsOpen(false);
+							props.onQuickExplorerOpen();
+						}}
 					>
 						<span className="inline-flex items-baseline gap-2">
 							Quick Explorer
