@@ -166,7 +166,7 @@ export function AddQuery(props: {
 						})}
 					</CommandList>
 				</Command>
-				<DialogFooter className="flex w-full flex-row justify-start pt-2 gap-2">
+				<DialogFooter className="flex w-full flex-row justify-start pt-2 gap-2 flex-wrap">
 					<Button
 						type="submit"
 						variant="outline"
@@ -174,6 +174,7 @@ export function AddQuery(props: {
 							setIsOpen(false);
 							props.onQuickExplorerOpen();
 						}}
+						className="w-40"
 					>
 						<span className="inline-flex items-baseline gap-2">
 							Quick Explorer
@@ -181,10 +182,10 @@ export function AddQuery(props: {
 						</span>
 					</Button>
 					<Button
-						className="w-fit"
 						type="submit"
 						variant="outline"
 						onClick={handleCreateCustomQuery}
+						className="w-40"
 					>
 						<span className="inline-flex items-baseline gap-2">
 							New Query
