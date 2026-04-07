@@ -1,6 +1,6 @@
 import { sql } from "../utils/init-queries";
 
-export const denormSingleParams = (categoryName: string) => sql`
+export const denormNumberParams = (categoryName: string) => sql`
 	WITH
 		single_data AS (
 			SELECT
@@ -19,7 +19,7 @@ export const denormSingleParams = (categoryName: string) => sql`
 		localid;
 `;
 
-export const denormSingleParamsPivot = (categoryName: string) => sql`
+export const denormNumberParamsPivot = (categoryName: string) => sql`
 	WITH
 		single_data AS (
 			SELECT
@@ -49,7 +49,7 @@ export const denormSingleParamsPivot = (categoryName: string) => sql`
 		LocalId
 `;
 
-export const denormSingleParamsStats = (categoryName: string) => sql`
+export const denormNumberParamsStats = (categoryName: string) => sql`
   WITH
     single_data AS (
       SELECT

@@ -295,7 +295,7 @@ export const denormParamQueryBuilderName: {
 }[] = [
 	{
 		tableName: "denorm_number_params",
-		displayName: "Single Parameters",
+		displayName: "Number Parameters",
 	},
 	{
 		tableName: "denorm_entity_params",
