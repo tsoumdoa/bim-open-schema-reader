@@ -61,7 +61,6 @@ export default function Home() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<div className="bg-background min-h-screen">
-				<Header />
 				<UnzipFailedAlertDialog open={open} setOpen={setOpen} />
 				<main>
 					{dbReady && bosFileType !== "INVALID" ? (
@@ -71,12 +70,15 @@ export default function Home() {
 							bosFileType={bosFileType}
 						/>
 					) : (
-						<InitialDisplay
-							setFiles={setFiles}
-							files={files}
-							handleProcess={handleProcess}
-							isProcessing={isProcessing}
-						/>
+						<>
+							<Header />
+							<InitialDisplay
+								setFiles={setFiles}
+								files={files}
+								handleProcess={handleProcess}
+								isProcessing={isProcessing}
+							/>
+						</>
 					)}
 				</main>
 			</div>

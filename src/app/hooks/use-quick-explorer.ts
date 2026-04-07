@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export function useQuickExplorer(
-	setDisplayExpanded: (b: number) => void,
-	disableShortcutRef: React.RefObject<boolean>
-) {
+export function useQuickExplorer(disableShortcutRef: React.RefObject<boolean>) {
 	const [isActive, setIsActive] = useState(true);
 
 	useEffect(() => {
@@ -24,7 +21,6 @@ export function useQuickExplorer(
 					disableShortcutRef.current = next;
 					return next;
 				});
-				setDisplayExpanded(-1);
 			}
 		};
 

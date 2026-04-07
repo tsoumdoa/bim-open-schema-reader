@@ -1,66 +1,65 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const basicMaterialsInfo = sql`
 	WITH
-		int_data AS (
-			SELECT
-				*
-			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_integer_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
-			WHERE
-				e.category = 'Materials'
-		),
-		str_data AS (
+		material_int AS (
 			SELECT
 				e.LocalId,
-				p.Name,
-				p.Strings
+				p.d_name,
+				p.p_Value
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_integer_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Materials'
-				AND p.Name = 'Name'
+				e.type = 'Materials'
+		),
+		material_name AS (
+			SELECT
+				e.LocalId,
+				p.v_Strings AS material_name
+			FROM
+				denorm_entities e
+				JOIN denorm_string_params p ON e.index = p.p_Entity
+			WHERE
+				e.type = 'Materials'
+				AND p.d_name = 'Name'
 		)
 	SELECT
-		id.LocalId,
-		sd.Strings AS material_name,
+		mi.LocalId,
+		mn.material_name,
 		MAX(
 			CASE
-				WHEN Name_1 = 'Shininess' THEN VALUE
+				WHEN mi.d_name = 'Shininess' THEN mi.p_Value
 			END
 		) AS shininess,
 		MAX(
 			CASE
-				WHEN Name_1 = 'Color' THEN VALUE
+				WHEN mi.d_name = 'Color' THEN mi.p_Value
 			END
 		) AS hex_color_code,
 		MAX(
 			CASE
-				WHEN Name_1 = 'Smoothness' THEN VALUE
+				WHEN mi.d_name = 'Smoothness' THEN mi.p_Value
 			END
 		) AS smoothness,
 		MAX(
 			CASE
-				WHEN Name_1 = 'Transparency' THEN VALUE
+				WHEN mi.d_name = 'Transparency' THEN mi.p_Value
 			END
 		) AS transparency,
 		MAX(
 			CASE
-				WHEN Name_1 = 'Glow' THEN VALUE
+				WHEN mi.d_name = 'Glow' THEN mi.p_Value
 			END
 		) AS glow
 	FROM
-		int_data AS id
-		LEFT JOIN str_data AS sd ON sd.LocalId = id.LocalId
+		material_int mi
+		LEFT JOIN material_name mn ON mi.LocalId = mn.LocalId
 	GROUP BY
-		id.LocalId,
-		sd.Strings
+		mi.LocalId,
+		mn.material_name
 	ORDER BY
-		id.LocalId;
+		mi.LocalId;
 `;
 // TODO:
 //sth like this to get Material property of all elements

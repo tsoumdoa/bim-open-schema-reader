@@ -1,63 +1,68 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const sheetSchedule = sql`
 	WITH
 		str_data AS (
 			SELECT
-				*
+				e.LocalId,
+				e.name,
+				p.d_name,
+				p.v_Strings
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_string_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Sheets'
+				e.type = 'Sheets'
 		),
 		pivot_str_data AS (
-			PIVOT str_data ON name_1 USING first (Strings),
+			PIVOT str_data ON d_name USING FIRST (v_Strings)
 			GROUP BY
 				LocalId,
 				name
 		),
 		views_str_data AS (
 			SELECT
-				*
+				e.LocalId,
+				e.name,
+				p.d_name,
+				p.v_Strings,
+				e.Type
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_string_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Views'
+				e.type = 'Views'
 		),
 		views_on_sheets AS (
 			SELECT DISTINCT
 				LocalId,
 				name,
-				Name_1 AS param_name,
-				Strings AS param_value,
-				"GROUP" AS param_group,
+				d_name AS param_name,
+				v_Strings AS param_value,
 				Type
 			FROM
 				views_str_data
 			WHERE
-				param_name = 'Sheet Number'
-				AND param_value != '---'
-				OR param_name = "Type"
-				--param_name = 'File Path'
+				(
+					d_name = 'Sheet Number'
+					AND v_Strings <> '---'
+				)
+				OR d_name = 'Type'
 		),
 		joint_views_on_sheets AS (
-			SELECT DISTINCT
+			SELECT
 				psd.*,
-				list (DISTINCT vos.name) AS view_names,
+				LIST (DISTINCT vos.name) AS view_names
 			FROM
-				pivot_str_data AS psd
-				INNER JOIN views_on_sheets AS vos ON psd."Sheet Number" = vos.param_value
+				pivot_str_data psd
+				JOIN views_on_sheets vos ON psd."Sheet Number" = vos.param_value
 			GROUP BY ALL
 		)
-	SELECT DISTINCT
+	SELECT
 		"Sheet Number",
 		"Sheet Name",
 		view_names,
-		length (view_names) AS view_count,
+		LENGTH (view_names) AS view_count,
 		"Scale",
 		"Current Revision",
 		"Sheet Issue Date",
@@ -70,10 +75,9 @@ export const sheetSchedule = sql`
 		"Designed By",
 		"Checked By",
 		"Drawn By",
-		"File Path",
-		-- list (DISTINCT vos_rows) AS "Views on Sheet",
+		"File Path"
 	FROM
-		joint_views_on_sheets AS jvos
+		joint_views_on_sheets
 	ORDER BY
 		"File Path",
 		"Sheet Number",

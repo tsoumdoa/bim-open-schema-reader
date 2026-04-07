@@ -1,79 +1,52 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const listLevelWithCoredStatus = sql`
 	WITH
-		level_per_model AS (
+		level_data AS (
 			SELECT
 				p.name,
-				p.project_name, -- convert to mm and round
-				ROUND(r0.value * 304.8, 0) AS elevation
+				p.title,
+				ROUND(r0.v_value * 304.8, 0) AS elevation
 			FROM
-				denorm_entities AS p
-				INNER JOIN denorm_string_params AS r2 ON p.index = r2.entity
-				INNER JOIN denorm_single_params AS r0 ON p.index = r0.entity
+				denorm_entities p
+				JOIN denorm_number_params r0 ON p.index = r0.p_Entity
 			WHERE
-				p.category LIKE 'Levels'
-				AND r0.name LIKE 'Elevation'
-			GROUP BY
-				p.name,
-				p.project_name,
-				r0.value
+				p.type = 'Levels'
+				AND r0.d_name = 'Elevation'
 		),
-		-- Add reference elevation for each level (first model in group)
-		level_with_reference AS (
+		level_ref AS (
 			SELECT
-				*,
-				FIRST (elevation) OVER (
+				name,
+				title,
+				elevation,
+				FIRST_VALUE (elevation) OVER (
 					PARTITION BY
 						name
 				) AS ref_elevation
 			FROM
-				level_per_model
-		),
-		-- Mark each model as OK or Wrong
-		level_with_flags AS (
-			SELECT
-				*,
-				CASE
-					WHEN elevation = ref_elevation THEN 'OK'
-					ELSE 'Wrong'
-				END AS model_status
-			FROM
-				level_with_reference
-		),
-		-- Aggregate to get one row per level name
-		level_across_models AS (
-			SELECT
-				name,
-				ref_elevation,
-				CASE
-					WHEN BOOL_AND (model_status = 'OK') THEN 'OK'
-					ELSE 'Uncoordinated level'
-				END AS cord_status,
-				LIST (DISTINCT project_name) AS models,
-				LIST (
-					DISTINCT CASE
-						WHEN model_status = 'Wrong' THEN project_name
-					END
-				) AS wrong_models,
-				LIST (DISTINCT elevation) AS elevations
-			FROM
-				level_with_flags
-			GROUP BY
-				name,
-				ref_elevation
+				level_data
 		)
 	SELECT
 		name,
-		cord_status,
 		ref_elevation,
-		wrong_models,
 		CASE
-			WHEN cord_status = 'Uncoordinated level' THEN elevations
-		END AS mismatched_elevations,
-		models
+			WHEN BOOL_AND (elevation = ref_elevation) THEN 'OK'
+			ELSE 'Uncoordinated level'
+		END AS cord_status,
+		LIST (DISTINCT title) AS models,
+		LIST (
+			DISTINCT CASE
+				WHEN elevation <> ref_elevation THEN title
+			END
+		) AS wrong_models,
+		CASE
+			WHEN NOT BOOL_AND (elevation = ref_elevation) THEN LIST (DISTINCT elevation)
+		END AS mismatched_elevations
 	FROM
-		level_across_models
+		level_ref
+	GROUP BY
+		name,
+		ref_elevation
 	ORDER BY
 		ref_elevation DESC;
 `;
@@ -84,59 +57,58 @@ export const listGridWithCoredStatus = sql`
 			SELECT
 				e.index,
 				e.name,
-				dp2.strings AS grid_type,
-				e.project_name,
+				e.title,
+				dp2.v_Strings AS grid_type,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:StartPoint' THEN dp1.x
+						WHEN dp1.d_name = 'rvt:Grid:StartPoint' THEN dp1.v_X
 					END
 				) AS start_x,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:StartPoint' THEN dp1.y
+						WHEN dp1.d_name = 'rvt:Grid:StartPoint' THEN dp1.v_Y
 					END
 				) AS start_y,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:EndPoint' THEN dp1.x
+						WHEN dp1.d_name = 'rvt:Grid:EndPoint' THEN dp1.v_X
 					END
 				) AS end_x,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:EndPoint' THEN dp1.y
+						WHEN dp1.d_name = 'rvt:Grid:EndPoint' THEN dp1.v_Y
 					END
 				) AS end_y,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN dp1.x
+						WHEN dp1.d_name = 'rvt:Grid:CenterPoint' THEN dp1.v_X
 					END
 				) AS center_x,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN dp1.y
+						WHEN dp1.d_name = 'rvt:Grid:CenterPoint' THEN dp1.v_Y
 					END
 				) AS center_y,
 				MAX(
 					CASE
-						WHEN dp1.name = 'rvt:Grid:CenterPoint' THEN dp3.value
+						WHEN dp3.d_name = 'rvt:Grid:ArcRadius' THEN dp3.v_value
 					END
 				) AS arc_radius
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_points_params AS dp1 ON e.index = dp1.entity
-				INNER JOIN denorm_string_params AS dp2 ON e.index = dp2.entity
-				LEFT JOIN denorm_single_params AS dp3 ON e.index = dp3.entity
+				denorm_entities e
+				JOIN denorm_points_params dp1 ON e.index = dp1.p_Entity
+				JOIN denorm_string_params dp2 ON e.index = dp2.p_Entity
+				LEFT JOIN denorm_number_params dp3 ON e.index = dp3.p_Entity
 			WHERE
-				e.category LIKE 'Grids'
-				AND dp2.name LIKE 'rvt:Grid:Type'
+				e.type = 'Grids'
+				AND dp2.d_name = 'rvt:Grid:Type'
 			GROUP BY
 				e.index,
 				e.name,
-				dp2.strings,
-				e.project_name
+				e.title,
+				dp2.v_Strings
 		),
-		-- Compute normalized direction vectors for Linear grids
-		grid_with_vectors AS (
+		grid_vectors AS (
 			SELECT
 				*,
 				CASE
@@ -152,39 +124,38 @@ export const listGridWithCoredStatus = sql`
 			FROM
 				grid_per_model
 		),
-		-- Compare each model to the reference model
-		grid_with_comparison AS (
+		grid_compare AS (
 			SELECT
 				*,
-				FIRST (dir_x) OVER (
+				FIRST_VALUE (dir_x) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_dir_x,
-				FIRST (dir_y) OVER (
+				FIRST_VALUE (dir_y) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_dir_y,
-				FIRST (center_x) OVER (
+				FIRST_VALUE (center_x) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_center_x,
-				FIRST (center_y) OVER (
+				FIRST_VALUE (center_y) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_center_y,
-				FIRST (arc_radius) OVER (
+				FIRST_VALUE (arc_radius) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_arc_radius
 			FROM
-				grid_with_vectors
+				grid_vectors
 		),
-		grid_with_flags AS (
+		grid_flags AS (
 			SELECT
 				*,
 				CASE
@@ -200,32 +171,24 @@ export const listGridWithCoredStatus = sql`
 					END
 				END AS model_status
 			FROM
-				grid_with_comparison
-		),
-		-- Aggregate to get overall status and wrong models
-		grid_across_models AS (
-			SELECT
-				name,
-				CASE
-					WHEN (model_status = 'OK') THEN 'OK'
-					ELSE 'Uncoordinated'
-				END AS cord_status,
-				LIST (
-					DISTINCT CASE
-						WHEN model_status = 'Wrong' THEN project_name
-					END
-				) AS wrong_models,
-				LIST (DISTINCT project_name) AS models
-			FROM
-				grid_with_flags
-			GROUP BY
-				name,
-				model_status
+				grid_compare
 		)
 	SELECT
-		*
+		name,
+		CASE
+			WHEN BOOL_AND (model_status = 'OK') THEN 'OK'
+			ELSE 'Uncoordinated'
+		END AS cord_status,
+		LIST (DISTINCT title) AS models,
+		LIST (
+			DISTINCT CASE
+				WHEN model_status = 'Wrong' THEN title
+			END
+		) AS wrong_models
 	FROM
-		grid_across_models
+		grid_flags
+	GROUP BY
+		name
 	ORDER BY
 		name;
 `;

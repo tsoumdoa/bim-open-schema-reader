@@ -1,6 +1,14 @@
 import { dwgSchedule } from "../sql/dwg-schedule";
 import { floorSchedule } from "../sql/floor-schedule";
 import { floorScheduleByType } from "../sql/floor-schedule-by-type";
+import {
+	renderAllGeometry,
+	renderWallsGeometry,
+	renderFloorsGeometry,
+	renderColumnsGeometry,
+	renderDoorsGeometry,
+	renderWindowsGeometry,
+} from "../sql/geometry-queries";
 import { listGrids, listLevels } from "../sql/level-and-grid";
 import {
 	listGridWithCoredStatus,
@@ -229,7 +237,44 @@ const structure: QueriesSelector = {
 	],
 };
 
+const viewer3d: QueriesSelector = {
+	queryCategory: "3D Viewer",
+	queryObjects: [
+		{
+			queryTitle: "Render All Geometry",
+			sqlQuery: renderAllGeometry,
+			explanation: "Renders all 3D geometry in the viewer.",
+		},
+		{
+			queryTitle: "Render Walls",
+			sqlQuery: renderWallsGeometry,
+			explanation: "Renders only walls in the 3D viewer.",
+		},
+		{
+			queryTitle: "Render Floors",
+			sqlQuery: renderFloorsGeometry,
+			explanation: "Renders only floors in the 3D viewer.",
+		},
+		{
+			queryTitle: "Render Columns",
+			sqlQuery: renderColumnsGeometry,
+			explanation: "Renders only structural columns in the 3D viewer.",
+		},
+		{
+			queryTitle: "Render Doors",
+			sqlQuery: renderDoorsGeometry,
+			explanation: "Renders only doors in the 3D viewer.",
+		},
+		{
+			queryTitle: "Render Windows",
+			sqlQuery: renderWindowsGeometry,
+			explanation: "Renders only windows in the 3D viewer.",
+		},
+	],
+};
+
 export const queriesSelectorList: QueriesSelector[] = [
+	viewer3d,
 	levels,
 	grids,
 	materials,
@@ -240,7 +285,8 @@ export const queriesSelectorList: QueriesSelector[] = [
 	rooms,
 	cadLinks,
 	floors,
-	structure,
+	// structure, //TODO: completely broken for now, can't fix till the next
+	// exporter release
 ];
 
 export const denormParamQueryBuilderName: {
@@ -248,8 +294,8 @@ export const denormParamQueryBuilderName: {
 	displayName: string;
 }[] = [
 	{
-		tableName: "denorm_single_params",
-		displayName: "Single Parameters",
+		tableName: "denorm_number_params",
+		displayName: "Number Parameters",
 	},
 	{
 		tableName: "denorm_entity_params",

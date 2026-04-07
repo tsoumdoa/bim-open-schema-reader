@@ -1,4 +1,4 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const levelSchedule = sql`
 	WITH
@@ -7,79 +7,51 @@ export const levelSchedule = sql`
 				p.index,
 				p.name,
 				p.LocalId,
-				p.project_name,
-				round(r0.value * 304.8, 0) AS elevation
+				p.title,
+				ROUND(r0.v_value * 304.8, 0) AS elevation
 			FROM
-				denorm_entities AS p
-				INNER JOIN denorm_string_params AS r2 ON p.index = r2.entity
-				INNER JOIN denorm_single_params AS r0 ON p.index = r0.entity
+				denorm_entities p
+				JOIN denorm_number_params r0 ON p.index = r0.p_Entity
 			WHERE
-				p.category LIKE 'Levels'
-				AND r0.name LIKE 'Elevation'
-			GROUP BY
-				p.name,
-				p.index,
-				p.LocalId,
-				p.project_name,
-				r0.value
+				p.type = 'Levels'
+				AND r0.d_name = 'Elevation'
 		),
-		int_data AS (
+		level_flags AS (
 			SELECT
-				*
-			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_integer_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
-			WHERE
-				e.category = 'Levels'
-		),
-		filtered_int_data AS (
-			SELECT
-				LocalId,
-				name,
+				e.LocalId,
 				MAX(
 					CASE
-						WHEN Name_1 = 'Building Story' THEN CASE
-							WHEN VALUE = 1 THEN 'True'
-							ELSE 'False'
-						END
+						WHEN p.d_name = 'Building Story'
+						AND p.p_Value = 1 THEN 'True'
+						ELSE 'False'
 					END
 				) AS building_story,
 				MAX(
 					CASE
-						WHEN Name_1 = 'Structural' THEN CASE
-							WHEN VALUE = 1 THEN 'True'
-							ELSE 'False'
-						END
+						WHEN p.d_name = 'Structural'
+						AND p.p_Value = 1 THEN 'True'
+						ELSE 'False'
 					END
 				) AS structural
 			FROM
-				int_data
+				denorm_entities e
+				JOIN denorm_integer_params p ON e.index = p.p_Entity
+			WHERE
+				e.type = 'Levels'
+				AND p.d_name IN ('Building Story', 'Structural')
 			GROUP BY
-				LocalId,
-				name
-		),
-		joint_table AS (
-			SELECT DISTINCT
-				level_data.*,
-				filtered_int_data.* EXCLUDE (LocalId, name),
-			FROM
-				level_data
-				JOIN filtered_int_data ON level_data.LocalId = filtered_int_data.LocalId
+				e.LocalId
 		)
 	SELECT
-		-- index,
-		-- LocalId,
-		project_name,
-		name,
-		elevation,
-		building_story,
-		structural
+		l.title,
+		l.name,
+		l.elevation,
+		f.building_story,
+		f.structural
 	FROM
-		joint_table
-		-- WHERE
-		--   project_name = 'Snowdon Towers Sample Architectural'
+		level_data l
+		LEFT JOIN level_flags f ON l.LocalId = f.LocalId
 	ORDER BY
-		elevation DESC,
-		project_name;
+		l.elevation DESC,
+		l.title;
 `;

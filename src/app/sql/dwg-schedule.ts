@@ -1,63 +1,32 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
+// TODO: this is completely broken... wtf
 export const dwgSchedule = sql`
 	WITH
-		double_data AS (
-			SELECT
-				*
-			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_single_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
-			WHERE
-				e.category = 'Rooms'
-		),
-		pivot_double_data AS (
-			PIVOT double_data ON name_1 IN ("Volume", "Area", "Unbounded Height") USING first (VALUE),
-			-- first (Units) AS param_units
-			GROUP BY
-				LocalId,
-				name
-		),
 		str_data AS (
 			SELECT
-				*
+				e.LocalId,
+				e.name,
+				p.d_name,
+				p.v_Strings
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_string_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Rooms'
+				e.type = 'RVT Links'
 		),
 		pivot_str_data AS (
-			PIVOT str_data ON name_1 IN (
-				"Level",
-				"Floor Finish",
-				"Wall Finish",
-				"Base Finish",
-				"Ceiling Finish",
-				"Comments",
-				"Department"
-			) USING first (Strings)
+			PIVOT str_data ON d_name USING FIRST (v_Strings)
 			GROUP BY
 				LocalId,
 				name
-		),
-		joint AS (
-			SELECT DISTINCT
-				psd.*,
-				pdd.Area * 0.092903 AS area_m2,
-				pdd."Unbounded Height" * 304.8 AS height_mm,
-				pdd.Volume * 0.0283168 volume_m3,
-			FROM
-				pivot_str_data AS psd
-				LEFT JOIN pivot_double_data AS pdd ON psd.LocalId = pdd.LocalId
 		)
-	SELECT
-		*
+	SELECT DISTINCT
+		name
 	FROM
-		joint
+		pivot_str_data psd
+	WHERE
+		"Family Name" = 'Linked CAD Model'
 	ORDER BY
-		Level,
 		name;
 `;

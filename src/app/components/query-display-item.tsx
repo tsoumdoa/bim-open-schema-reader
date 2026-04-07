@@ -1,12 +1,9 @@
 import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { formatForFileDownload } from "../utils/format";
-import {
-	QueryDisplayState,
-	QueryObject,
-	UseExpandDisplay,
-} from "../utils/types";
-import QueryResultDisplayTable from "./query-result-display";
-import SqlQueryCodeBlock from "./sql-code-block";
+import { QueryDisplayState, QueryObject } from "../utils/types";
+import { BimViewer } from "./bim-viewer";
+import CodeBlockAndResultDisplay from "./codeblock-and-result-display";
+import { useQueryObjCtx } from "./query-obj-provider";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -16,14 +13,13 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Menu } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 function AboutMenuItem(props: { queryObject: QueryObject }) {
 	return (
@@ -100,10 +96,8 @@ export default function QueryDisplayItem(props: {
 	queryObject: QueryObject;
 	removeObject: (queryObject: QueryObject) => void;
 	index: number;
-	useExpandDisplay: UseExpandDisplay;
-	updateQueryTitle: (queryObject: QueryObject, newTitle: string) => void;
-	updateQuery: (queryObject: QueryObject, newQuery: string) => void;
 }) {
+	//TODO:
 	const useQueryViewerAndEditorHook = useQueryViewerAndEditor(
 		props.queryObject.queryTitle,
 		props.queryObject.sqlQuery
@@ -114,7 +108,10 @@ export default function QueryDisplayItem(props: {
 		setQueryDisplayState,
 		setQueryTitleState,
 	} = useQueryViewerAndEditorHook;
-	const { displayExpanded, setDisplayExpanded } = props.useExpandDisplay;
+
+	const { updateQueryTitle } = useQueryObjCtx();
+
+	// handle title input change
 	const [titleInputValue, setTitleInputValue] = useState(
 		props.queryObject.queryTitle
 	);
@@ -125,7 +122,7 @@ export default function QueryDisplayItem(props: {
 		setTitleInputValue(newTitle);
 		if (newTitle !== props.queryObject.queryTitle) {
 			setQueryTitleState("edited");
-			props.updateQueryTitle(props.queryObject, newTitle);
+			updateQueryTitle(props.queryObject, newTitle);
 		} else {
 			setQueryTitleState("original");
 		}
@@ -137,13 +134,6 @@ export default function QueryDisplayItem(props: {
 			: props.queryObject.queryTitle
 	);
 
-	const isFocused = () => {
-		if (displayExpanded === -1) {
-			return true;
-		}
-		return displayExpanded === props.index;
-	};
-
 	const handleShowSqlQuery = () => {
 		setQueryDisplayState("hidden");
 		if (queryDisplayState === "hidden") {
@@ -151,22 +141,47 @@ export default function QueryDisplayItem(props: {
 		} else {
 			setQueryDisplayState("hidden");
 		}
-
-		setDisplayExpanded(-1);
 	};
-
-	useEffect(() => {
-		if (displayExpanded !== -1) {
-			setQueryDisplayState("hidden");
-		}
-	}, [displayExpanded]);
 
 	const showTitle =
 		queryDisplayState === "viewer" || queryDisplayState === "hidden";
 
+	const [entityIndices, setEntityIndices] = useState<number[]>([]);
+
+	const handleQueryResults = useCallback(
+		(headers: string[], rows: unknown[][]) => {
+			const entityIndexColIndex = headers.findIndex((h) => {
+				const name = h.toLowerCase();
+				return name === "entity_index" || name === "index";
+			});
+
+			if (entityIndexColIndex === -1) {
+				setEntityIndices((prev) => (prev.length === 0 ? prev : []));
+				return;
+			}
+
+			const indices = rows
+				.map((row) => Number(row[entityIndexColIndex]))
+				.filter((idx) => !Number.isNaN(idx));
+
+			const uniqueIndices = [...new Set(indices)];
+
+			setEntityIndices((prev) => {
+				if (
+					prev.length === uniqueIndices.length &&
+					prev.every((value, i) => value === uniqueIndices[i])
+				) {
+					return prev;
+				}
+				return uniqueIndices;
+			});
+		},
+		[]
+	);
+
 	return (
 		<div
-			className={`${!isFocused() ? "opacity-35" : ""} flex w-full flex-col gap-y-2`}
+			className="flex w-full flex-col "
 			key={`${props.index}-${props.queryObject.id}`}
 		>
 			<div className="flex w-full flex-row items-center justify-start gap-x-2">
@@ -195,26 +210,15 @@ export default function QueryDisplayItem(props: {
 					removeObject={props.removeObject}
 				/>
 			</div>
-			{queryDisplayState !== "hidden" && (
-				<SqlQueryCodeBlock
-					queryObject={props.queryObject}
-					updateQueryTitle={props.updateQueryTitle}
-					updateQuery={props.updateQuery}
-					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
-				/>
-			)}
-
-			<div className="w-full min-w-0 overflow-auto">
-				<QueryResultDisplayTable
-					index={props.index}
-					displayExpanded={displayExpanded}
-					setDisplayExpanded={setDisplayExpanded}
-					lockScroll={!isFocused()}
-					fileDownloadName={fileDownloadName}
-					useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
-				/>
-			</div>
-			<Separator className="my-4" />
+			<BimViewer entityIndices={entityIndices} />
+			<CodeBlockAndResultDisplay
+				index={props.index}
+				queryObject={props.queryObject}
+				fileDownloadName={fileDownloadName}
+				queryDisplayState={queryDisplayState}
+				handleQueryResults={handleQueryResults}
+				useQueryViewerAndEditorHook={useQueryViewerAndEditorHook}
+			/>
 		</div>
 	);
 }

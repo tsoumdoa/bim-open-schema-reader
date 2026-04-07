@@ -1,40 +1,39 @@
-import { UseExpandDisplay } from "../utils/types";
 import { useQueryObjCtx } from "./query-obj-provider";
 
 export default function ListQueriesInSidebar(props: {
-	useExpandDisplay: UseExpandDisplay;
+	deleteAll: () => void;
+	objLength: number;
 }) {
-	const { useQueryObjects } = useQueryObjCtx();
-	const queryObjs = useQueryObjects.queryObjects;
-
-	const { setDisplayExpanded } = props.useExpandDisplay;
-	const handleClick = (id: number) => {
-		setDisplayExpanded(id);
-	};
-
-	const indexMap = new Map<string, number>();
-	queryObjs.forEach((q, i) => {
-		indexMap.set(q.id ?? "", i);
-	});
+	const { queryObjects, selectedQueryId, setSelectedQueryId } =
+		useQueryObjCtx();
 
 	return (
 		<div>
-			{queryObjs.map((queryObject, i) => (
-				<ul key={queryObject.id ?? `query-object-${i}`}>
-					<li className="w-full truncate pl-2 text-sm leading-tight">
-						<button
-							type="button"
-							className="text-base hover:cursor-pointer hover:underline"
-							onClick={() => {
-								handleClick(indexMap.get(queryObject.id ?? "") ?? -1);
-							}}
-						>
-							<span className="text-xs font-bold">Q{i + 1} </span>
-							<span className="text-xs">{queryObject.queryTitle}</span>
-						</button>
-					</li>
-				</ul>
-			))}
+			{queryObjects.map((queryObject, i) => {
+				const isSelected = selectedQueryId === queryObject.id;
+				return (
+					<button
+						key={queryObject.id ?? `query-object-${i}`}
+						onClick={() => setSelectedQueryId(queryObject.id ?? null)}
+						className="w-full truncate pl-2 text-sm leading-tight text-left"
+					>
+						<span className={`text-xs ${isSelected ? "font-bold" : ""}`}>
+							Q{i + 1}{" "}
+						</span>
+						<span className={`text-xs ${isSelected ? "font-bold" : ""}`}>
+							{queryObject.queryTitle}
+						</span>
+					</button>
+				);
+			})}
+			{props.objLength > 2 && (
+				<button
+					onClick={props.deleteAll}
+					className="mt-1 w-full pl-2  font-semibold text-left text-xs text-zinc-400 hover:text-red-400 transition-colors duration-150"
+				>
+					Delete All
+				</button>
+			)}
 		</div>
 	);
 }

@@ -1,0 +1,385 @@
+import { ValidFileNames, ValidFileNamesWithGeo } from "./types";
+
+// NOTE: boilerplate
+export const sql = (strings: TemplateStringsArray, ...values: string[]) =>
+	strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), "");
+
+export const createBosTable = (
+	fileNames: ValidFileNames[] | ValidFileNamesWithGeo[]
+) => {
+	return fileNames
+		.map((fileName) => {
+			return sql`
+				CREATE VIEW ${fileName.replace(".parquet", "")} AS
+				SELECT
+					*,
+					(row_number() OVER () - 1) AS index
+				FROM
+					${fileName};
+			`;
+		})
+		.join("\n");
+};
+
+export const createHelperViewsAndTables = () => sql`
+	-- parameter enum table
+	CREATE
+	OR REPLACE TABLE Enum_Parameter (index INTEGER, ParameterType VARCHAR(20));
+
+	INSERT INTO
+		Enum_Parameter (index, ParameterType)
+	VALUES
+		(0, 'Int'),
+		(1, 'Double'),
+		(2, 'Entity'),
+		(3, 'String'),
+		(4, 'Point');
+
+	CREATE TABLE IF NOT EXISTS Enum_RelationType (index INTEGER, RelationType VARCHAR(20));
+
+	INSERT INTO
+		Enum_RelationType (index, RelationType)
+	VALUES
+		(0, 'PartOf'),
+		(1, 'MemberOf'),
+		(2, 'ContainedIn'),
+		(3, 'HostedBy'),
+		(4, 'ChildOf'),
+		(5, 'HasLayer'),
+		(6, 'HasMaterial'),
+		(7, 'ConnectsTo'),
+		(8, 'HasConnector'),
+		(9, 'BoundedBy'),
+		(10, 'TraverseTo'),
+		(11, 'Voids'),
+		(12, 'Fills'),
+		(13, 'Covers'),
+		(14, 'Serves');
+
+	CREATE TABLE IF NOT EXISTS Enum_DiagnosticType (index INTEGER, DiagnosticType VARCHAR(20));
+
+	INSERT INTO
+		Enum_DiagnosticType (index, DiagnosticType)
+	VALUES
+		(0, 'RevitWarning'),
+		(1, 'RevitError'),
+		(2, 'ExporterWarning'),
+		(3, 'ExporterError'),
+		(4, 'ExporterInfo');
+
+	-- denormalize documents
+	CREATE
+	OR REPLACE VIEW denorm_documents AS
+	SELECT
+		d.index,
+		p.Strings AS path,
+		t.Strings AS title,
+	FROM
+		Documents d
+		LEFT OUTER JOIN Strings p ON d.Path = p."index"
+		LEFT OUTER JOIN Strings t ON d.Title = t."index";
+
+	-- denormalize diagonostics
+	CREATE
+	OR REPLACE VIEW denorm_diagnostics AS
+	SELECT
+		d.index,
+		d.Entity,
+		t.DiagnosticType AS type,
+		m.Strings AS message,
+	FROM
+		Diagnostics d
+		JOIN Strings m ON m."index" = d.Message
+		JOIN Enum_DiagnosticType t ON t.index = d.Type;
+
+	-- denormalize entities
+	CREATE
+	OR REPLACE VIEW denorm_entities AS
+	SELECT
+		e.LocalId,
+		e.GlobalId,
+		e."index" AS index,
+		s_name.Strings AS name,
+		type_name.Strings AS type,
+		e.category,
+		e.Type AS instance_entity_index,
+		dd.index AS doc_index,
+		dd.path,
+		dd.title
+	FROM
+		Entities e
+		LEFT OUTER JOIN Strings AS s_name ON e."name" = s_name."index"
+		LEFT OUTER JOIN Entities AS instance_ent ON instance_ent."index" = e.Category
+		LEFT OUTER JOIN Strings AS type_name ON instance_ent."name" = type_name."index"
+		LEFT OUTER JOIN denorm_documents dd ON e.Document = dd."index";
+
+	-- denormalize descriptor
+	CREATE
+	OR REPLACE VIEW denorm_descriptors AS
+	SELECT
+		d.index AS index,
+		n.Strings AS name,
+		u.Strings AS units,
+		g.Strings AS "group",
+		t.ParameterType AS type
+	FROM
+		Descriptors d
+		LEFT OUTER JOIN Strings n ON n.index = d.Name
+		LEFT OUTER JOIN Strings u ON u.index = d.Units
+		LEFT OUTER JOIN Strings g ON g.index = d.Group
+		LEFT OUTER JOIN Enum_Parameter t ON t.index = d.Type;
+
+	-- denormalize StringParameters
+	CREATE
+	OR REPLACE VIEW denorm_string_params AS
+	WITH
+		string_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'String'
+		)
+	SELECT
+		COLUMNS (p.* EXCLUDE (Descriptor, "Value")) AS ${String.raw`'p_\0'`},
+		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
+		COLUMNS (d.* EXCLUDE (index, Units)) AS ${String.raw`'d_\0'`},
+	FROM
+		Parameters p
+		JOIN string_descriptors d ON d.index = p.Descriptor
+		JOIN Strings v ON v.index = p."Value";
+
+	-- denormalize PointParameters
+	CREATE
+	OR REPLACE VIEW denorm_points_params AS
+	WITH
+		point_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'Point'
+		)
+	SELECT
+		COLUMNS (p.* EXCLUDE (Descriptor, "Value", index)) AS ${String.raw`'p_\0'`},
+		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
+		COLUMNS (d.* EXCLUDE (index, Units)) AS ${String.raw`'d_\0'`},
+	FROM
+		Parameters p
+		JOIN point_descriptors d ON d.index = p.Descriptor
+		JOIN Points v ON v.index = p."Value";
+
+	CREATE
+	OR REPLACE VIEW denorm_number_params AS
+	WITH
+		number_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'Double' --NOTE: looks sus.. should it not be Number...?
+		)
+	SELECT
+		COLUMNS (p.* EXCLUDE (Descriptor, index, "Value")) AS ${String.raw`'p_\0'`},
+		p."Value" AS v_value,
+		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
+	FROM
+		Parameters p
+		JOIN number_descriptors d ON d.index = p.Descriptor;
+
+	-- denormalize Integer Parameters
+	CREATE
+	OR REPLACE VIEW denorm_integer_params AS
+	WITH
+		int_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'Int'
+		)
+	SELECT
+		COLUMNS (p.* EXCLUDE (Descriptor, index)) AS ${String.raw`'p_\0'`},
+		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
+	FROM
+		Parameters p
+		JOIN int_descriptors d ON d.index = p.Descriptor;
+
+	-- denormalize Entity Parameters
+	CREATE
+	OR REPLACE VIEW denorm_entity_params AS
+	WITH
+		entity_descriptors AS (
+			SELECT
+				*
+			FROM
+				denorm_descriptors d
+			WHERE
+				d.type = 'Entity'
+		)
+	SELECT
+		COLUMNS (p.*) AS ${String.raw`'p_\0'`},
+		COLUMNS (v.* EXCLUDE (index)) AS ${String.raw`'v_\0'`},
+		COLUMNS (d.* EXCLUDE (index)) AS ${String.raw`'d_\0'`},
+	FROM
+		Parameters p
+		JOIN denorm_entities v USING (index)
+		JOIN denorm_descriptors d ON d.index = p.Descriptor;
+
+	-- DENORM GEOMETRICAL DATA TABLES
+	-- denormalize geometry: VertexBuffer
+	CREATE
+	OR REPLACE VIEW denorm_vertex_buffer_view AS
+	SELECT
+		VertexBuffer.index AS index,
+		VertexBuffer.VertexX / 10000.0 AS x,
+		VertexBuffer.VertexY / 10000.0 AS y,
+		VertexBuffer.VertexZ / 10000.0 AS z
+	FROM
+		VertexBuffer;
+
+	-- denormalize geometry: IndexBuffer
+	CREATE
+	OR REPLACE VIEW denorm_index_buffer_view AS
+	SELECT
+		IndexBuffer.index AS index,
+		IndexBuffer.IndexBuffer AS index_value
+	FROM
+		IndexBuffer;
+
+	-- denormalize geometry: Meshes
+	CREATE
+	OR REPLACE VIEW denorm_meshes_view AS
+	SELECT
+		Meshes.index AS index,
+		Meshes.MeshVertexOffset AS vertex_offset,
+		Meshes.MeshIndexOffset AS index_offset
+	FROM
+		Meshes;
+
+	-- denormalize geometry: Materials
+	CREATE
+	OR REPLACE VIEW denorm_materials_view AS
+	SELECT
+		Materials.index AS index,
+		Materials.MaterialRed / 255.0 AS red,
+		Materials.MaterialGreen / 255.0 AS green,
+		Materials.MaterialBlue / 255.0 AS blue,
+		Materials.MaterialAlpha / 255.0 AS alpha,
+		Materials.MaterialRoughness / 255.0 AS roughness,
+		Materials.MaterialMetallic / 255.0 AS metallic
+	FROM
+		Materials;
+
+	-- denormalize geometry: Transforms
+	CREATE
+	OR REPLACE VIEW denorm_transforms_view AS
+	SELECT
+		Transforms.index AS index,
+		Transforms.TransformTX AS tx,
+		Transforms.TransformTY AS ty,
+		Transforms.TransformTZ AS tz,
+		Transforms.TransformQX AS qx,
+		Transforms.TransformQY AS qy,
+		Transforms.TransformQZ AS qz,
+		Transforms.TransformQW AS qw,
+		Transforms.TransformSX AS sx,
+		Transforms.TransformSY AS sy,
+		Transforms.TransformSZ AS sz
+	FROM
+		Transforms;
+
+	-- denormalize geometry: Instances
+	CREATE
+	OR REPLACE VIEW denorm_instances_view AS
+	SELECT
+		Instances.index AS index,
+		Instances.InstanceEntityIndex AS entity_index,
+		Instances.InstanceMaterialIndex AS material_index,
+		Instances.InstanceMeshIndex AS mesh_index,
+		Instances.InstanceTransformIndex AS transform_index,
+		Instances.InstanceFlags AS flags
+	FROM
+		Instances;
+
+	-- denormalize geometry: Elements (joins all geometry tables with entities)
+	CREATE
+	OR REPLACE VIEW denorm_geometry_elements AS
+	SELECT
+		i.index AS instance_index,
+		i.entity_index,
+		i.mesh_index,
+		i.transform_index,
+		i.material_index,
+		i.flags,
+		e.LocalId,
+		e.GlobalId,
+		e.category,
+		m.vertex_offset,
+		m.index_offset AS mesh_index_offset,
+		t.tx,
+		t.ty,
+		t.tz,
+		t.qx,
+		t.qy,
+		t.qz,
+		t.qw,
+		t.sx,
+		t.sy,
+		t.sz,
+		mat.red,
+		mat.green,
+		mat.blue,
+		mat.alpha,
+		mat.roughness,
+		mat.metallic
+	FROM
+		denorm_instances_view i
+		LEFT OUTER JOIN denorm_entities e ON i.entity_index = e.index
+		LEFT OUTER JOIN denorm_meshes_view m ON i.mesh_index = m.index
+		LEFT OUTER JOIN denorm_transforms_view t ON i.transform_index = t.index
+		LEFT OUTER JOIN denorm_materials_view mat ON i.material_index = mat.index;
+`;
+
+export const listAllTableInfo = sql`
+	SELECT
+		*
+	FROM
+		information_schema.tables;
+`;
+
+export const listAllTableInfoWithColumnInfo = sql`
+	SELECT
+		table_name,
+		list (column_name),
+		list (data_type),
+		first (table_catalog)
+	FROM
+		information_schema.columns
+		--where table_catalog LIKE 'memory'
+	GROUP BY
+		table_name
+`;
+
+export const listCountByCategory = sql`
+	SELECT
+		e.type AS paramname,
+		COUNT(DISTINCT e.index) AS count
+	FROM
+		denorm_entities AS e
+	GROUP BY
+		e.type
+	ORDER BY
+		paramname ASC;
+`;
+
+export const summarizeTableInfo = (tableName: string) => sql`
+	SELECT
+		COUNT(*)
+	FROM
+		${tableName};
+`;

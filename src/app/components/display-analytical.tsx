@@ -1,8 +1,8 @@
 import { useDuckDB } from "../hooks/use-duckdb";
 import { useImportParquet } from "../hooks/use-import-parquet";
-import { useQueryObjects } from "../hooks/use-query-objects";
 import { BosFileType, ParquetBlob } from "../utils/types";
 import DashboardContainer from "./dashboard-container";
+import { GeometryProviderFromParquet } from "./geometry-from-parquet-context";
 import QueryObjProvider from "./query-obj-provider";
 import { SimpleErrMessage } from "./simple-err-message";
 import { DuckDbProvider, useDuckDb } from "./use-db";
@@ -21,7 +21,15 @@ function DbProvider(props: {
 		return <div>Initializing...</div>;
 	}
 	if (isInitialized) {
-		return props.children;
+		return (
+			<GeometryProviderFromParquet
+				parquetFileEntries={props.parquetFileEntries}
+				db={db}
+				conn={conn}
+			>
+				{props.children}
+			</GeometryProviderFromParquet>
+		);
 	}
 	return (
 		<SimpleErrMessage
@@ -37,7 +45,6 @@ export default function AnalyticalDisplay(props: {
 	bosFileType: BosFileType;
 }) {
 	const { dbRef, connectionRef, error, loading } = useDuckDB();
-	const useQueryObj = useQueryObjects();
 
 	if (!error && loading) {
 		return <div>Initializing...</div>;
@@ -49,9 +56,8 @@ export default function AnalyticalDisplay(props: {
 				db={dbRef.current}
 				c={connectionRef.current}
 				bosFileType={props.bosFileType}
-				useQueryObjects={useQueryObj}
 			>
-				<QueryObjProvider useQueryObjects={useQueryObj}>
+				<QueryObjProvider>
 					<DbProvider parquetFileEntries={props.parquetFileEntries}>
 						<DashboardContainer
 							fileName={props.fileName}

@@ -47,8 +47,11 @@ export function QuickExplorer(props: {
 }) {
 	const [focused, setFocused] = useState("");
 	const { isSelected } = useDataReadinessFilter();
-	const useKeywordFilterHook = useKeywordFilter();
-	const { keyword } = useKeywordFilterHook;
+	const keywordFilter = useKeywordFilter();
+	const { keyword } = keywordFilter;
+
+	const normalizedKeyword = keyword.trim().toLowerCase();
+	const hasKeyword = normalizedKeyword.length > 0;
 
 	return (
 		<BlurredBackdrop>
@@ -67,35 +70,32 @@ export function QuickExplorer(props: {
 						<span className="sr-only">Close</span>
 					</Button>
 				</CardHeader>
+
 				<CardContent>
 					<div className="flex flex-row items-center justify-between">
 						<FilterByDataReadiness />
-						<KeywordFilter useKeywordFilter={useKeywordFilterHook} />
+						<KeywordFilter useKeywordFilter={keywordFilter} />
 					</div>
+
 					<ScrollArea className="h-[60vh] pt-1 pr-4">
 						{generalCategory.map((categoryName, categoryIndex) => {
 							const rawRows = props.categoryGroupMap.get(categoryName);
 							if (!rawRows || rawRows.length === 0) return null;
 
-							const kw = keyword.trim().toLowerCase();
-							const doKeyword = kw.length > 0;
+							const filteredRows: [GeneralCategoryObj, number][] =
+								rawRows.filter(([item]) => {
+									if (!isSelected(item.analyticalReadiness)) {
+										return false;
+									}
 
-							const filteredRows = [];
-							for (const row of rawRows) {
-								const item = row[0];
-								if (!isSelected(item.analyticalReadiness)) continue;
-								if (!doKeyword) {
-									filteredRows.push(row);
-									continue;
-								}
-								if (
-									doKeyword &&
-									item.categoryName?.toLowerCase().includes(kw)
-								) {
-									continue;
-								}
-								filteredRows.push(row);
-							}
+									if (!hasKeyword) {
+										return true;
+									}
+
+									return (item.categoryName ?? "")
+										.toLowerCase()
+										.includes(normalizedKeyword);
+								});
 
 							if (filteredRows.length === 0) return null;
 
@@ -114,33 +114,35 @@ export function QuickExplorer(props: {
 
 									<div className="flex flex-row flex-wrap gap-3">
 										{filteredRows.map((row, groupIndex) => {
+											const [item, count] = row;
+
+											const focusKey = `quick-${categoryIndex}-${groupIndex}`;
 											const dimmedBadge =
-												focused !== "" &&
-												focused !== `quick-${categoryIndex}-${groupIndex}`;
+												focused !== "" && focused !== focusKey;
 
 											return (
 												<Badge
-													key={`koolthing-category-count-${groupIndex}`}
+													key={`quick-badge-${categoryIndex}-${groupIndex}`}
 													variant="default"
-													className={`transition-all hover:bg-neutral-400 ${
+													className={`text-md font-normal transition-all hover:cursor-pointer hover:bg-neutral-400 ${
 														dimmedBadge ? "opacity-20" : ""
-													} text-md font-normal hover:cursor-pointer`}
+													}`}
 												>
 													<DropDownMenu
-														categoryName={(row[0].categoryName as string) || ""}
+														categoryName={item.categoryName ?? ""}
 														setFocused={setFocused}
-														indexKey={`quick-${categoryIndex}-${groupIndex}`}
+														indexKey={focusKey}
 														disableShortcutRef={props.disableShortcutRef}
 														onClose={props.onClose}
 													>
 														<div className="flex flex-row items-center gap-2">
 															<DataReadinessIcon
-																dataReadiness={row[0].analyticalReadiness}
+																dataReadiness={item.analyticalReadiness}
 																useThin={false}
 															/>
 															<span className="w-fit hover:cursor-pointer">
-																{row[0].categoryName || "<undefined>"}{" "}
-																{`- ${row[1].toLocaleString()}`}
+																{item.categoryName ?? "<undefined>"}{" "}
+																{`- ${count.toLocaleString()}`}
 															</span>
 														</div>
 													</DropDownMenu>
@@ -154,6 +156,7 @@ export function QuickExplorer(props: {
 							);
 						})}
 					</ScrollArea>
+
 					<ShortcutHelp />
 				</CardContent>
 			</Card>

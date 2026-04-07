@@ -34,3 +34,18 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 
 - Open an issue to discuss ideas
 - Keep PRs focused and include a brief description and screenshots if UI-related
+
+## Current limitations and future work
+
+- glass material is not rendered properly...
+- z-fighiting so hard
+- highlight by selecting
+- zoom to select/ zoom to fit
+- highlight by color and show that in table too
+- being able to isolate element from table
+- section/ plan cuts
+- measuring tool
+- model export (e.g. obj, stl, dxf)
+- exploded view for models
+- imersive views (full screen viewer experience)
+- diff between models

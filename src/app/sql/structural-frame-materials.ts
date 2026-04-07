@@ -1,4 +1,4 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 // TODO: export length and volume of each column from revit and add to this...?
 export const structuralFrameMaterials = sql`
@@ -12,7 +12,7 @@ export const structuralFrameMaterials = sql`
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 				INNER JOIN denorm_entities AS e2 ON p.Value = e2.index
 			WHERE
-				e.category = 'Structural Framing'
+				e.type = 'Structural Framing'
 		),
 		pivot_entity_data AS (
 			PIVOT entity_data ON name_1 USING first (name_3) AS param_value,
@@ -21,18 +21,18 @@ export const structuralFrameMaterials = sql`
 				LocalId,
 				name
 		),
-		double_data AS (
+		single_data AS (
 			SELECT
 				*
 			FROM
 				denorm_entities AS e
-				INNER JOIN denorm_single_params AS p ON e.index = p.entity
+				INNER JOIN denorm_number_params AS p ON e.index = p.entity
 				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
 			WHERE
-				e.category = 'Structural Framing'
+				e.type = 'Structural Framing'
 		),
-		pivot_double_data AS (
-			PIVOT double_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,
+		pivot_single_data AS (
+			PIVOT single_data ON name_1 IN (Length, Volume) USING first (VALUE) AS param_value,
 			GROUP BY
 				LocalId,
 				name
@@ -54,7 +54,7 @@ export const structuralFrameMaterials = sql`
 				pd.Volume_param_value AS total_volume
 			FROM
 				pivot_entity_data AS ci
-				JOIN pivot_double_data pd ON pd.LocalId = ci.LocalId
+				JOIN pivot_single_data pd ON pd.LocalId = ci.LocalId
 			WHERE
 				Family_param_value IS NOT NULL
 		),

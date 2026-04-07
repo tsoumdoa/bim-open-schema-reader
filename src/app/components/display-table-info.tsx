@@ -3,9 +3,9 @@ import { formatData } from "../utils/format";
 import {
 	listAllTableInfoWithColumnInfo,
 	summarizeTableInfo,
-} from "../utils/queries";
+} from "../utils/init-queries";
 import {
-	// denormGeoTableNames,
+	denormGeoTableNames,
 	denormTableNames,
 	GeoTableNames,
 	NonGeoTableNames,
@@ -40,7 +40,7 @@ function TableSummary(props: { name: string }) {
 	);
 }
 
-function mergeNameAndType(names: string | number, types: string | number) {
+function mergeNameAndType(names: unknown, types: unknown) {
 	//bad bad bad but i know what i'm doing
 	//@ts-ignore
 	const nameArray = names.toArray() as string[];
@@ -86,7 +86,7 @@ function AccordionDisplay(props: {
 	);
 }
 
-function RowDisplay(props: { rows: (string | number)[][] }) {
+function RowDisplay(props: { rows: unknown[][] }) {
 	return props.rows.map((row, i) => (
 		<React.Fragment key={`table-row-${i} `}>
 			<TableSummary name={row[0] as string} />
@@ -107,20 +107,26 @@ export function DisplayTableInfo() {
 
 	const names = rows.map((row) => row[0]) as string[];
 
-	const enumRows = rows.filter((_, index) => names[index].includes("Enum_"));
-
 	const denormalizedNonGeoRows = rows.filter((_, index) =>
 		denormTableNames.includes(names[index])
 	);
-	// const denormalizedGeoRows = rows.filter((_, index) =>
-	// 	denormGeoTableNames.includes(names[index])
-	// );
+	const denormalizedGeoRows = rows.filter((_, index) =>
+		denormGeoTableNames.includes(names[index])
+	);
 	const geoTableRows = rows.filter((_, index) =>
 		GeoTableNames.includes(names[index])
 	);
 	const nonGeoRows = rows.filter((_, index) =>
 		NonGeoTableNames.includes(names[index])
 	);
+
+	const allNames = [
+		...GeoTableNames,
+		...NonGeoTableNames,
+		...denormTableNames,
+		...denormGeoTableNames,
+	];
+	const misc = rows.filter((_, index) => !allNames.includes(names[index]));
 
 	return (
 		<div className="pt-1">
@@ -132,20 +138,17 @@ export function DisplayTableInfo() {
 				<RowDisplay rows={nonGeoRows} />
 			</AccordionDisplay>
 			<Separator className="my-2 bg-neutral-500" />
+			<AccordionDisplay accordionTitle="Geometrical - denormalized">
+				<RowDisplay rows={denormalizedGeoRows} />
+			</AccordionDisplay>
+			<Separator className="my-2 bg-neutral-500" />
 			<AccordionDisplay accordionTitle="Non-Geometrical - denormalized">
 				<RowDisplay rows={denormalizedNonGeoRows} />
 			</AccordionDisplay>
 			<Separator className="my-2 bg-neutral-500" />
-			{/*			
-			<AccordionDisplay accordionTitle="Geometrical - denormalized">
-				<RowDisplay rows={denormalizedGeoRows} />
-			</AccordionDisplay> 
-			<Separator className="my-2 bg-neutral-500" />
-		  */}
-			<AccordionDisplay accordionTitle="Enum">
-				<RowDisplay rows={enumRows} />
+			<AccordionDisplay accordionTitle="misc">
+				<RowDisplay rows={misc} />
 			</AccordionDisplay>
-			<Separator className="mt-2 mb-1.0 bg-neutral-500" />
 		</div>
 	);
 }

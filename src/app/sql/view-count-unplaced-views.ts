@@ -1,18 +1,17 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const countUnplacedViews = sql`
 	WITH
 		str_data AS (
 			SELECT
 				e.LocalId,
-				p.Strings
+				name AS sheet_name
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_string_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Views'
-				AND p.Name = 'Sheet Name'
+				e.type = 'Views'
+				AND p.d_name = 'Sheet Name'
 		)
 	SELECT
 		status,
@@ -22,13 +21,13 @@ export const countUnplacedViews = sql`
 			SELECT
 				LocalId,
 				CASE
-					WHEN Strings = '---' THEN 'Unplaced'
-					WHEN Strings <> '---' THEN 'Placed'
+					WHEN sheet_name = '---' THEN 'Unplaced'
+					WHEN sheet_name <> '---' THEN 'Placed'
 					ELSE 'Unknown'
 				END AS status
 			FROM
 				str_data
-		)
+		) t
 	GROUP BY
 		status
 	UNION ALL

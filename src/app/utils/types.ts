@@ -1,23 +1,22 @@
-import { useExpandDisplay } from "../hooks/use-expand-display";
+import useEditor from "../hooks/use-editor";
 import useFilterByDataReadiness from "../hooks/use-filter-by-data-readiness";
 import { useKeywordFilter } from "../hooks/use-keyword-filter";
 import { useQueryObjects } from "../hooks/use-query-objects";
 import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
+import { getEditorState } from "./editor-display-state";
 import * as duckdb from "@duckdb/duckdb-wasm";
+import * as THREE from "three";
 
 export const validFileNames = [
 	"Descriptors.parquet",
 	"Diagnostics.parquet",
 	"Documents.parquet",
 	"Entities.parquet",
-	"EntityParameters.parquet",
-	"IntegerParameters.parquet",
-	"PointParameters.parquet",
+	"Numbers.parquet",
+	"Parameters.parquet",
 	"Points.parquet",
 	"Relations.parquet",
-	"SingleParameters.parquet",
-	"StringParameters.parquet",
 	"Strings.parquet",
 ];
 
@@ -26,17 +25,14 @@ export const validFileNamesWithGeo = [
 	"Diagnostics.parquet",
 	"Documents.parquet",
 	"Entities.parquet",
-	"EntityParameters.parquet",
 	"IndexBuffer.parquet",
 	"Instances.parquet",
-	"IntegerParameters.parquet",
 	"Materials.parquet",
 	"Meshes.parquet",
-	"PointParameters.parquet",
+	"Numbers.parquet",
+	"Parameters.parquet",
 	"Points.parquet",
 	"Relations.parquet",
-	"SingleParameters.parquet",
-	"StringParameters.parquet",
 	"Strings.parquet",
 	"Transforms.parquet",
 	"VertexBuffer.parquet",
@@ -46,14 +42,11 @@ export const NonGeoTableNames = [
 	"Descriptors",
 	"Documents",
 	"Entities",
-	"EntityParameters",
-	"IntegerParameters",
-	"PointParameters",
+	"Numbers",
+	"Parameters",
 	"Points",
 	"Relations",
-	"StringParameters",
 	"Strings",
-	"SingleParameters",
 ];
 export const GeoTableNames = [
 	"Instances",
@@ -79,19 +72,23 @@ export type QueryEditorState =
 	| "error"
 	| "canceled";
 export const denormTableNames = [
-	"denorm_single_params",
+	"denorm_documents",
+	"denorm_descriptors",
+	"denorm_entities",
+	"denorm_number_params",
 	"denorm_entity_params",
 	"denorm_integer_params",
 	"denorm_points_params",
 	"denorm_string_params",
 ];
 export const denormGeoTableNames = [
-	"denorm_elements",
-	"denorm_index_buffer",
-	"denorm_materials",
-	"denorm_meshes",
-	"denorm_transforms",
-	"denorm_vertex_buffer",
+	"denorm_geometry_elements",
+	"denorm_index_buffer_view",
+	"denorm_instances_view",
+	"denorm_materials_view",
+	"denorm_meshes_view",
+	"denorm_transforms_view",
+	"denorm_vertex_buffer_view",
 ];
 
 export type DenormTableName = (typeof denormTableNames)[number];
@@ -103,6 +100,7 @@ export type ParquetBlob = {
 };
 
 export const queryCategories = [
+	"3D Viewer",
 	"CAD & RVT Links",
 	"Floors",
 	"Grids",
@@ -138,7 +136,6 @@ export type UseRunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type RunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type QueryObjects = QueryObject[];
 export type UseQueryObjects = ReturnType<typeof useQueryObjects>;
-export type UseExpandDisplay = ReturnType<typeof useExpandDisplay>;
 export type UseFilterByDataReadiness = ReturnType<
 	typeof useFilterByDataReadiness
 >;
@@ -217,3 +214,82 @@ export const analyticReadinessTitles = Object.freeze([
 ] as const);
 export type AnalyticsReadinessLevels = (typeof analyticReadinessLevels)[number];
 export type AnalyticsReadinessTitle = (typeof analyticReadinessTitles)[number];
+
+// for geometrical data processing
+
+export type FilteredGeometryResult = {
+	scene: THREE.Group | null;
+	instanceCount: number;
+	totalCount: number;
+};
+
+export type GeometryContextValue = {
+	loading: boolean;
+	error: Error | null;
+	cache: GeometricalDataCache | null;
+};
+
+export type GeometryInstance = {
+	instanceIndex: number;
+	entityIndex: number;
+	meshIndex: number;
+	transformIndex: number;
+	materialIndex: number;
+	LocalId: string;
+	GlobalId: string;
+	entityName: string;
+	category: string;
+	vertexOffset: number;
+	indexOffset: number;
+	transform: THREE.Matrix4;
+	material: THREE.MeshStandardMaterial;
+};
+
+export interface GeometricalDataCache {
+	positions: Float32Array;
+	normals: Float32Array;
+	uvs: Float32Array;
+	indices: Uint32Array;
+	meshVertexOffset: Uint32Array;
+	meshVertexCount: Uint32Array;
+	meshIndexOffset: Uint32Array;
+	meshIndexCount: Uint32Array;
+	materialBaseColor: Float32Array;
+	materialRoughness: Float32Array;
+	materialMetallic: Float32Array;
+	transforms: Float32Array;
+	instanceMeshIndex: Uint32Array;
+	instanceMaterialIndex: Uint32Array;
+	instanceTransformIndex: Uint32Array;
+	instanceEntityIndex: Uint32Array;
+	vertexCount: number;
+	indexCount: number;
+	meshCount: number;
+	materialCount: number;
+	transformCount: number;
+	instanceCount: number;
+}
+
+export type EditorDisplayState = ReturnType<typeof getEditorState>;
+export type UseEditor = ReturnType<typeof useEditor>;
+export type UseGeoComputedResult = {
+	scene: THREE.Group | null;
+	instanceCount: number;
+	totalEntityCount: number;
+	ghostCount: number;
+	availableEntityCount: number;
+};
+export type UseGeoLastInputs = {
+	entityIndices: number[];
+	ghostOthers: boolean;
+	cache: unknown;
+};
+export type UseGeometryFilterResult = {
+	scene: THREE.Group | null;
+	instanceCount: number;
+	totalEntityCount: number;
+	ghostCount: number;
+	ghostOthers: boolean;
+	availableEntityCount: number;
+	toggleGhostOthers: () => void;
+};

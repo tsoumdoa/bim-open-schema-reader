@@ -1,62 +1,61 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const countByViewType = sql`
 	WITH
 		ranked AS (
 			SELECT
 				e.LocalId,
-				p.Strings,
-				p.Name,
+				p.v_Strings AS string_val,
+				p.d_name,
 				ROW_NUMBER() OVER (
 					PARTITION BY
 						e.LocalId
 					ORDER BY
 						CASE
-							WHEN p.Name = 'Type' THEN 1
+							WHEN p.d_name = 'Type' THEN 1
 							ELSE 2
 						END,
-						p.index DESC
+						p.p_index DESC
 				) AS rn
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_string_params AS p ON e.index = p.entity
+				denorm_entities e
+				JOIN denorm_string_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Views'
+				e.type = 'Views'
 		)
 	SELECT
 		CASE
-			WHEN r.Name = 'Type'
+			WHEN r.d_name = 'Type'
 			AND (
-				r.Strings IS NULL
-				OR r.Strings = ''
+				r.string_val IS NULL
+				OR r.string_val = ''
 			) THEN NULL
-			WHEN r.Strings IS NULL
-			OR r.Strings = '' THEN '_uncategorized'
-			ELSE r.Strings
+			WHEN r.string_val IS NULL
+			OR r.string_val = '' THEN '_uncategorized'
+			ELSE r.string_val
 		END AS view_type,
 		COUNT(DISTINCT r.LocalId) AS distinct_view_count
 	FROM
 		ranked r
 	WHERE
 		r.rn = 1
-		-- exclude the "Family" rows that have no Strings
 		AND NOT (
-			r.Name = 'Type'
+			r.d_name = 'Type'
 			AND (
-				r.Strings IS NULL
-				OR r.Strings = ''
+				r.string_val IS NULL
+				OR r.string_val = ''
 			)
 		)
 	GROUP BY
 		CASE
-			WHEN r.Name = 'Type'
+			WHEN r.d_name = 'Type'
 			AND (
-				r.Strings IS NULL
-				OR r.Strings = ''
+				r.string_val IS NULL
+				OR r.string_val = ''
 			) THEN NULL
-			WHEN r.Strings IS NULL
-			OR r.Strings = '' THEN '_uncategorized'
-			ELSE r.Strings
+			WHEN r.string_val IS NULL
+			OR r.string_val = '' THEN '_uncategorized'
+			ELSE r.string_val
 		END
 	ORDER BY
 		view_type;

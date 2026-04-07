@@ -1,30 +1,31 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 export const floorScheduleByType = sql`
 	WITH
 		pt_data AS (
 			SELECT
-				LocalId,
-				e.Name,
+				e.LocalId,
+				e.name
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_points_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_points_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Floors'
+				e.type = 'Floors'
 		),
-		double_data AS (
+		single_data AS (
 			SELECT
-				*
+				e.LocalId,
+				e.name,
+				p.d_name,
+				p.v_value
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_single_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_number_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Floors'
+				e.type = 'Floors'
 		),
-		pivot_double_data AS (
-			PIVOT double_data ON name_1 IN ('Thickness', 'Area', 'Volume') USING first (VALUE),
+		pivot_single_data AS (
+			PIVOT single_data ON d_name IN ('Thickness', 'Area', 'Volume') USING FIRST (v_value)
 			GROUP BY
 				LocalId,
 				name
@@ -32,21 +33,21 @@ export const floorScheduleByType = sql`
 		joint_table AS (
 			SELECT DISTINCT
 				pt_data.*,
-				pivot_double_data.* EXCLUDE (LocalId, name),
+				pivot_single_data.* EXCLUDE (LocalId, name)
 			FROM
-				pivot_double_data
-				JOIN pt_data ON pivot_double_data.LocalId = pt_data.LocalId
+				pivot_single_data
+				JOIN pt_data ON pivot_single_data.LocalId = pt_data.LocalId
 		)
 	SELECT
 		name,
-		min(Thickness) * 304.8 AS thickness_mm,
-		sum(Area) * 0.092903 AS area_m2,
-		sum(Volume) * 0.0283168 AS volume_m3,
-		count(*) AS element_count
+		MIN(Thickness) * 304.8 AS thickness_mm,
+		SUM(Area) * 0.092903 AS area_m2,
+		SUM(Volume) * 0.0283168 AS volume_m3,
+		COUNT(*) AS element_count
 	FROM
 		joint_table
 	GROUP BY
-		Name
+		name
 	ORDER BY
-		Name;
+		name;
 `;

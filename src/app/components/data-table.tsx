@@ -29,27 +29,11 @@ function DataTableBody<TData, TValue>(props: {
 	index: number;
 	table: TableType<TData>;
 	pageSize: number;
-	tableContainerRef: React.RefObject<HTMLDivElement | null>;
-	displayExpanded: number;
 	columnDef: ColumnDef<TData, TValue>[];
 }) {
-	const {
-		index,
-		table,
-		pageSize,
-		tableContainerRef,
-		displayExpanded,
-		columnDef: columns,
-	} = props;
+	const { table, pageSize, columnDef: columns } = props;
 	return (
-		<div
-			className={`overflow-auto ${
-				index === displayExpanded
-					? "h-[calc(100dvh-200px)] min-h-0"
-					: "max-h-80"
-			} `}
-			ref={tableContainerRef}
-		>
+		<div>
 			<Table className="w-fit overflow-auto">
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (
@@ -120,19 +104,17 @@ function DataTableBody<TData, TValue>(props: {
 
 export function DataTable<TData, TValue>(props: {
 	index: number;
-	displayExpanded: number;
-	setDisplayExpanded: (b: number) => void;
 	fileDownloadName: string;
 	runDuckDbQuery: RunDuckDbQuery;
 }) {
-	const { index, displayExpanded, setDisplayExpanded } = props;
+	const { index } = props;
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const pageSize = 20;
 	const tableContainerRef = useRef<HTMLDivElement>(null);
 
 	const columns = props.runDuckDbQuery.headers.map((header, i) => {
 		return {
-			accessorFn: (row: (string | number)[]) => row[i],
+			accessorFn: (row: unknown[]) => row[i],
 			header: header,
 			cell: (info: any) => {
 				return formatData(info.getValue());
@@ -173,14 +155,10 @@ export function DataTable<TData, TValue>(props: {
 				index={index}
 				table={table}
 				pageSize={pageSize}
-				tableContainerRef={tableContainerRef}
-				displayExpanded={displayExpanded}
 				columnDef={columns}
 			/>
 			<DataTableFooter
 				index={index}
-				displayExpanded={displayExpanded}
-				setDisplayExpanded={setDisplayExpanded}
 				table={table}
 				pageSize={pageSize}
 				tableContainerRef={tableContainerRef}

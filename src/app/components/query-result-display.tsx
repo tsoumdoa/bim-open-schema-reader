@@ -1,47 +1,25 @@
-import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
-import { UseQueryViewerAndEditor } from "../utils/types";
+import { UseQueryViewerAndEditor, UseRunDuckDbQuery } from "../utils/types";
 import { DataTable } from "./data-table";
-import { useDuckDb } from "./use-db";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 export default function QueryResultDisplayTable(props: {
+	runDuckDbQuery: UseRunDuckDbQuery;
 	index: number;
-	displayExpanded: number;
-	setDisplayExpanded: (b: number) => void;
-	lockScroll: boolean;
 	fileDownloadName: string;
 	useQueryViewerAndEditorHook: UseQueryViewerAndEditor;
+	onResultsAvailable?: (headers: string[], rows: unknown[][]) => void;
 }) {
-	const {
-		handleCancelQueryRef,
-		setQueryEditorState,
-		newSqlQuery,
-		formatedQuery,
-	} = props.useQueryViewerAndEditorHook;
-	const { conn } = useDuckDb();
-	const runDuckDbQuery = useRunDuckDbQuery(conn, formatedQuery);
-	const { cancelQuery, isLoading, isSuccess, error, run, rows } =
-		runDuckDbQuery;
+	const { handleCancelQueryRef } = props.useQueryViewerAndEditorHook;
+	const { cancelQuery, isLoading, isSuccess, error, rows, headers } =
+		props.runDuckDbQuery;
 	handleCancelQueryRef.current = { cancelQuery };
 
-	const rerunTrigeredRef = useRef(false);
-
+	// this is for geometry data
 	useEffect(() => {
-		if (rerunTrigeredRef.current) {
-			if (isSuccess) {
-				setQueryEditorState("rerun");
-			} else {
-				setQueryEditorState("error");
-			}
+		if (props.onResultsAvailable && isSuccess && rows.length > 0) {
+			props.onResultsAvailable(headers, rows);
 		}
-	}, [isSuccess, error]);
-
-	useEffect(() => {
-		if (newSqlQuery !== formatedQuery) {
-			rerunTrigeredRef.current = true;
-		}
-		run(newSqlQuery);
-	}, [newSqlQuery]);
+	}, [isSuccess, rows, headers, props.onResultsAvailable]);
 
 	if (error) {
 		return (
@@ -54,15 +32,11 @@ export default function QueryResultDisplayTable(props: {
 
 	if (isSuccess && rows.length > 0) {
 		return (
-			<div
-				className={`flex h-full flex-col gap-y-2 ${props.lockScroll ? "overflow-hidden" : "overflow-auto"} max-w-[120rem]`}
-			>
+			<div className="flex h-full flex-col gap-y-2 overflow-auto ">
 				<DataTable
 					index={props.index}
-					displayExpanded={props.displayExpanded}
-					setDisplayExpanded={props.setDisplayExpanded}
 					fileDownloadName={props.fileDownloadName}
-					runDuckDbQuery={runDuckDbQuery}
+					runDuckDbQuery={props.runDuckDbQuery}
 				/>
 			</div>
 		);

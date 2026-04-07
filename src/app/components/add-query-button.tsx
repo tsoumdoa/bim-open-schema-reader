@@ -28,8 +28,8 @@ import { RefObject, useEffect, useState } from "react";
 
 export function AddQuery(props: {
 	addQuery: (queryObject: QueryObject) => void;
-	setDisplayExpanded: (b: number) => void;
 	disableShortcutRef: RefObject<boolean>;
+	onQuickExplorerOpen: () => void;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const isMac = navigator.platform.toLowerCase().includes("mac");
@@ -58,21 +58,19 @@ export function AddQuery(props: {
 				e.preventDefault();
 				if (!isOpen) {
 					setIsOpen(true);
-					props.setDisplayExpanded(-1);
 				}
 				return;
 			}
 
 			if (addNewCustomQueryShortcut) {
 				e.preventDefault();
-				props.setDisplayExpanded(-1);
 				handleCreateCustomQuery();
 				return;
 			}
 		};
 		document.addEventListener("keydown", onKeyDown);
 		return () => document.removeEventListener("keydown", onKeyDown);
-	}, [isOpen, props.setDisplayExpanded]);
+	}, [isOpen]);
 
 	const handleAddCommand = (
 		queryCategory: string,
@@ -108,11 +106,10 @@ export function AddQuery(props: {
 		>
 			<DialogTrigger asChild>
 				<Button
-					variant="outline"
-					className="w-fit"
+					variant="ghost"
+					className="w-fit h-5 my-1 hover:bg-transparent hover:cursor-pointer"
 					onClick={() => {
 						setIsOpen(true);
-						props.setDisplayExpanded(-1);
 					}}
 				>
 					Add Query{" "}
@@ -121,14 +118,14 @@ export function AddQuery(props: {
 					</span>
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="gap-1 px-6 pt-6 pb-2 sm:max-w-[500px]">
+			<DialogContent className="gap-1 px-6 pt-6 pb-2 sm:max-w-125">
 				<DialogHeader>
 					<DialogTitle> Query Selector</DialogTitle>
 					<DialogDescription className="text-xs text-neutral-500">
 						Select a query from the list below to add.
 					</DialogDescription>
 				</DialogHeader>
-				<Command className="rounded-lg border shadow-md md:min-w-[450px]">
+				<Command className="rounded-lg border shadow-md md:min-w-112.5">
 					<CommandInput placeholder="Type a query or search..." />
 					<CommandList className="max-h-[min(60vh,900px)]">
 						<CommandEmpty>No results found.</CommandEmpty>
@@ -169,7 +166,20 @@ export function AddQuery(props: {
 						})}
 					</CommandList>
 				</Command>
-				<DialogFooter className="flex w-full flex-row justify-start pt-2">
+				<DialogFooter className="flex w-full flex-row justify-start pt-2 gap-2">
+					<Button
+						type="submit"
+						variant="outline"
+						onClick={() => {
+							setIsOpen(false);
+							props.onQuickExplorerOpen();
+						}}
+					>
+						<span className="inline-flex items-baseline gap-2">
+							Quick Explorer
+							<span className="text-xs text-neutral-500">⇧␣</span>
+						</span>
+					</Button>
 					<Button
 						className="w-fit"
 						type="submit"
@@ -177,7 +187,7 @@ export function AddQuery(props: {
 						onClick={handleCreateCustomQuery}
 					>
 						<span className="inline-flex items-baseline gap-2">
-							Create a custom Query
+							New Query
 							<span className="text-xs text-neutral-500">
 								{isMac ? "⌘⇧i" : "ctrl+shift+i"}
 							</span>

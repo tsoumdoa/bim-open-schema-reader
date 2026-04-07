@@ -4,10 +4,15 @@ import { useState } from "react";
 
 export function useQueryObjects() {
 	const [queryObjects, setQueryObjects] = useState<QueryObjects>([]);
+	const [selectedQueryId, setSelectedQueryId] = useState<string | null>(null);
+
 	const addQuery = (queryObject: QueryObject) => {
 		const id = nanoid(7);
 		const newQueryObjects = { ...queryObject, id };
-		setQueryObjects((prev) => [...prev, newQueryObjects]);
+		setQueryObjects((prev) => {
+			setSelectedQueryId(id);
+			return [...prev, newQueryObjects];
+		});
 	};
 
 	const addQueries = (queryObjectsToAdd: QueryObject[]) => {
@@ -15,38 +20,55 @@ export function useQueryObjects() {
 			...obj,
 			id: nanoid(7),
 		}));
-		setQueryObjects((prev) => [...prev, ...newOnes]);
+		setQueryObjects((prev) => {
+			if (newOnes.length > 0) {
+				setSelectedQueryId(newOnes[newOnes.length - 1].id);
+			}
+			return [...prev, ...newOnes];
+		});
 	};
 
 	const removeQuery = (queryObject: QueryObject) => {
-		setQueryObjects(queryObjects.filter((q) => q.id !== queryObject.id));
+		setQueryObjects((prev) => {
+			const updated = prev.filter((q) => q.id !== queryObject.id);
+			if (selectedQueryId === queryObject.id) {
+				setSelectedQueryId(updated.length > 0 ? (updated[0].id ?? null) : null);
+			}
+			return updated;
+		});
 	};
 
 	const updateQueryTitle = (queryObject: QueryObject, newTitle: string) => {
-		const newQueryObjects = queryObjects.map((q) => {
-			if (q.id === queryObject.id) {
-				return { ...q, queryTitle: newTitle, isCustom: true };
-			}
-			return q;
-		});
-		setQueryObjects(newQueryObjects);
+		setQueryObjects((prev) =>
+			prev.map((q) => {
+				if (q.id === queryObject.id) {
+					return { ...q, queryTitle: newTitle, isCustom: true };
+				}
+				return q;
+			})
+		);
 	};
+
 	const updateQuery = (queryObject: QueryObject, newQuery: string) => {
-		const newQueryObjects = queryObjects.map((q) => {
-			if (q.id === queryObject.id) {
-				return { ...q, sqlQuery: newQuery };
-			}
-			return q;
-		});
-		setQueryObjects(newQueryObjects);
+		setQueryObjects((prev) =>
+			prev.map((q) => {
+				if (q.id === queryObject.id) {
+					return { ...q, sqlQuery: newQuery };
+				}
+				return q;
+			})
+		);
 	};
 
 	const deleteAll = () => {
 		setQueryObjects([]);
+		setSelectedQueryId(null);
 	};
 
 	return {
 		queryObjects,
+		selectedQueryId,
+		setSelectedQueryId,
 		addQuery,
 		addQueries,
 		removeQuery,

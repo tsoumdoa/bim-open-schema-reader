@@ -1,4 +1,4 @@
-import { createBosTable, createHelperViewsAndTables } from "./queries";
+import { createBosTable, createHelperViewsAndTables } from "./init-queries";
 import { ParquetBlob } from "./types";
 import * as duckdb from "@duckdb/duckdb-wasm";
 
@@ -6,7 +6,7 @@ export async function runQuery(c: duckdb.AsyncDuckDBConnection, query: string) {
 	try {
 		const res = await c.query(query);
 		const headers = res.schema.fields.map((f) => f.name);
-		const rows: (string | number)[][] = res.toArray().map(Object.values);
+		const rows: unknown[][] = res.toArray().map(Object.values);
 		return { headers, rows };
 	} catch (e) {
 		throw e;

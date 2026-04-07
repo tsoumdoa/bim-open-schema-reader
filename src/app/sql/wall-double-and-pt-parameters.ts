@@ -1,46 +1,56 @@
-import { sql } from "../utils/queries";
+import { sql } from "../utils/init-queries";
 
 // NOTE: Using CTE and PIVOT pattern exploration
 export const wallDoubleAndPointParameters = sql`
 	WITH
 		pt_data AS (
 			SELECT
-				*
+				e.index,
+				e.LocalId,
+				e.name,
+				p.d_name,
+				p.v_X,
+				p.v_Y,
+				p.v_Z
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_points_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_points_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Walls'
+				e.type = 'Walls'
 		),
 		pt_data_pivot AS (
-			PIVOT pt_data ON name_1 IN (
-				'rvt:Element:Location.StartPoint',
-				'rvt:Element:Location.EndPoint'
-			) USING first (x) AS x,
-			first (y) AS y,
-			first (z) AS z,
+			PIVOT pt_data ON d_name IN (
+				'Rvt:Element:Location.StartPoint',
+				'Rvt:Element:Location.EndPoint'
+			) USING FIRST (v_X) AS x,
+			FIRST (v_Y) AS y,
+			FIRST (v_Z) AS z
 			GROUP BY
+				index,
 				LocalId,
 				name
 		),
-		double_data AS (
+		single_data AS (
 			SELECT
-				*
+				e.index,
+				e.LocalId,
+				e.name,
+				p.d_name,
+				p.v_value
 			FROM
-				denorm_entities AS e
-				INNER JOIN denorm_single_params AS p ON e.index = p.entity
-				INNER JOIN descriptors AS dsp ON p.descriptor = dsp.index
+				denorm_entities e
+				JOIN denorm_number_params p ON e.index = p.p_Entity
 			WHERE
-				e.category = 'Walls'
+				e.type = 'Walls'
 		),
 		converted AS (
 			SELECT
+				index,
 				LocalId,
 				name,
-				name_1,
+				d_name,
 				CASE
-					WHEN name_1 IN (
+					WHEN d_name IN (
 						'Base Extension Distance',
 						'Base Offset',
 						'Bottom Width',
@@ -50,16 +60,16 @@ export const wallDoubleAndPointParameters = sql`
 						'Top Offset',
 						'Unconnected Height',
 						'Width'
-					) THEN VALUE * 304.8
-					WHEN name_1 = 'Area' THEN VALUE * 0.092903
-					WHEN name_1 = 'Volume' THEN VALUE * 0.0283168
-					ELSE VALUE
+					) THEN v_value * 304.8
+					WHEN d_name = 'Area' THEN v_value * 0.092903
+					WHEN d_name = 'Volume' THEN v_value * 0.0283168
+					ELSE v_value
 				END AS value_converted
 			FROM
-				double_data
+				single_data
 		),
-		pivot_double_data AS (
-			PIVOT converted /* or double_data */ ON name_1 IN (
+		pivot_single_data AS (
+			PIVOT converted ON d_name IN (
 				'Area',
 				'Base Extension Distance',
 				'Base Offset',
@@ -71,25 +81,21 @@ export const wallDoubleAndPointParameters = sql`
 				'Unconnected Height',
 				'Volume',
 				'Width'
-			) USING IFNULL (FIRST (value_converted /* or value */), 0),
+			) USING IFNULL (FIRST (value_converted), 0)
 			GROUP BY
+				index,
 				LocalId,
 				name
-		),
-		join_data AS (
-			SELECT
-				pt.LocalId,
-				pt.name,
-				pt.* EXCLUDE (LocalId, name),
-				pd.* EXCLUDE (LocalId, name)
-			FROM
-				pt_data_pivot AS pt
-				LEFT JOIN pivot_double_data AS pd ON pt.LocalId = pd.LocalId
 		)
 	SELECT
-		*
+		pt.index,
+		pt.LocalId,
+		pt.name,
+		pt.* EXCLUDE (index, LocalId, name),
+		ps.* EXCLUDE (index, LocalId, name)
 	FROM
-		join_data
+		pt_data_pivot pt
+		LEFT JOIN pivot_single_data ps ON pt.index = ps.index
 	ORDER BY
-		LocalId
+		pt.LocalId;
 `;
