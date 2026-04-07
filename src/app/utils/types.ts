@@ -272,3 +272,24 @@ export interface GeometricalDataCache {
 
 export type EditorDisplayState = ReturnType<typeof getEditorState>;
 export type UseEditor = ReturnType<typeof useEditor>;
+export type UseGeoComputedResult = {
+	scene: THREE.Group | null;
+	instanceCount: number;
+	totalEntityCount: number;
+	ghostCount: number;
+	availableEntityCount: number;
+};
+export type UseGeoLastInputs = {
+	entityIndices: number[];
+	ghostOthers: boolean;
+	cache: unknown;
+};
+export type UseGeometryFilterResult = {
+	scene: THREE.Group | null;
+	instanceCount: number;
+	totalEntityCount: number;
+	ghostCount: number;
+	ghostOthers: boolean;
+	availableEntityCount: number;
+	toggleGhostOthers: () => void;
+};

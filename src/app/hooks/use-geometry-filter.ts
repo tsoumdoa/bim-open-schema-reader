@@ -1,24 +1,81 @@
 import { useGeometryFromParquetCtx } from "../components/geometry-from-parquet-context";
+import {
+	GeometricalDataCache,
+	UseGeoComputedResult,
+	UseGeoLastInputs,
+	UseGeometryFilterResult,
+} from "../utils/types";
 import { buildFilteredScene, buildGhostedScene } from "@/lib/geometry-utils";
 import { useRef, useState } from "react";
-import * as THREE from "three";
 
-interface UseGeometryFilterResult {
-	scene: THREE.Group | null;
-	instanceCount: number;
-	totalEntityCount: number;
-	ghostCount: number;
-	ghostOthers: boolean;
-	availableEntityCount: number;
-	toggleGhostOthers: () => void;
+function getEntityIndicesKey(entityIndices: number[]) {
+	return JSON.stringify([...entityIndices].sort());
 }
 
-interface ComputedResult {
-	scene: THREE.Group | null;
-	instanceCount: number;
-	totalEntityCount: number;
-	ghostCount: number;
-	availableEntityCount: number;
+function shouldReuseLastResult(
+	lastResult: unknown,
+	lastInputs: UseGeoLastInputs | null,
+	entityIndices: number[],
+	ghostOthers: boolean,
+	cache: unknown
+) {
+	if (lastResult == null || lastInputs == null) {
+		return false;
+	}
+
+	return (
+		getEntityIndicesKey(lastInputs.entityIndices) ===
+		getEntityIndicesKey(entityIndices) &&
+		lastInputs.ghostOthers === ghostOthers &&
+		lastInputs.cache === cache
+	);
+}
+
+function buildGeomComputedResult(
+	loading: boolean,
+	error: Error | null,
+	entityIndices: number[],
+	ghostOthers: boolean,
+	cache: GeometricalDataCache | null
+): UseGeoComputedResult {
+	if (loading || error || entityIndices.length === 0) {
+		return {
+			scene: null,
+			instanceCount: 0,
+			totalEntityCount: 0,
+			ghostCount: 0,
+			availableEntityCount: cache ? new Set(cache.instanceEntityIndex).size : 0,
+		};
+	}
+
+	const totalEntityCount = new Set(entityIndices).size;
+	const availableEntityCount = cache
+		? new Set(cache.instanceEntityIndex).size
+		: 0;
+
+	if (ghostOthers) {
+		const { scene, selectedCount, ghostCount } = buildGhostedScene(
+			entityIndices,
+			cache
+		);
+
+		return {
+			scene,
+			instanceCount: selectedCount,
+			totalEntityCount,
+			ghostCount,
+			availableEntityCount,
+		};
+	} else {
+		const { scene, instanceCount } = buildFilteredScene(entityIndices, cache);
+		return {
+			scene,
+			instanceCount,
+			totalEntityCount,
+			ghostCount: 0,
+			availableEntityCount,
+		};
+	}
 }
 
 export function useGeometryFilter(
@@ -27,63 +84,29 @@ export function useGeometryFilter(
 	const { cache, loading, error } = useGeometryFromParquetCtx();
 	const [ghostOthers, setGhostOthers] = useState(false);
 
-	const lastResultRef = useRef<ComputedResult | null>(null);
-	const lastInputsRef = useRef<{
-		entityIndices: number[];
-		ghostOthers: boolean;
-		cache: unknown;
-	} | null>(null);
+	const lastResultRef = useRef<UseGeoComputedResult | null>(null);
+	const lastInputsRef = useRef<UseGeoLastInputs | null>(null);
 
 	const toggleGhostOthers = () => setGhostOthers((prev) => !prev);
 
-	const inputsMatch =
-		lastResultRef.current !== null &&
-		lastInputsRef.current !== null &&
-		lastInputsRef.current.entityIndices === entityIndices &&
-		lastInputsRef.current.ghostOthers === ghostOthers &&
-		lastInputsRef.current.cache === cache;
+	const reuseLastRes = shouldReuseLastResult(
+		lastResultRef.current,
+		lastInputsRef.current,
+		entityIndices,
+		ghostOthers,
+		cache
+	);
 
-	if (loading || error || entityIndices.length === 0) {
-		lastResultRef.current = {
-			scene: null,
-			instanceCount: 0,
-			totalEntityCount: 0,
-			ghostCount: 0,
-			availableEntityCount: cache ? new Set(cache.instanceEntityIndex).size : 0,
-		};
-	} else if (!inputsMatch) {
-		const totalEntityCount = new Set(entityIndices).size;
-		const availableEntityCount = cache
-			? new Set(cache.instanceEntityIndex).size
-			: 0;
-
-		if (ghostOthers) {
-			const { scene, selectedCount, ghostCount } = buildGhostedScene(
-				entityIndices,
-				cache
-			);
-
-			lastResultRef.current = {
-				scene,
-				instanceCount: selectedCount,
-				totalEntityCount,
-				ghostCount,
-				availableEntityCount,
-			};
-			lastInputsRef.current = { entityIndices, ghostOthers, cache };
-		} else {
-			const { scene, instanceCount } = buildFilteredScene(entityIndices, cache);
-
-			lastResultRef.current = {
-				scene,
-				instanceCount,
-				totalEntityCount,
-				ghostCount: 0,
-				availableEntityCount,
-			};
-			lastInputsRef.current = { entityIndices, ghostOthers, cache };
-		}
+	if (!reuseLastRes) {
+		lastResultRef.current = buildGeomComputedResult(
+			loading,
+			error,
+			entityIndices,
+			ghostOthers,
+			cache
+		);
 	}
+	lastInputsRef.current = { entityIndices, ghostOthers, cache };
 
 	return {
 		...lastResultRef.current!,
