@@ -88,10 +88,10 @@ export class GeometryObjectCache {
 			transparent: cache.materialBaseColor[i + 3] < 1.0,
 			opacity: cache.materialBaseColor[i + 3],
 			roughness: cache.materialRoughness[materialIndex],
+			metalness: cache.materialMetallic[materialIndex],
 			side: THREE.DoubleSide,
 		});
-		(material as unknown as { metallic: number }).metallic =
-			cache.materialMetallic[materialIndex];
+
 		this.materialCache.set(materialIndex, material);
 		return material;
 	}
