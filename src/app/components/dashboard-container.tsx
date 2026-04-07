@@ -20,6 +20,7 @@ function DashboardHeader(props: {
 	bosFileType: BosFileType;
 	addQuery: (queryObject: QueryObject) => void;
 	disableShortcutRef: React.RefObject<boolean>;
+	onQuickExplorerOpen: () => void;
 }) {
 	return (
 		<div className="sticky top-0 z-50 flex flex-row items-center justify-start gap-x-1 bg-white px-2">
@@ -37,6 +38,7 @@ function DashboardHeader(props: {
 				<AddQuery
 					addQuery={props.addQuery}
 					disableShortcutRef={props.disableShortcutRef}
+					onQuickExplorerOpen={props.onQuickExplorerOpen}
 				/>
 			</div>
 		</div>
@@ -96,6 +98,7 @@ export default function DashboardContainer(props: {
 						bosFileType={props.bosFileType}
 						addQuery={addQuery}
 						disableShortcutRef={disableShortcutRef}
+						onQuickExplorerOpen={() => setIsActive(true)}
 					/>
 
 					<div className="flex-1 overflow-auto">

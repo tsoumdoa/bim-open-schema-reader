@@ -29,6 +29,7 @@ import { RefObject, useEffect, useState } from "react";
 export function AddQuery(props: {
 	addQuery: (queryObject: QueryObject) => void;
 	disableShortcutRef: RefObject<boolean>;
+	onQuickExplorerOpen: () => void;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const isMac = navigator.platform.toLowerCase().includes("mac");
@@ -165,7 +166,17 @@ export function AddQuery(props: {
 						})}
 					</CommandList>
 				</Command>
-				<DialogFooter className="flex w-full flex-row justify-start pt-2">
+				<DialogFooter className="flex w-full flex-row justify-start pt-2 gap-2">
+					<Button
+						type="submit"
+						variant="outline"
+						onClick={props.onQuickExplorerOpen}
+					>
+						<span className="inline-flex items-baseline gap-2">
+							Quick Explorer
+							<span className="text-xs text-neutral-500">⇧␣</span>
+						</span>
+					</Button>
 					<Button
 						className="w-fit"
 						type="submit"
@@ -173,7 +184,7 @@ export function AddQuery(props: {
 						onClick={handleCreateCustomQuery}
 					>
 						<span className="inline-flex items-baseline gap-2">
-							Create a custom Query
+							New Query
 							<span className="text-xs text-neutral-500">
 								{isMac ? "⌘⇧i" : "ctrl+shift+i"}
 							</span>
