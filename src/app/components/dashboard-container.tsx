@@ -65,7 +65,7 @@ function DashboardMain() {
 			) : (
 				queryObjects.length === 0 && (
 					<div className="text-sm text-gray-500 m-auto">
-						No query selected. Click a query in the sidebar to view it.
+						No queries yet—click “Add Query” to create your first one.
 					</div>
 				)
 			)}
