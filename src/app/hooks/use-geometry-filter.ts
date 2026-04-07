@@ -25,7 +25,7 @@ function shouldReuseLastResult(
 
 	return (
 		getEntityIndicesKey(lastInputs.entityIndices) ===
-		getEntityIndicesKey(entityIndices) &&
+			getEntityIndicesKey(entityIndices) &&
 		lastInputs.ghostOthers === ghostOthers &&
 		lastInputs.cache === cache
 	);

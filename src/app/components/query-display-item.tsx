@@ -1,10 +1,8 @@
 import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { formatForFileDownload } from "../utils/format";
-import {
-	QueryDisplayState,
-	QueryObject,
-} from "../utils/types";
+import { QueryDisplayState, QueryObject } from "../utils/types";
 import { BimViewer } from "./bim-viewer";
+import CodeBlockAndResultDisplay from "./codeblock-and-result-display";
 import { useQueryObjCtx } from "./query-obj-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +20,6 @@ import {
 } from "@/components/ui/tooltip";
 import { Menu } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
-import CodeBlockAndResultDisplay from "./codeblock-and-result-display";
 
 function AboutMenuItem(props: { queryObject: QueryObject }) {
 	return (
@@ -225,4 +222,3 @@ export default function QueryDisplayItem(props: {
 		</div>
 	);
 }
-

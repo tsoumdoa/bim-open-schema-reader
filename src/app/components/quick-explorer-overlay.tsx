@@ -105,8 +105,9 @@ export function QuickExplorer(props: {
 							return (
 								<div key={`quickCat-${categoryIndex}`} className="pb-2">
 									<div
-										className={`pb-2 text-2xl font-bold lg:text-3xl ${dimmedCategory ? "opacity-20" : ""
-											}`}
+										className={`pb-2 text-2xl font-bold lg:text-3xl ${
+											dimmedCategory ? "opacity-20" : ""
+										}`}
 									>
 										{categoryName}
 									</div>
@@ -123,8 +124,9 @@ export function QuickExplorer(props: {
 												<Badge
 													key={`quick-badge-${categoryIndex}-${groupIndex}`}
 													variant="default"
-													className={`text-md font-normal transition-all hover:cursor-pointer hover:bg-neutral-400 ${dimmedBadge ? "opacity-20" : ""
-														}`}
+													className={`text-md font-normal transition-all hover:cursor-pointer hover:bg-neutral-400 ${
+														dimmedBadge ? "opacity-20" : ""
+													}`}
 												>
 													<DropDownMenu
 														categoryName={item.categoryName ?? ""}
