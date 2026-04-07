@@ -46,3 +46,6 @@ This is open source under MIT. I haven’t set formal contribution guidelines ye
 - section/ plan cuts
 - measuring tool
 - model export (e.g. obj, stl, dxf)
+- exploded view for models
+- imersive views (full screen viewer experience)
+- diff between models
