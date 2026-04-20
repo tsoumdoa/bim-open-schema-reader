@@ -5,7 +5,11 @@ import {
 	UseGeoLastInputs,
 	UseGeometryFilterResult,
 } from "../utils/types";
-import { buildFilteredScene, buildGhostedScene } from "@/lib/geometry-utils";
+import {
+	buildFilteredScene,
+	buildGhostedScene,
+	buildHighlightOverlay,
+} from "@/lib/geometry-utils";
 import { useRef, useState } from "react";
 
 function getEntityIndicesKey(entityIndices: number[]) {
@@ -45,6 +49,7 @@ function buildGeomComputedResult(
 			totalEntityCount: 0,
 			ghostCount: 0,
 			availableEntityCount: cache ? new Set(cache.instanceEntityIndex).size : 0,
+			bounds: [],
 		};
 	}
 
@@ -54,7 +59,7 @@ function buildGeomComputedResult(
 		: 0;
 
 	if (ghostOthers) {
-		const { scene, selectedCount, ghostCount } = buildGhostedScene(
+		const { scene, selectedCount, ghostCount, bounds } = buildGhostedScene(
 			entityIndices,
 			cache
 		);
@@ -65,15 +70,20 @@ function buildGeomComputedResult(
 			totalEntityCount,
 			ghostCount,
 			availableEntityCount,
+			bounds,
 		};
 	} else {
-		const { scene, instanceCount } = buildFilteredScene(entityIndices, cache);
+		const { scene, instanceCount, bounds } = buildFilteredScene(
+			entityIndices,
+			cache
+		);
 		return {
 			scene,
 			instanceCount,
 			totalEntityCount,
 			ghostCount: 0,
 			availableEntityCount,
+			bounds,
 		};
 	}
 }
@@ -83,6 +93,9 @@ export function useGeometryFilter(
 ): UseGeometryFilterResult {
 	const { cache, loading, error } = useGeometryFromParquetCtx();
 	const [ghostOthers, setGhostOthers] = useState(false);
+	const [highlightedEntityIndex, setHighlightedEntityIndex] = useState<
+		number | null
+	>(null);
 
 	const lastResultRef = useRef<UseGeoComputedResult | null>(null);
 	const lastInputsRef = useRef<UseGeoLastInputs | null>(null);
@@ -106,11 +119,20 @@ export function useGeometryFilter(
 			cache
 		);
 	}
-	lastInputsRef.current = { entityIndices, ghostOthers, cache };
+	lastInputsRef.current = { entityIndices, ghostOthers, highlightedEntityIndex, cache };
+
+	const highlightOverlay =
+		cache && highlightedEntityIndex != null && !loading && !error
+			? buildHighlightOverlay(highlightedEntityIndex, entityIndices, cache)
+			: null;
 
 	return {
 		...lastResultRef.current!,
 		ghostOthers,
 		toggleGhostOthers,
+		bounds: lastResultRef.current?.bounds ?? [],
+		highlightedEntityIndex,
+		setHighlightedEntityIndex,
+		highlightOverlay,
 	};
 }

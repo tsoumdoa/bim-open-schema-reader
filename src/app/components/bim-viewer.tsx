@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import { useGeometryFromParquetCtx } from "./geometry-from-parquet-context";
 import { useGeometryFilter } from "@/app/hooks/use-geometry-filter";
 import { Button } from "@/components/ui/button";
@@ -10,14 +11,95 @@ import {
 	PerspectiveCamera,
 	Environment,
 } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { Box, Ghost } from "lucide-react";
 import * as THREE from "three";
+import type { InstanceBounds } from "@/lib/geometry-utils";
 
-function Scene({ scene }: { scene: THREE.Group | null }) {
+function FrameInvalidator({ deps }: { deps: unknown }) {
+	const invalidate = useThree((state) => state.invalidate);
+	useEffect(() => {
+		invalidate();
+	}, [deps, invalidate]);
+	return null;
+}
+
+function PickTarget({
+	bounds,
+	onHighlight,
+}: {
+	bounds: InstanceBounds[];
+	onHighlight: (entityIndex: number) => void;
+}) {
+	const { camera, gl } = useThree();
+
+	function handlePointerDown(event: THREE.Event) {
+		(event as unknown as { stopPropagation: () => void }).stopPropagation();
+
+		const pointer = (event as unknown as { clientX: number; clientY: number });
+		const rect = gl.domElement.getBoundingClientRect();
+		const ndc = new THREE.Vector2(
+			((pointer.clientX - rect.left) / rect.width) * 2 - 1,
+			-((pointer.clientY - rect.top) / rect.height) * 2 + 1
+		);
+
+		const raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera(ndc, camera);
+
+		let closestEntity: number | null = null;
+		let closestDist = Infinity;
+
+		for (const b of bounds) {
+			const intersection = raycaster.ray.intersectBox(b.bbox, new THREE.Vector3());
+			if (intersection) {
+				const dist = intersection.distanceTo(raycaster.ray.origin);
+				if (dist < closestDist) {
+					closestDist = dist;
+					closestEntity = b.entityIndex;
+				}
+			}
+		}
+
+		if (closestEntity !== null) {
+			onHighlight(closestEntity);
+		}
+	}
+
+	return (
+		<mesh
+			visible={false}
+			position={[0, 0, 0]}
+			onPointerDown={handlePointerDown}
+		>
+			<planeGeometry args={[10000, 10000]} />
+			<meshBasicMaterial />
+		</mesh>
+	);
+}
+
+function Scene({
+	scene,
+	highlightOverlay,
+	bounds,
+	onHighlight,
+	invalidateKey,
+}: {
+	scene: THREE.Group | null;
+	highlightOverlay: THREE.Group | null;
+	bounds: InstanceBounds[];
+	onHighlight: (entityIndex: number) => void;
+	invalidateKey: unknown;
+}) {
 	if (!scene) return null;
 
-	return <primitive object={scene} />;
+	return (
+		<>
+			<primitive object={scene} />
+			{highlightOverlay && <primitive object={highlightOverlay} />}
+			<PickTarget bounds={bounds} onHighlight={onHighlight} />
+			<FrameInvalidator deps={invalidateKey} />
+		</>
+	);
 }
 
 export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
@@ -29,7 +111,13 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		ghostOthers,
 		availableEntityCount,
 		toggleGhostOthers,
+		bounds,
+		highlightedEntityIndex,
+		setHighlightedEntityIndex,
+		highlightOverlay,
 	} = useGeometryFilter(entityIndices);
+	const highlightRef = useRef(setHighlightedEntityIndex);
+	highlightRef.current = setHighlightedEntityIndex;
 
 	if (loading) {
 		return (
@@ -57,6 +145,10 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		);
 	}
 
+	const handleHighlight = (entityIndex: number) => {
+		highlightRef.current(entityIndex);
+	};
+
 	return (
 		<div className="relative w-full h-100">
 			<div className="absolute top-2 left-2 z-10 flex gap-2">
@@ -71,18 +163,30 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 						`${totalEntityCount.toLocaleString()} entities`
 					)}
 				</div>
+				{highlightedEntityIndex !== null && (
+					<div className="bg-yellow-500/90 text-black px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1">
+						<span>Entity #{highlightedEntityIndex}</span>
+						<button
+							className="ml-1 hover:text-red-700 font-bold cursor-pointer bg-transparent border-none p-0"
+							onClick={() => setHighlightedEntityIndex(null)}
+						>
+							✕
+						</button>
+					</div>
+				)}
 			</div>
-			{entityIndices.length > 0 && totalEntityCount < availableEntityCount && (
-				<Button
-					variant={ghostOthers ? "default" : "secondary"}
-					size="sm"
-					onClick={toggleGhostOthers}
-					className="absolute bottom-2 right-2 z-10 gap-1.5"
-				>
-					<Ghost className="h-4 w-4" />
-					{ghostOthers ? "Hide Unselected" : "Show Unselected"}
-				</Button>
-			)}
+			{entityIndices.length > 0 &&
+				totalEntityCount < availableEntityCount && (
+					<Button
+						variant={ghostOthers ? "default" : "secondary"}
+						size="sm"
+						onClick={toggleGhostOthers}
+						className="absolute bottom-2 right-2 z-10 gap-1.5"
+					>
+						<Ghost className="h-4 w-4" />
+						{ghostOthers ? "Hide Unselected" : "Show Unselected"}
+					</Button>
+				)}
 			<Canvas
 				frameloop="demand"
 				shadows
@@ -111,7 +215,13 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 				/>
 				<directionalLight position={[-50, 50, -50]} intensity={0.3} />
 
-				<Scene scene={scene} />
+				<Scene
+					scene={scene}
+					highlightOverlay={highlightOverlay}
+					bounds={bounds}
+					onHighlight={handleHighlight}
+					invalidateKey={highlightedEntityIndex}
+				/>
 
 				<Environment preset="city" />
 				<gridHelper args={[1000, 100]} />

@@ -122,6 +122,33 @@ export interface BatchedGeometry {
 	instances: GeometryInstance[];
 }
 
+export interface InstanceBounds {
+	entityIndex: number;
+	instanceIndex: number;
+	bbox: THREE.Box3;
+}
+
+const highlightMaterialCache = new Map<number, THREE.MeshStandardMaterial>();
+
+function getHighlightMaterial(
+	baseMaterial: THREE.MeshStandardMaterial
+): THREE.MeshStandardMaterial {
+	const baseColor = baseMaterial.color.getHex();
+	let cached = highlightMaterialCache.get(baseColor);
+	if (cached) return cached;
+
+	const mat = baseMaterial.clone();
+	mat.emissive = new THREE.Color(0xffaa00);
+	mat.emissiveIntensity = 0.8;
+	mat.depthTest = true;
+	mat.depthWrite = false;
+	mat.polygonOffset = true;
+	mat.polygonOffsetFactor = -2;
+	mat.polygonOffsetUnits = -4;
+	highlightMaterialCache.set(baseColor, mat);
+	return mat;
+}
+
 export function batchInstancesByMaterialAndGeometry(
 	instances: GeometryInstance[],
 	geometries: Map<number, THREE.BufferGeometry>,
@@ -305,10 +332,14 @@ export function convertZUpToYUp(group: THREE.Group): void {
 	group.rotation.x = -Math.PI / 2;
 }
 
-export function buildSceneFromInstances(
+function buildGeometryInstances(
 	instanceIndices: number[],
 	cache: GeometricalDataCache
-): { scene: THREE.Group | null; instanceCount: number } {
+): {
+	instances: GeometryInstance[];
+	geometryMap: Map<number, THREE.BufferGeometry>;
+	materialMap: Map<number, THREE.MeshStandardMaterial>;
+} {
 	const geometryMap = new Map<number, THREE.BufferGeometry>();
 	const materialMap = new Map<number, THREE.MeshStandardMaterial>();
 
@@ -346,8 +377,80 @@ export function buildSceneFromInstances(
 		});
 	}
 
+	return { instances: geometryInstances, geometryMap, materialMap };
+}
+
+function computeInstanceBounds(
+	instances: GeometryInstance[],
+	geometryMap: Map<number, THREE.BufferGeometry>
+): InstanceBounds[] {
+	const yUpMatrix = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
+	const bounds: InstanceBounds[] = [];
+
+	for (const inst of instances) {
+		const geom = geometryMap.get(inst.meshIndex);
+		if (!geom) continue;
+
+		const positions = geom.attributes.position.array as Float32Array;
+		const vertexCount = geom.attributes.position.count;
+		const m = inst.transform.elements;
+
+		const bbox = new THREE.Box3();
+		for (let i = 0; i < vertexCount; i++) {
+			const px = positions[i * 3];
+			const py = positions[i * 3 + 1];
+			const pz = positions[i * 3 + 2];
+
+			const tx = m[0] * px + m[4] * py + m[8] * pz + m[12];
+			const ty = m[1] * px + m[5] * py + m[9] * pz + m[13];
+			const tz = m[2] * px + m[6] * py + m[10] * pz + m[14];
+
+			const wx =
+				yUpMatrix.elements[0] * tx +
+				yUpMatrix.elements[4] * ty +
+				yUpMatrix.elements[8] * tz +
+				yUpMatrix.elements[12];
+			const wy =
+				yUpMatrix.elements[1] * tx +
+				yUpMatrix.elements[5] * ty +
+				yUpMatrix.elements[9] * tz +
+				yUpMatrix.elements[13];
+			const wz =
+				yUpMatrix.elements[2] * tx +
+				yUpMatrix.elements[6] * ty +
+				yUpMatrix.elements[10] * tz +
+				yUpMatrix.elements[14];
+
+			bbox.expandByPoint(
+				new THREE.Vector3(wx, wy, wz)
+			);
+		}
+
+		bounds.push({
+			entityIndex: inst.entityIndex,
+			instanceIndex: inst.instanceIndex,
+			bbox,
+		});
+	}
+
+	return bounds;
+}
+
+export function buildSceneFromInstances(
+	instanceIndices: number[],
+	cache: GeometricalDataCache
+): {
+	scene: THREE.Group | null;
+	instanceCount: number;
+	bounds: InstanceBounds[];
+} {
+	const { instances, geometryMap, materialMap } = buildGeometryInstances(
+		instanceIndices,
+		cache
+	);
+
 	const batches = batchInstancesByMaterialAndGeometry(
-		geometryInstances,
+		instances,
 		geometryMap,
 		materialMap
 	);
@@ -365,7 +468,45 @@ export function buildSceneFromInstances(
 
 	convertZUpToYUp(group);
 
-	return { scene: group, instanceCount: instanceIndices.length };
+	const bounds = computeInstanceBounds(instances, geometryMap);
+
+	return { scene: group, instanceCount: instanceIndices.length, bounds };
+}
+
+export function buildHighlightOverlay(
+	highlightedEntityIndex: number,
+	entityIndices: number[],
+	cache: GeometricalDataCache
+): THREE.Group | null {
+	const entityIndexSet = new Set(entityIndices);
+	const matchedInstanceIndices: number[] = [];
+
+	for (let i = 0; i < cache.instanceCount; i++) {
+		const ei = cache.instanceEntityIndex[i];
+		if (ei === highlightedEntityIndex && entityIndexSet.has(ei)) {
+			matchedInstanceIndices.push(i);
+		}
+	}
+
+	if (matchedInstanceIndices.length === 0) return null;
+
+	const { instances, geometryMap, materialMap } = buildGeometryInstances(
+		matchedInstanceIndices,
+		cache
+	);
+
+	const batches = batchInstancesByMaterialAndGeometry(instances, geometryMap, materialMap);
+
+	const group = new THREE.Group();
+	for (const batch of batches) {
+		const mergedGeometry = mergeGeometriesForBatch(batch.instances, geometryMap);
+		const highlightMat = getHighlightMaterial(batch.material);
+		const mesh = new THREE.Mesh(mergedGeometry, highlightMat);
+		group.add(mesh);
+	}
+
+	convertZUpToYUp(group);
+	return group;
 }
 
 export const buildFilteredScene = (
@@ -373,7 +514,7 @@ export const buildFilteredScene = (
 	cache: GeometricalDataCache | null
 ): FilteredGeometryResult => {
 	if (!cache) {
-		return { scene: null, instanceCount: 0, totalCount: 0 };
+		return { scene: null, instanceCount: 0, totalCount: 0, bounds: [] };
 	}
 
 	const entityIndexSet = new Set(entityIndices);
@@ -388,12 +529,16 @@ export const buildFilteredScene = (
 		}
 	}
 
-	const { scene } = buildSceneFromInstances(filteredInstanceIndices, cache);
+	const { scene, bounds } = buildSceneFromInstances(
+		filteredInstanceIndices,
+		cache
+	);
 
 	return {
 		scene,
 		instanceCount: filteredInstanceIndices.length,
 		totalCount: filteredEntities.size,
+		bounds,
 	};
 };
 
@@ -402,6 +547,7 @@ export interface GhostedSceneResult {
 	selectedCount: number;
 	ghostCount: number;
 	totalCount: number;
+	bounds: InstanceBounds[];
 }
 
 const surfaceMaterial = new THREE.MeshPhysicalMaterial({
@@ -427,7 +573,13 @@ export const buildGhostedScene = (
 	cache: GeometricalDataCache | null
 ): GhostedSceneResult => {
 	if (!cache) {
-		return { scene: null, selectedCount: 0, ghostCount: 0, totalCount: 0 };
+		return {
+			scene: null,
+			selectedCount: 0,
+			ghostCount: 0,
+			totalCount: 0,
+			bounds: [],
+		};
 	}
 
 	const entityIndexSet = new Set(entityIndices);
@@ -445,7 +597,7 @@ export const buildGhostedScene = (
 		}
 	}
 
-	const { scene: selectedScene } = buildSceneFromInstances(
+	const { scene: selectedScene, bounds } = buildSceneFromInstances(
 		selectedInstanceIndices,
 		cache
 	);
@@ -456,6 +608,7 @@ export const buildGhostedScene = (
 			selectedCount: 0,
 			ghostCount: ghostInstanceIndices.length,
 			totalCount: selectedEntities.size,
+			bounds,
 		};
 	}
 
@@ -482,6 +635,7 @@ export const buildGhostedScene = (
 		selectedCount: selectedInstanceIndices.length,
 		ghostCount: ghostInstanceIndices.length,
 		totalCount: selectedEntities.size,
+		bounds,
 	};
 };
 
