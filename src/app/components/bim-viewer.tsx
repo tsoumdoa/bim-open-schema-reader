@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+	import { useEffect } from "react";
 import { useGeometryFromParquetCtx } from "./geometry-from-parquet-context";
 import { useGeometryFilter } from "@/app/hooks/use-geometry-filter";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ function PickTarget({
 	onHighlight,
 }: {
 	bounds: InstanceBounds[];
-	onHighlight: (entityIndex: number) => void;
+	onHighlight: (entityIndex: number, shiftKey: boolean) => void;
 }) {
 	const { camera, gl } = useThree();
 
@@ -37,6 +37,7 @@ function PickTarget({
 		(event as unknown as { stopPropagation: () => void }).stopPropagation();
 
 		const pointer = (event as unknown as { clientX: number; clientY: number });
+		const shiftKey = (event as unknown as { shiftKey: boolean }).shiftKey ?? false;
 		const rect = gl.domElement.getBoundingClientRect();
 		const ndc = new THREE.Vector2(
 			((pointer.clientX - rect.left) / rect.width) * 2 - 1,
@@ -61,7 +62,7 @@ function PickTarget({
 		}
 
 		if (closestEntity !== null) {
-			onHighlight(closestEntity);
+			onHighlight(closestEntity, shiftKey);
 		}
 	}
 
@@ -87,7 +88,7 @@ function Scene({
 	scene: THREE.Group | null;
 	highlightOverlay: THREE.Group | null;
 	bounds: InstanceBounds[];
-	onHighlight: (entityIndex: number) => void;
+	onHighlight: (entityIndex: number, shiftKey: boolean) => void;
 	invalidateKey: unknown;
 }) {
 	if (!scene) return null;
@@ -112,12 +113,10 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		availableEntityCount,
 		toggleGhostOthers,
 		bounds,
-		highlightedEntityIndex,
-		setHighlightedEntityIndex,
+		highlightedEntityIndices,
+		setHighlightedEntityIndices,
 		highlightOverlay,
 	} = useGeometryFilter(entityIndices);
-	const highlightRef = useRef(setHighlightedEntityIndex);
-	highlightRef.current = setHighlightedEntityIndex;
 
 	if (loading) {
 		return (
@@ -145,8 +144,20 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		);
 	}
 
-	const handleHighlight = (entityIndex: number) => {
-		highlightRef.current(entityIndex);
+	const handleHighlight = (entityIndex: number, shiftKey: boolean) => {
+		if (shiftKey) {
+			setHighlightedEntityIndices((prev) => {
+				const next = new Set(prev);
+				if (next.has(entityIndex)) {
+					next.delete(entityIndex);
+				} else {
+					next.add(entityIndex);
+				}
+				return next;
+			});
+		} else {
+			setHighlightedEntityIndices(new Set([entityIndex]));
+		}
 	};
 
 	return (
@@ -163,17 +174,17 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 						`${totalEntityCount.toLocaleString()} entities`
 					)}
 				</div>
-				{highlightedEntityIndex !== null && (
-					<div className="bg-yellow-500/90 text-black px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1">
-						<span>Entity #{highlightedEntityIndex}</span>
-						<button
-							className="ml-1 hover:text-red-700 font-bold cursor-pointer bg-transparent border-none p-0"
-							onClick={() => setHighlightedEntityIndex(null)}
-						>
-							✕
-						</button>
-					</div>
-				)}
+			{highlightedEntityIndices.size > 0 && (
+				<div className="bg-yellow-500/90 text-black px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1">
+					<span>{highlightedEntityIndices.size} entity{highlightedEntityIndices.size > 1 ? 's' : ''} selected</span>
+					<button
+						className="ml-1 hover:text-red-700 font-bold cursor-pointer bg-transparent border-none p-0"
+						onClick={() => setHighlightedEntityIndices(new Set())}
+					>
+						✕
+					</button>
+				</div>
+			)}
 			</div>
 			{entityIndices.length > 0 &&
 				totalEntityCount < availableEntityCount && (
@@ -220,7 +231,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 					highlightOverlay={highlightOverlay}
 					bounds={bounds}
 					onHighlight={handleHighlight}
-					invalidateKey={highlightedEntityIndex}
+					invalidateKey={highlightedEntityIndices}
 				/>
 
 				<Environment preset="city" />

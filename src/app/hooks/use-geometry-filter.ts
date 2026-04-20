@@ -93,9 +93,9 @@ export function useGeometryFilter(
 ): UseGeometryFilterResult {
 	const { cache, loading, error } = useGeometryFromParquetCtx();
 	const [ghostOthers, setGhostOthers] = useState(false);
-	const [highlightedEntityIndex, setHighlightedEntityIndex] = useState<
-		number | null
-	>(null);
+	const [highlightedEntityIndices, setHighlightedEntityIndices] = useState<
+		Set<number>
+	>(new Set());
 
 	const lastResultRef = useRef<UseGeoComputedResult | null>(null);
 	const lastInputsRef = useRef<UseGeoLastInputs | null>(null);
@@ -119,11 +119,11 @@ export function useGeometryFilter(
 			cache
 		);
 	}
-	lastInputsRef.current = { entityIndices, ghostOthers, highlightedEntityIndex, cache };
+	lastInputsRef.current = { entityIndices, ghostOthers, highlightedEntityIndices, cache };
 
 	const highlightOverlay =
-		cache && highlightedEntityIndex != null && !loading && !error
-			? buildHighlightOverlay(highlightedEntityIndex, entityIndices, cache)
+		cache && highlightedEntityIndices.size > 0 && !loading && !error
+			? buildHighlightOverlay(highlightedEntityIndices, entityIndices, cache)
 			: null;
 
 	return {
@@ -131,8 +131,8 @@ export function useGeometryFilter(
 		ghostOthers,
 		toggleGhostOthers,
 		bounds: lastResultRef.current?.bounds ?? [],
-		highlightedEntityIndex,
-		setHighlightedEntityIndex,
+		highlightedEntityIndices,
+		setHighlightedEntityIndices,
 		highlightOverlay,
 	};
 }

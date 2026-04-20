@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import useEditor from "../hooks/use-editor";
 import useFilterByDataReadiness from "../hooks/use-filter-by-data-readiness";
 import { useKeywordFilter } from "../hooks/use-keyword-filter";
@@ -284,7 +285,7 @@ export type UseGeoComputedResult = {
 export type UseGeoLastInputs = {
 	entityIndices: number[];
 	ghostOthers: boolean;
-	highlightedEntityIndex: number | null;
+	highlightedEntityIndices: Set<number>;
 	cache: unknown;
 };
 export type UseGeometryFilterResult = {
@@ -296,7 +297,7 @@ export type UseGeometryFilterResult = {
 	availableEntityCount: number;
 	toggleGhostOthers: () => void;
 	bounds: import("@/lib/geometry-utils").InstanceBounds[];
-	highlightedEntityIndex: number | null;
-	setHighlightedEntityIndex: (index: number | null) => void;
+	highlightedEntityIndices: Set<number>;
+	setHighlightedEntityIndices: Dispatch<SetStateAction<Set<number>>>;
 	highlightOverlay: THREE.Group | null;
 };

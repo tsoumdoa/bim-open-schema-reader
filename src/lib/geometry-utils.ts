@@ -474,7 +474,7 @@ export function buildSceneFromInstances(
 }
 
 export function buildHighlightOverlay(
-	highlightedEntityIndex: number,
+	highlightedEntityIndices: Set<number>,
 	entityIndices: number[],
 	cache: GeometricalDataCache
 ): THREE.Group | null {
@@ -483,7 +483,7 @@ export function buildHighlightOverlay(
 
 	for (let i = 0; i < cache.instanceCount; i++) {
 		const ei = cache.instanceEntityIndex[i];
-		if (ei === highlightedEntityIndex && entityIndexSet.has(ei)) {
+		if (highlightedEntityIndices.has(ei) && entityIndexSet.has(ei)) {
 			matchedInstanceIndices.push(i);
 		}
 	}
