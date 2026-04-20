@@ -122,10 +122,10 @@ export interface BatchedGeometry {
 	instances: GeometryInstance[];
 }
 
-export interface InstanceBounds {
+export interface EntityFaceRange {
 	entityIndex: number;
-	instanceIndex: number;
-	bbox: THREE.Box3;
+	startFace: number;
+	faceCount: number;
 }
 
 const highlightMaterialCache = new Map<number, THREE.MeshStandardMaterial>();
@@ -180,7 +180,7 @@ export function batchInstancesByMaterialAndGeometry(
 function mergeGeometriesForBatch(
 	instances: GeometryInstance[],
 	geometries: Map<number, THREE.BufferGeometry>
-): THREE.BufferGeometry {
+): { geometry: THREE.BufferGeometry; faceRanges: EntityFaceRange[] } {
 	let totalVertexCount = 0;
 	let totalIndexCount = 0;
 
@@ -193,6 +193,7 @@ function mergeGeometriesForBatch(
 
 	const mergedPositions = new Float32Array(totalVertexCount * 3);
 	const mergedIndices = new Uint32Array(totalIndexCount);
+	const faceRanges: EntityFaceRange[] = [];
 	let vertexOffset = 0;
 	let indexOffset = 0;
 	let indexVertexOffset = 0;
@@ -223,7 +224,9 @@ function mergeGeometriesForBatch(
 		}
 
 		mergedPositions.set(transformedPositions, vertexOffset * 3);
-		vertexOffset += vertexCount;
+
+		const startFace = indexOffset / 3;
+		let faceCount = 0;
 
 		if (geom.index) {
 			const indices = geom.index.array as Uint32Array;
@@ -231,9 +234,12 @@ function mergeGeometriesForBatch(
 			for (let i = 0; i < indexCount; i++) {
 				mergedIndices[indexOffset + i] = indices[i] + indexVertexOffset;
 			}
+			faceCount = indexCount / 3;
 			indexOffset += indexCount;
 		}
 
+		faceRanges.push({ entityIndex: inst.entityIndex, startFace, faceCount });
+		vertexOffset += vertexCount;
 		indexVertexOffset += vertexCount;
 	}
 
@@ -242,7 +248,7 @@ function mergeGeometriesForBatch(
 	mergedGeometry.setIndex(indexAttr);
 	mergedGeometry.computeVertexNormals();
 
-	return mergedGeometry;
+	return { geometry: mergedGeometry, faceRanges };
 }
 
 function buildGhostGeometry(
@@ -380,69 +386,12 @@ function buildGeometryInstances(
 	return { instances: geometryInstances, geometryMap, materialMap };
 }
 
-function computeInstanceBounds(
-	instances: GeometryInstance[],
-	geometryMap: Map<number, THREE.BufferGeometry>
-): InstanceBounds[] {
-	const yUpMatrix = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
-	const bounds: InstanceBounds[] = [];
-
-	for (const inst of instances) {
-		const geom = geometryMap.get(inst.meshIndex);
-		if (!geom) continue;
-
-		const positions = geom.attributes.position.array as Float32Array;
-		const vertexCount = geom.attributes.position.count;
-		const m = inst.transform.elements;
-
-		const bbox = new THREE.Box3();
-		for (let i = 0; i < vertexCount; i++) {
-			const px = positions[i * 3];
-			const py = positions[i * 3 + 1];
-			const pz = positions[i * 3 + 2];
-
-			const tx = m[0] * px + m[4] * py + m[8] * pz + m[12];
-			const ty = m[1] * px + m[5] * py + m[9] * pz + m[13];
-			const tz = m[2] * px + m[6] * py + m[10] * pz + m[14];
-
-			const wx =
-				yUpMatrix.elements[0] * tx +
-				yUpMatrix.elements[4] * ty +
-				yUpMatrix.elements[8] * tz +
-				yUpMatrix.elements[12];
-			const wy =
-				yUpMatrix.elements[1] * tx +
-				yUpMatrix.elements[5] * ty +
-				yUpMatrix.elements[9] * tz +
-				yUpMatrix.elements[13];
-			const wz =
-				yUpMatrix.elements[2] * tx +
-				yUpMatrix.elements[6] * ty +
-				yUpMatrix.elements[10] * tz +
-				yUpMatrix.elements[14];
-
-			bbox.expandByPoint(
-				new THREE.Vector3(wx, wy, wz)
-			);
-		}
-
-		bounds.push({
-			entityIndex: inst.entityIndex,
-			instanceIndex: inst.instanceIndex,
-			bbox,
-		});
-	}
-
-	return bounds;
-}
-
 export function buildSceneFromInstances(
 	instanceIndices: number[],
 	cache: GeometricalDataCache
 ): {
 	scene: THREE.Group | null;
 	instanceCount: number;
-	bounds: InstanceBounds[];
 } {
 	const { instances, geometryMap, materialMap } = buildGeometryInstances(
 		instanceIndices,
@@ -458,19 +407,18 @@ export function buildSceneFromInstances(
 	const group = new THREE.Group();
 
 	for (const batch of batches) {
-		const mergedGeometry = mergeGeometriesForBatch(
+		const { geometry: mergedGeometry, faceRanges } = mergeGeometriesForBatch(
 			batch.instances,
 			geometryMap
 		);
 		const mesh = new THREE.Mesh(mergedGeometry, batch.material);
+		mesh.userData.entityFaceRanges = faceRanges;
 		group.add(mesh);
 	}
 
 	convertZUpToYUp(group);
 
-	const bounds = computeInstanceBounds(instances, geometryMap);
-
-	return { scene: group, instanceCount: instanceIndices.length, bounds };
+	return { scene: group, instanceCount: instanceIndices.length };
 }
 
 export function buildHighlightOverlay(
@@ -499,7 +447,7 @@ export function buildHighlightOverlay(
 
 	const group = new THREE.Group();
 	for (const batch of batches) {
-		const mergedGeometry = mergeGeometriesForBatch(batch.instances, geometryMap);
+		const { geometry: mergedGeometry } = mergeGeometriesForBatch(batch.instances, geometryMap);
 		const highlightMat = getHighlightMaterial(batch.material);
 		const mesh = new THREE.Mesh(mergedGeometry, highlightMat);
 		group.add(mesh);
@@ -514,7 +462,7 @@ export const buildFilteredScene = (
 	cache: GeometricalDataCache | null
 ): FilteredGeometryResult => {
 	if (!cache) {
-		return { scene: null, instanceCount: 0, totalCount: 0, bounds: [] };
+		return { scene: null, instanceCount: 0, totalCount: 0 };
 	}
 
 	const entityIndexSet = new Set(entityIndices);
@@ -529,7 +477,7 @@ export const buildFilteredScene = (
 		}
 	}
 
-	const { scene, bounds } = buildSceneFromInstances(
+	const { scene } = buildSceneFromInstances(
 		filteredInstanceIndices,
 		cache
 	);
@@ -538,7 +486,6 @@ export const buildFilteredScene = (
 		scene,
 		instanceCount: filteredInstanceIndices.length,
 		totalCount: filteredEntities.size,
-		bounds,
 	};
 };
 
@@ -547,7 +494,6 @@ export interface GhostedSceneResult {
 	selectedCount: number;
 	ghostCount: number;
 	totalCount: number;
-	bounds: InstanceBounds[];
 }
 
 const surfaceMaterial = new THREE.MeshPhysicalMaterial({
@@ -578,7 +524,6 @@ export const buildGhostedScene = (
 			selectedCount: 0,
 			ghostCount: 0,
 			totalCount: 0,
-			bounds: [],
 		};
 	}
 
@@ -597,7 +542,7 @@ export const buildGhostedScene = (
 		}
 	}
 
-	const { scene: selectedScene, bounds } = buildSceneFromInstances(
+	const { scene: selectedScene } = buildSceneFromInstances(
 		selectedInstanceIndices,
 		cache
 	);
@@ -608,7 +553,6 @@ export const buildGhostedScene = (
 			selectedCount: 0,
 			ghostCount: ghostInstanceIndices.length,
 			totalCount: selectedEntities.size,
-			bounds,
 		};
 	}
 
@@ -635,7 +579,6 @@ export const buildGhostedScene = (
 		selectedCount: selectedInstanceIndices.length,
 		ghostCount: ghostInstanceIndices.length,
 		totalCount: selectedEntities.size,
-		bounds,
 	};
 };
 

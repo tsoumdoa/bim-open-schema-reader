@@ -1,6 +1,6 @@
 "use client";
 
-	import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useCallback } from "react";
 import { useGeometryFromParquetCtx } from "./geometry-from-parquet-context";
 import { useGeometryFilter } from "@/app/hooks/use-geometry-filter";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
 import { Canvas, useThree } from "@react-three/fiber";
 import { Box, Ghost } from "lucide-react";
 import * as THREE from "three";
-import type { InstanceBounds } from "@/lib/geometry-utils";
+import type { EntityFaceRange } from "@/lib/geometry-utils";
 
 function FrameInvalidator({ deps }: { deps: unknown }) {
 	const invalidate = useThree((state) => state.invalidate);
@@ -24,14 +24,38 @@ function FrameInvalidator({ deps }: { deps: unknown }) {
 	return null;
 }
 
-function PickTarget({
-	bounds,
+function findEntityByFaceIndex(
+	faceIndex: number,
+	faceRanges: EntityFaceRange[]
+): number | null {
+	for (const range of faceRanges) {
+		if (faceIndex >= range.startFace && faceIndex < range.startFace + range.faceCount) {
+			return range.entityIndex;
+		}
+	}
+	return null;
+}
+
+function RaycastPicker({
+	scene,
 	onHighlight,
 }: {
-	bounds: InstanceBounds[];
+	scene: THREE.Group;
 	onHighlight: (entityIndex: number, shiftKey: boolean) => void;
 }) {
 	const { camera, gl } = useThree();
+	const raycaster = useMemo(() => new THREE.Raycaster(), []);
+	const meshRefs = useRef<THREE.Mesh[]>([]);
+
+	useEffect(() => {
+		const meshes: THREE.Mesh[] = [];
+		scene.traverse((child) => {
+			if (child instanceof THREE.Mesh && child.userData.entityFaceRanges) {
+				meshes.push(child);
+			}
+		});
+		meshRefs.current = meshes;
+	}, [scene]);
 
 	function handlePointerDown(event: THREE.Event) {
 		(event as unknown as { stopPropagation: () => void }).stopPropagation();
@@ -44,25 +68,19 @@ function PickTarget({
 			-((pointer.clientY - rect.top) / rect.height) * 2 + 1
 		);
 
-		const raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera(ndc, camera);
+		const intersects = raycaster.intersectObjects(meshRefs.current, false);
 
-		let closestEntity: number | null = null;
-		let closestDist = Infinity;
-
-		for (const b of bounds) {
-			const intersection = raycaster.ray.intersectBox(b.bbox, new THREE.Vector3());
-			if (intersection) {
-				const dist = intersection.distanceTo(raycaster.ray.origin);
-				if (dist < closestDist) {
-					closestDist = dist;
-					closestEntity = b.entityIndex;
+		if (intersects.length > 0) {
+			const hit = intersects[0];
+			const faceRanges = (hit.object as THREE.Mesh).userData
+				.entityFaceRanges as EntityFaceRange[];
+			if (faceRanges && hit.faceIndex != null) {
+				const entityIndex = findEntityByFaceIndex(hit.faceIndex, faceRanges);
+				if (entityIndex !== null) {
+					onHighlight(entityIndex, shiftKey);
 				}
 			}
-		}
-
-		if (closestEntity !== null) {
-			onHighlight(closestEntity, shiftKey);
 		}
 	}
 
@@ -81,13 +99,11 @@ function PickTarget({
 function Scene({
 	scene,
 	highlightOverlay,
-	bounds,
 	onHighlight,
 	invalidateKey,
 }: {
 	scene: THREE.Group | null;
 	highlightOverlay: THREE.Group | null;
-	bounds: InstanceBounds[];
 	onHighlight: (entityIndex: number, shiftKey: boolean) => void;
 	invalidateKey: unknown;
 }) {
@@ -97,7 +113,7 @@ function Scene({
 		<>
 			<primitive object={scene} />
 			{highlightOverlay && <primitive object={highlightOverlay} />}
-			<PickTarget bounds={bounds} onHighlight={onHighlight} />
+			<RaycastPicker scene={scene} onHighlight={onHighlight} />
 			<FrameInvalidator deps={invalidateKey} />
 		</>
 	);
@@ -112,11 +128,26 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		ghostOthers,
 		availableEntityCount,
 		toggleGhostOthers,
-		bounds,
 		highlightedEntityIndices,
 		setHighlightedEntityIndices,
 		highlightOverlay,
 	} = useGeometryFilter(entityIndices);
+
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const el = containerRef.current;
+		if (!el) return;
+
+		function onKeyDown(e: KeyboardEvent) {
+			if (e.key === "Escape" && highlightedEntityIndices.size > 0) {
+				e.preventDefault();
+				setHighlightedEntityIndices(new Set());
+			}
+		}
+		el.addEventListener("keydown", onKeyDown);
+		return () => el.removeEventListener("keydown", onKeyDown);
+	}, [highlightedEntityIndices.size, setHighlightedEntityIndices]);
 
 	if (loading) {
 		return (
@@ -161,7 +192,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 	};
 
 	return (
-		<div className="relative w-full h-100">
+		<div ref={containerRef} className="relative w-full h-100" tabIndex={0}>
 			<div className="absolute top-2 left-2 z-10 flex gap-2">
 				<div className="bg-black/70 text-white px-3 py-1.5 rounded text-xs flex items-center gap-2">
 					<Box className="h-4 w-4" />
@@ -226,10 +257,9 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 				/>
 				<directionalLight position={[-50, 50, -50]} intensity={0.3} />
 
-				<Scene
+			<Scene
 					scene={scene}
 					highlightOverlay={highlightOverlay}
-					bounds={bounds}
 					onHighlight={handleHighlight}
 					invalidateKey={highlightedEntityIndices}
 				/>

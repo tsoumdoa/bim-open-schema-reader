@@ -222,7 +222,6 @@ export type FilteredGeometryResult = {
 	scene: THREE.Group | null;
 	instanceCount: number;
 	totalCount: number;
-	bounds: import("@/lib/geometry-utils").InstanceBounds[];
 };
 
 export type GeometryContextValue = {
@@ -280,7 +279,6 @@ export type UseGeoComputedResult = {
 	totalEntityCount: number;
 	ghostCount: number;
 	availableEntityCount: number;
-	bounds: import("@/lib/geometry-utils").InstanceBounds[];
 };
 export type UseGeoLastInputs = {
 	entityIndices: number[];
@@ -296,7 +294,6 @@ export type UseGeometryFilterResult = {
 	ghostOthers: boolean;
 	availableEntityCount: number;
 	toggleGhostOthers: () => void;
-	bounds: import("@/lib/geometry-utils").InstanceBounds[];
 	highlightedEntityIndices: Set<number>;
 	setHighlightedEntityIndices: Dispatch<SetStateAction<Set<number>>>;
 	highlightOverlay: THREE.Group | null;

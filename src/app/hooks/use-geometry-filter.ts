@@ -49,7 +49,6 @@ function buildGeomComputedResult(
 			totalEntityCount: 0,
 			ghostCount: 0,
 			availableEntityCount: cache ? new Set(cache.instanceEntityIndex).size : 0,
-			bounds: [],
 		};
 	}
 
@@ -59,7 +58,7 @@ function buildGeomComputedResult(
 		: 0;
 
 	if (ghostOthers) {
-		const { scene, selectedCount, ghostCount, bounds } = buildGhostedScene(
+		const { scene, selectedCount, ghostCount } = buildGhostedScene(
 			entityIndices,
 			cache
 		);
@@ -70,10 +69,9 @@ function buildGeomComputedResult(
 			totalEntityCount,
 			ghostCount,
 			availableEntityCount,
-			bounds,
 		};
 	} else {
-		const { scene, instanceCount, bounds } = buildFilteredScene(
+		const { scene, instanceCount } = buildFilteredScene(
 			entityIndices,
 			cache
 		);
@@ -83,7 +81,6 @@ function buildGeomComputedResult(
 			totalEntityCount,
 			ghostCount: 0,
 			availableEntityCount,
-			bounds,
 		};
 	}
 }
@@ -130,7 +127,6 @@ export function useGeometryFilter(
 		...lastResultRef.current!,
 		ghostOthers,
 		toggleGhostOthers,
-		bounds: lastResultRef.current?.bounds ?? [],
 		highlightedEntityIndices,
 		setHighlightedEntityIndices,
 		highlightOverlay,
