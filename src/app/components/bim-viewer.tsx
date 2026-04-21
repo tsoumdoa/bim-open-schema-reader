@@ -14,7 +14,7 @@ import {
 import { Canvas, useThree } from "@react-three/fiber";
 import { Box, Ghost } from "lucide-react";
 import * as THREE from "three";
-import type { EntityFaceRange } from "@/lib/geometry-utils";
+import type { EntityFaceRangesSoA } from "@/lib/geometry-utils";
 
 function FrameInvalidator({ deps }: { deps: unknown }) {
 	const invalidate = useThree((state) => state.invalidate);
@@ -26,11 +26,20 @@ function FrameInvalidator({ deps }: { deps: unknown }) {
 
 function findEntityByFaceIndex(
 	faceIndex: number,
-	faceRanges: EntityFaceRange[]
+	faceRanges: EntityFaceRangesSoA
 ): number | null {
-	for (const range of faceRanges) {
-		if (faceIndex >= range.startFace && faceIndex < range.startFace + range.faceCount) {
-			return range.entityIndex;
+	const { entityIndices, startFaces, faceCounts } = faceRanges;
+	let lo = 0;
+	let hi = startFaces.length - 1;
+	while (lo <= hi) {
+		const mid = (lo + hi) >>> 1;
+		const start = startFaces[mid];
+		if (faceIndex < start) {
+			hi = mid - 1;
+		} else if (faceIndex >= start + faceCounts[mid]) {
+			lo = mid + 1;
+		} else {
+			return entityIndices[mid];
 		}
 	}
 	return null;
@@ -74,7 +83,7 @@ function RaycastPicker({
 		if (intersects.length > 0) {
 			const hit = intersects[0];
 			const faceRanges = (hit.object as THREE.Mesh).userData
-				.entityFaceRanges as EntityFaceRange[];
+				.entityFaceRanges as EntityFaceRangesSoA;
 			if (faceRanges && hit.faceIndex != null) {
 				const entityIndex = findEntityByFaceIndex(hit.faceIndex, faceRanges);
 				if (entityIndex !== null) {

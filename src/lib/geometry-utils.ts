@@ -122,10 +122,10 @@ export interface BatchedGeometry {
 	instances: GeometryInstance[];
 }
 
-export interface EntityFaceRange {
-	entityIndex: number;
-	startFace: number;
-	faceCount: number;
+export interface EntityFaceRangesSoA {
+	entityIndices: Uint32Array;
+	startFaces: Uint32Array;
+	faceCounts: Uint32Array;
 }
 
 const highlightMaterialCache = new Map<number, THREE.MeshStandardMaterial>();
@@ -180,7 +180,7 @@ export function batchInstancesByMaterialAndGeometry(
 function mergeGeometriesForBatch(
 	instances: GeometryInstance[],
 	geometries: Map<number, THREE.BufferGeometry>
-): { geometry: THREE.BufferGeometry; faceRanges: EntityFaceRange[] } {
+): { geometry: THREE.BufferGeometry; faceRanges: EntityFaceRangesSoA } {
 	let totalVertexCount = 0;
 	let totalIndexCount = 0;
 
@@ -193,13 +193,17 @@ function mergeGeometriesForBatch(
 
 	const mergedPositions = new Float32Array(totalVertexCount * 3);
 	const mergedIndices = new Uint32Array(totalIndexCount);
-	const faceRanges: EntityFaceRange[] = [];
 	let vertexOffset = 0;
 	let indexOffset = 0;
 	let indexVertexOffset = 0;
 
 	const positionAttr = new THREE.BufferAttribute(mergedPositions, 3);
 	const indexAttr = new THREE.BufferAttribute(mergedIndices, 1);
+
+	const entityIndices = new Uint32Array(instances.length);
+	const startFaces = new Uint32Array(instances.length);
+	const faceCounts = new Uint32Array(instances.length);
+	let rangeIdx = 0;
 
 	for (const inst of instances) {
 		const geom = geometries.get(inst.meshIndex);
@@ -238,7 +242,10 @@ function mergeGeometriesForBatch(
 			indexOffset += indexCount;
 		}
 
-		faceRanges.push({ entityIndex: inst.entityIndex, startFace, faceCount });
+		entityIndices[rangeIdx] = inst.entityIndex;
+		startFaces[rangeIdx] = startFace;
+		faceCounts[rangeIdx] = faceCount;
+		rangeIdx++;
 		vertexOffset += vertexCount;
 		indexVertexOffset += vertexCount;
 	}
@@ -248,7 +255,7 @@ function mergeGeometriesForBatch(
 	mergedGeometry.setIndex(indexAttr);
 	mergedGeometry.computeVertexNormals();
 
-	return { geometry: mergedGeometry, faceRanges };
+	return { geometry: mergedGeometry, faceRanges: { entityIndices, startFaces, faceCounts } };
 }
 
 function buildGhostGeometry(
