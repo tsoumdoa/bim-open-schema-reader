@@ -71,10 +71,7 @@ function buildGeomComputedResult(
 			availableEntityCount,
 		};
 	} else {
-		const { scene, instanceCount } = buildFilteredScene(
-			entityIndices,
-			cache
-		);
+		const { scene, instanceCount } = buildFilteredScene(entityIndices, cache);
 		return {
 			scene,
 			instanceCount,
@@ -116,7 +113,12 @@ export function useGeometryFilter(
 			cache
 		);
 	}
-	lastInputsRef.current = { entityIndices, ghostOthers, highlightedEntityIndices, cache };
+	lastInputsRef.current = {
+		entityIndices,
+		ghostOthers,
+		highlightedEntityIndices,
+		cache,
+	};
 
 	const highlightOverlay =
 		cache && highlightedEntityIndices.size > 0 && !loading && !error

@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import useEditor from "../hooks/use-editor";
 import useFilterByDataReadiness from "../hooks/use-filter-by-data-readiness";
 import { useKeywordFilter } from "../hooks/use-keyword-filter";
@@ -7,6 +6,7 @@ import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { getEditorState } from "./editor-display-state";
 import * as duckdb from "@duckdb/duckdb-wasm";
+import { Dispatch, SetStateAction } from "react";
 import * as THREE from "three";
 
 export const validFileNames = [

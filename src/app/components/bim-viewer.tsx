@@ -13,7 +13,7 @@ import {
 } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import { Box, Ghost } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 function FrameInvalidator({ deps }: { deps: unknown }) {
