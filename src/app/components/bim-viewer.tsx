@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useCallback } from "react";
 import { useGeometryFromParquetCtx } from "./geometry-from-parquet-context";
 import { useGeometryFilter } from "@/app/hooks/use-geometry-filter";
 import { Button } from "@/components/ui/button";
+import type { EntityFaceRangesSoA } from "@/lib/geometry-utils";
 import {
 	GizmoHelper,
 	GizmoViewcube,
@@ -13,8 +13,8 @@ import {
 } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
 import { Box, Ghost } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import type { EntityFaceRangesSoA } from "@/lib/geometry-utils";
 
 function FrameInvalidator({ deps }: { deps: unknown }) {
 	const invalidate = useThree((state) => state.invalidate);
@@ -52,8 +52,7 @@ function RaycastPicker({
 	scene: THREE.Group;
 	onHighlight: (entityIndex: number, shiftKey: boolean) => void;
 }) {
-	const { camera, gl } = useThree();
-	const raycaster = useMemo(() => new THREE.Raycaster(), []);
+	const { camera, gl, raycaster } = useThree();
 	const meshRefs = useRef<THREE.Mesh[]>([]);
 
 	useEffect(() => {
@@ -69,8 +68,9 @@ function RaycastPicker({
 	function handlePointerDown(event: THREE.Event) {
 		(event as unknown as { stopPropagation: () => void }).stopPropagation();
 
-		const pointer = (event as unknown as { clientX: number; clientY: number });
-		const shiftKey = (event as unknown as { shiftKey: boolean }).shiftKey ?? false;
+		const pointer = event as unknown as { clientX: number; clientY: number };
+		const shiftKey =
+			(event as unknown as { shiftKey: boolean }).shiftKey ?? false;
 		const rect = gl.domElement.getBoundingClientRect();
 		const ndc = new THREE.Vector2(
 			((pointer.clientX - rect.left) / rect.width) * 2 - 1,
@@ -100,7 +100,7 @@ function RaycastPicker({
 			onPointerDown={handlePointerDown}
 		>
 			<planeGeometry args={[10000, 10000]} />
-			<meshBasicMaterial />
+			<meshBasicMaterial side={THREE.DoubleSide} />
 		</mesh>
 	);
 }
@@ -214,30 +214,32 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 						`${totalEntityCount.toLocaleString()} entities`
 					)}
 				</div>
-			{highlightedEntityIndices.size > 0 && (
-				<div className="bg-yellow-500/90 text-black px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1">
-					<span>{highlightedEntityIndices.size} entity{highlightedEntityIndices.size > 1 ? 's' : ''} selected</span>
-					<button
-						className="ml-1 hover:text-red-700 font-bold cursor-pointer bg-transparent border-none p-0"
-						onClick={() => setHighlightedEntityIndices(new Set())}
-					>
-						✕
-					</button>
-				</div>
-			)}
-			</div>
-			{entityIndices.length > 0 &&
-				totalEntityCount < availableEntityCount && (
-					<Button
-						variant={ghostOthers ? "default" : "secondary"}
-						size="sm"
-						onClick={toggleGhostOthers}
-						className="absolute bottom-2 right-2 z-10 gap-1.5"
-					>
-						<Ghost className="h-4 w-4" />
-						{ghostOthers ? "Hide Unselected" : "Show Unselected"}
-					</Button>
+				{highlightedEntityIndices.size > 0 && (
+					<div className="bg-yellow-500/90 text-black px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1">
+						<span>
+							{highlightedEntityIndices.size} entity
+							{highlightedEntityIndices.size > 1 ? "s" : ""} selected
+						</span>
+						<button
+							className="ml-1 hover:text-red-700 font-bold cursor-pointer bg-transparent border-none p-0"
+							onClick={() => setHighlightedEntityIndices(new Set())}
+						>
+							✕
+						</button>
+					</div>
 				)}
+			</div>
+			{entityIndices.length > 0 && totalEntityCount < availableEntityCount && (
+				<Button
+					variant={ghostOthers ? "default" : "secondary"}
+					size="sm"
+					onClick={toggleGhostOthers}
+					className="absolute bottom-2 right-2 z-10 gap-1.5"
+				>
+					<Ghost className="h-4 w-4" />
+					{ghostOthers ? "Hide Unselected" : "Show Unselected"}
+				</Button>
+			)}
 			<Canvas
 				frameloop="demand"
 				shadows
@@ -266,7 +268,7 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 				/>
 				<directionalLight position={[-50, 50, -50]} intensity={0.3} />
 
-			<Scene
+				<Scene
 					scene={scene}
 					highlightOverlay={highlightOverlay}
 					onHighlight={handleHighlight}
