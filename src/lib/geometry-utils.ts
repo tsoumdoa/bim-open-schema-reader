@@ -134,7 +134,7 @@ function getHighlightMaterial(
 	baseMaterial: THREE.MeshStandardMaterial
 ): THREE.MeshStandardMaterial {
 	const baseColor = baseMaterial.color.getHex();
-	let cached = highlightMaterialCache.get(baseColor);
+	const cached = highlightMaterialCache.get(baseColor);
 	if (cached) return cached;
 
 	const mat = baseMaterial.clone();
@@ -341,10 +341,6 @@ function buildGhostGeometry(
 	return mergedGeometry;
 }
 
-export function convertZUpToYUp(group: THREE.Group): void {
-	group.rotation.x = -Math.PI / 2;
-}
-
 function buildGeometryInstances(
 	instanceIndices: number[],
 	cache: GeometricalDataCache
@@ -423,8 +419,6 @@ export function buildSceneFromInstances(
 		group.add(mesh);
 	}
 
-	convertZUpToYUp(group);
-
 	return { scene: group, instanceCount: instanceIndices.length };
 }
 
@@ -460,7 +454,6 @@ export function buildHighlightOverlay(
 		group.add(mesh);
 	}
 
-	convertZUpToYUp(group);
 	return group;
 }
 
@@ -579,8 +572,6 @@ export const buildGhostedScene = (
 	selectedScene.add(surfaceMesh);
 	selectedScene.add(wireMesh);
 
-	convertZUpToYUp(selectedScene);
-
 	return {
 		scene: selectedScene,
 		selectedCount: selectedInstanceIndices.length,
@@ -683,8 +674,8 @@ export async function loadGeometryDataFromDuckDB(
 	const zArray = vertexRes.getChild("z")!.toArray() as Int32Array;
 	for (let i = 0; i < vertexCount; i++) {
 		positions[i * 3] = xArray[i] / VERTEX_MULTIPLIER;
-		positions[i * 3 + 1] = yArray[i] / VERTEX_MULTIPLIER;
-		positions[i * 3 + 2] = zArray[i] / VERTEX_MULTIPLIER;
+		positions[i * 3 + 1] = zArray[i] / VERTEX_MULTIPLIER;
+		positions[i * 3 + 2] = yArray[i] / VERTEX_MULTIPLIER;
 	}
 
 	const indexCount = indexRes.numRows;
@@ -765,14 +756,14 @@ export async function loadGeometryDataFromDuckDB(
 	const transforms = new Float32Array(transformCount * 16);
 
 	for (let i = 0; i < transformCount; i++) {
-		const position = new THREE.Vector3(txArray[i], tyArray[i], tzArray[i]);
+		const position = new THREE.Vector3(txArray[i], tzArray[i], tyArray[i]);
 		const quaternion = new THREE.Quaternion(
 			qxArray[i],
-			qyArray[i],
 			qzArray[i],
+			qyArray[i],
 			qwArray[i]
 		);
-		const scale = new THREE.Vector3(sxArray[i], syArray[i], szArray[i]);
+		const scale = new THREE.Vector3(sxArray[i], szArray[i], syArray[i]);
 		const matrix = new THREE.Matrix4();
 		matrix.compose(position, quaternion, scale);
 		transforms.set(matrix.elements, i * 16);
