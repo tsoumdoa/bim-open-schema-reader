@@ -12,6 +12,82 @@ function FrameInvalidator({ deps }: { deps: unknown }) {
 	return null;
 }
 
+function computeSceneBounds(root: THREE.Object3D): THREE.Box3 | null {
+	root.updateWorldMatrix(true, true);
+
+	const boxes: THREE.Box3[] = [];
+
+	root.traverse((obj) => {
+		if (!(obj instanceof THREE.Mesh)) return;
+		if (!obj.geometry) return;
+		if (!obj.visible) return;
+
+		if (!obj.geometry.boundingBox) {
+			obj.geometry.computeBoundingBox();
+		}
+		if (!obj.geometry.boundingBox) return;
+
+		const worldBox = obj.geometry.boundingBox.clone().applyMatrix4(
+			obj.matrixWorld
+		);
+		boxes.push(worldBox);
+	});
+
+	if (boxes.length === 0) return null;
+
+	const centers = boxes.map((b) => b.getCenter(new THREE.Vector3()));
+
+	const medianCenter = new THREE.Vector3();
+	for (const axis of ["x", "y", "z"] as const) {
+		const sorted = centers.map((c) => c[axis]).sort((a, b) => a - b);
+		medianCenter[axis] = sorted[Math.floor(sorted.length / 2)];
+	}
+
+	const distances = centers
+		.map((c) => c.distanceTo(medianCenter))
+		.sort((a, b) => a - b);
+
+	const q1Idx = Math.floor(distances.length * 0.25);
+	const q3Idx = Math.floor(distances.length * 0.75);
+	const iqr = distances[q3Idx] - distances[q1Idx];
+	const threshold = distances[q3Idx] + 3 * iqr;
+
+	const filtered = boxes.filter(
+		(_, i) => centers[i].distanceTo(medianCenter) <= threshold
+	);
+
+	if (filtered.length === 0) return null;
+
+	const bounds = new THREE.Box3();
+	bounds.copy(filtered[0]);
+	for (let i = 1; i < filtered.length; i++) {
+		bounds.union(filtered[i]);
+	}
+
+	return bounds.isEmpty() ? null : bounds;
+}
+
+function getFitDistanceToBox(
+	camera: THREE.PerspectiveCamera,
+	bounds: THREE.Box3,
+	padding = 1.02
+) {
+	const fov = THREE.MathUtils.degToRad(camera.fov);
+	const aspect = camera.aspect;
+
+	const size = bounds.getSize(new THREE.Vector3());
+	const fitH = size.y / (2 * Math.tan(fov / 2));
+	const fitW =
+		size.x /
+		(2 * Math.tan(Math.atan(Math.tan(fov / 2) * aspect)));
+
+	const sphere = new THREE.Sphere();
+	bounds.getBoundingSphere(sphere);
+	const fitSphere = sphere.radius / Math.sin(fov / 2);
+
+	return Math.max(fitH, fitW, fitSphere) * padding;
+}
+
 type ZoomCommand = "extent" | "selected" | null;
 
 export function ZoomController({
@@ -40,27 +116,38 @@ export function ZoomController({
 	} | null>(null);
 
 	useEffect(() => {
-		if (!zoomTrigger || !controls) return;
+		if (!zoomTrigger || !controls || !camera) return;
 
-		const target = zoomTrigger === "selected" ? highlightOverlay : scene;
-		if (!target) return;
+		let targetBounds: THREE.Box3 | null = null;
 
-		const box = new THREE.Box3().setFromObject(target);
-		if (box.isEmpty() || box.getSize(new THREE.Vector3()).lengthSq() === 0)
+		if (zoomTrigger === "selected") {
+			if (!highlightOverlay) {
+				onDone();
+				return;
+			}
+			targetBounds = computeSceneBounds(highlightOverlay);
+		} else if (zoomTrigger === "extent") {
+			if (!scene) {
+				onDone();
+				return;
+			}
+			targetBounds = computeSceneBounds(scene);
+		}
+
+		if (!targetBounds || targetBounds.isEmpty()) {
+			onDone();
 			return;
+		}
 
-		const center = box.getCenter(new THREE.Vector3());
-		const size = box.getSize(new THREE.Vector3());
-		const maxDim = Math.max(size.x, size.y, size.z);
-		const fovRad = (camera.fov * Math.PI) / 180;
-		const distance = (maxDim / (2 * Math.tan(fovRad / 2))) * 1.8;
+		const center = targetBounds.getCenter(new THREE.Vector3());
+		const distance = getFitDistanceToBox(camera, targetBounds);
 
-		const dir = new THREE.Vector3()
+		const toCameraDir = new THREE.Vector3()
 			.subVectors(camera.position, controls.target)
 			.normalize();
 		const endPos = new THREE.Vector3()
 			.copy(center)
-			.addScaledVector(dir, distance);
+			.addScaledVector(toCameraDir, distance);
 
 		animRef.current = {
 			startPos: camera.position.clone(),

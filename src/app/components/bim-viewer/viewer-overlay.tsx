@@ -83,7 +83,7 @@ export function ZoomControls({
 	hasSelection,
 }: ZoomControlsProps) {
 	return (
-		<div className="absolute top-2 right-2 z-10 flex gap-1.5">
+		<div className="absolute bottom-2 left-2 z-10 flex gap-1.5">
 			<Button
 				variant="secondary"
 				size="sm"
