@@ -27,9 +27,9 @@ function computeSceneBounds(root: THREE.Object3D): THREE.Box3 | null {
 		}
 		if (!obj.geometry.boundingBox) return;
 
-		const worldBox = obj.geometry.boundingBox.clone().applyMatrix4(
-			obj.matrixWorld
-		);
+		const worldBox = obj.geometry.boundingBox
+			.clone()
+			.applyMatrix4(obj.matrixWorld);
 		boxes.push(worldBox);
 	});
 
@@ -77,9 +77,7 @@ function getFitDistanceToBox(
 
 	const size = bounds.getSize(new THREE.Vector3());
 	const fitH = size.y / (2 * Math.tan(fov / 2));
-	const fitW =
-		size.x /
-		(2 * Math.tan(Math.atan(Math.tan(fov / 2) * aspect)));
+	const fitW = size.x / (2 * Math.tan(Math.atan(Math.tan(fov / 2) * aspect)));
 
 	const sphere = new THREE.Sphere();
 	bounds.getBoundingSphere(sphere);
