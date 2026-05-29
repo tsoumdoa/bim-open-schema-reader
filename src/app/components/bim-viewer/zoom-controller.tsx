@@ -67,23 +67,52 @@ function computeSceneBounds(root: THREE.Object3D): THREE.Box3 | null {
 	return bounds.isEmpty() ? null : bounds;
 }
 
+function getBoxCorners(bounds: THREE.Box3): THREE.Vector3[] {
+	const { min, max } = bounds;
+	return [
+		new THREE.Vector3(min.x, min.y, min.z),
+		new THREE.Vector3(min.x, min.y, max.z),
+		new THREE.Vector3(min.x, max.y, min.z),
+		new THREE.Vector3(min.x, max.y, max.z),
+		new THREE.Vector3(max.x, min.y, min.z),
+		new THREE.Vector3(max.x, min.y, max.z),
+		new THREE.Vector3(max.x, max.y, min.z),
+		new THREE.Vector3(max.x, max.y, max.z),
+	];
+}
+
 function getFitDistanceToBox(
 	camera: THREE.PerspectiveCamera,
 	bounds: THREE.Box3,
+	viewDirection: THREE.Vector3,
 	padding = 1.02
 ) {
-	const fov = THREE.MathUtils.degToRad(camera.fov);
-	const aspect = camera.aspect;
+	const center = bounds.getCenter(new THREE.Vector3());
+	const viewDir = viewDirection.clone().normalize();
 
-	const size = bounds.getSize(new THREE.Vector3());
-	const fitH = size.y / (2 * Math.tan(fov / 2));
-	const fitW = size.x / (2 * Math.tan(Math.atan(Math.tan(fov / 2) * aspect)));
+	let up = camera.up.clone();
+	if (Math.abs(up.dot(viewDir)) > 0.99) {
+		up =
+			Math.abs(viewDir.y) < 0.99
+				? new THREE.Vector3(0, 1, 0)
+				: new THREE.Vector3(1, 0, 0);
+	}
+	const right = new THREE.Vector3().crossVectors(up, viewDir).normalize();
+	const camUp = new THREE.Vector3().crossVectors(viewDir, right).normalize();
 
-	const sphere = new THREE.Sphere();
-	bounds.getBoundingSphere(sphere);
-	const fitSphere = sphere.radius / Math.sin(fov / 2);
+	const vTan = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+	const hTan = Math.tan(Math.atan(vTan * camera.aspect));
 
-	return Math.max(fitH, fitW, fitSphere) * padding;
+	let maxDist = 0;
+	for (const corner of getBoxCorners(bounds)) {
+		const rel = corner.clone().sub(center);
+		const x = Math.abs(rel.dot(right));
+		const y = Math.abs(rel.dot(camUp));
+		const z = rel.dot(viewDir);
+		maxDist = Math.max(maxDist, z + x / hTan, z + y / vTan);
+	}
+
+	return Math.max(maxDist, 1e-6) * padding;
 }
 
 type ZoomCommand = "extent" | "selected" | null;
@@ -138,11 +167,11 @@ export function ZoomController({
 		}
 
 		const center = targetBounds.getCenter(new THREE.Vector3());
-		const distance = getFitDistanceToBox(camera, targetBounds);
 
 		const toCameraDir = new THREE.Vector3()
 			.subVectors(camera.position, controls.target)
 			.normalize();
+		const distance = getFitDistanceToBox(camera, targetBounds, toCameraDir);
 		const endPos = new THREE.Vector3()
 			.copy(center)
 			.addScaledVector(toCameraDir, distance);

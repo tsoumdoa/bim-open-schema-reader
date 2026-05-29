@@ -5,6 +5,8 @@ import { useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
+const CLICK_DRAG_THRESHOLD_PX = 5;
+
 export function findEntityByFaceIndex(
 	faceIndex: number,
 	faceRanges: EntityFaceRangesSoA
@@ -26,6 +28,33 @@ export function findEntityByFaceIndex(
 	return null;
 }
 
+function pickEntityAt(
+	clientX: number,
+	clientY: number,
+	camera: THREE.Camera,
+	raycaster: THREE.Raycaster,
+	gl: THREE.WebGLRenderer,
+	meshes: THREE.Mesh[]
+): number | null {
+	const rect = gl.domElement.getBoundingClientRect();
+	const ndc = new THREE.Vector2(
+		((clientX - rect.left) / rect.width) * 2 - 1,
+		-((clientY - rect.top) / rect.height) * 2 + 1
+	);
+
+	raycaster.setFromCamera(ndc, camera);
+	const intersects = raycaster.intersectObjects(meshes, false);
+
+	if (intersects.length === 0) return null;
+
+	const hit = intersects[0];
+	const faceRanges = (hit.object as THREE.Mesh).userData
+		.entityFaceRanges as EntityFaceRangesSoA;
+	if (!faceRanges || hit.faceIndex == null) return null;
+
+	return findEntityByFaceIndex(hit.faceIndex, faceRanges);
+}
+
 export function RaycastPicker({
 	scene,
 	onHighlight,
@@ -35,6 +64,12 @@ export function RaycastPicker({
 }) {
 	const { camera, gl, raycaster } = useThree();
 	const meshRefs = useRef<THREE.Mesh[]>([]);
+	const onHighlightRef = useRef(onHighlight);
+	onHighlightRef.current = onHighlight;
+
+	const pointerDownRef = useRef<{ x: number; y: number; pointerId: number } | null>(
+		null
+	);
 
 	useEffect(() => {
 		const meshes: THREE.Mesh[] = [];
@@ -46,42 +81,60 @@ export function RaycastPicker({
 		meshRefs.current = meshes;
 	}, [scene]);
 
-	function handlePointerDown(event: THREE.Event) {
-		(event as unknown as { stopPropagation: () => void }).stopPropagation();
+	useEffect(() => {
+		const el = gl.domElement;
 
-		const pointer = event as unknown as { clientX: number; clientY: number };
-		const shiftKey =
-			(event as unknown as { shiftKey: boolean }).shiftKey ?? false;
-		const rect = gl.domElement.getBoundingClientRect();
-		const ndc = new THREE.Vector2(
-			((pointer.clientX - rect.left) / rect.width) * 2 - 1,
-			-((pointer.clientY - rect.top) / rect.height) * 2 + 1
-		);
+		const onPointerDown = (event: PointerEvent) => {
+			if (event.button !== 0) return;
+			pointerDownRef.current = {
+				x: event.clientX,
+				y: event.clientY,
+				pointerId: event.pointerId,
+			};
+		};
 
-		raycaster.setFromCamera(ndc, camera);
-		const intersects = raycaster.intersectObjects(meshRefs.current, false);
+		const onPointerUp = (event: PointerEvent) => {
+			const down = pointerDownRef.current;
+			if (!down || event.pointerId !== down.pointerId) return;
+			pointerDownRef.current = null;
 
-		if (intersects.length > 0) {
-			const hit = intersects[0];
-			const faceRanges = (hit.object as THREE.Mesh).userData
-				.entityFaceRanges as EntityFaceRangesSoA;
-			if (faceRanges && hit.faceIndex != null) {
-				const entityIndex = findEntityByFaceIndex(hit.faceIndex, faceRanges);
-				if (entityIndex !== null) {
-					onHighlight(entityIndex, shiftKey);
-				}
+			if (event.button !== 0) return;
+
+			const dx = event.clientX - down.x;
+			const dy = event.clientY - down.y;
+			if (dx * dx + dy * dy > CLICK_DRAG_THRESHOLD_PX ** 2) return;
+
+			const entityIndex = pickEntityAt(
+				event.clientX,
+				event.clientY,
+				camera,
+				raycaster,
+				gl,
+				meshRefs.current
+			);
+			if (entityIndex !== null) {
+				onHighlightRef.current(entityIndex, event.shiftKey);
 			}
-		}
-	}
+		};
 
-	return (
-		<mesh
-			visible={false}
-			position={[0, 0, 0]}
-			onPointerDown={handlePointerDown}
-		>
-			<planeGeometry args={[10000, 10000]} />
-			<meshBasicMaterial side={THREE.DoubleSide} />
-		</mesh>
-	);
+		const onPointerCancel = (event: PointerEvent) => {
+			if (
+				pointerDownRef.current?.pointerId === event.pointerId
+			) {
+				pointerDownRef.current = null;
+			}
+		};
+
+		el.addEventListener("pointerdown", onPointerDown);
+		el.addEventListener("pointerup", onPointerUp);
+		el.addEventListener("pointercancel", onPointerCancel);
+
+		return () => {
+			el.removeEventListener("pointerdown", onPointerDown);
+			el.removeEventListener("pointerup", onPointerUp);
+			el.removeEventListener("pointercancel", onPointerCancel);
+		};
+	}, [camera, gl, raycaster, scene]);
+
+	return null;
 }
