@@ -122,6 +122,33 @@ export interface BatchedGeometry {
 	instances: GeometryInstance[];
 }
 
+export interface EntityFaceRangesSoA {
+	entityIndices: Uint32Array;
+	startFaces: Uint32Array;
+	faceCounts: Uint32Array;
+}
+
+const highlightMaterialCache = new Map<number, THREE.MeshStandardMaterial>();
+
+function getHighlightMaterial(
+	baseMaterial: THREE.MeshStandardMaterial
+): THREE.MeshStandardMaterial {
+	const baseColor = baseMaterial.color.getHex();
+	let cached = highlightMaterialCache.get(baseColor);
+	if (cached) return cached;
+
+	const mat = baseMaterial.clone();
+	mat.emissive = new THREE.Color(0xffaa00);
+	mat.emissiveIntensity = 0.8;
+	mat.depthTest = true;
+	mat.depthWrite = false;
+	mat.polygonOffset = true;
+	mat.polygonOffsetFactor = -2;
+	mat.polygonOffsetUnits = -4;
+	highlightMaterialCache.set(baseColor, mat);
+	return mat;
+}
+
 export function batchInstancesByMaterialAndGeometry(
 	instances: GeometryInstance[],
 	geometries: Map<number, THREE.BufferGeometry>,
@@ -153,7 +180,7 @@ export function batchInstancesByMaterialAndGeometry(
 function mergeGeometriesForBatch(
 	instances: GeometryInstance[],
 	geometries: Map<number, THREE.BufferGeometry>
-): THREE.BufferGeometry {
+): { geometry: THREE.BufferGeometry; faceRanges: EntityFaceRangesSoA } {
 	let totalVertexCount = 0;
 	let totalIndexCount = 0;
 
@@ -172,6 +199,11 @@ function mergeGeometriesForBatch(
 
 	const positionAttr = new THREE.BufferAttribute(mergedPositions, 3);
 	const indexAttr = new THREE.BufferAttribute(mergedIndices, 1);
+
+	const entityIndices = new Uint32Array(instances.length);
+	const startFaces = new Uint32Array(instances.length);
+	const faceCounts = new Uint32Array(instances.length);
+	let rangeIdx = 0;
 
 	for (const inst of instances) {
 		const geom = geometries.get(inst.meshIndex);
@@ -196,7 +228,9 @@ function mergeGeometriesForBatch(
 		}
 
 		mergedPositions.set(transformedPositions, vertexOffset * 3);
-		vertexOffset += vertexCount;
+
+		const startFace = indexOffset / 3;
+		let faceCount = 0;
 
 		if (geom.index) {
 			const indices = geom.index.array as Uint32Array;
@@ -204,9 +238,15 @@ function mergeGeometriesForBatch(
 			for (let i = 0; i < indexCount; i++) {
 				mergedIndices[indexOffset + i] = indices[i] + indexVertexOffset;
 			}
+			faceCount = indexCount / 3;
 			indexOffset += indexCount;
 		}
 
+		entityIndices[rangeIdx] = inst.entityIndex;
+		startFaces[rangeIdx] = startFace;
+		faceCounts[rangeIdx] = faceCount;
+		rangeIdx++;
+		vertexOffset += vertexCount;
 		indexVertexOffset += vertexCount;
 	}
 
@@ -215,7 +255,10 @@ function mergeGeometriesForBatch(
 	mergedGeometry.setIndex(indexAttr);
 	mergedGeometry.computeVertexNormals();
 
-	return mergedGeometry;
+	return {
+		geometry: mergedGeometry,
+		faceRanges: { entityIndices, startFaces, faceCounts },
+	};
 }
 
 function buildGhostGeometry(
@@ -305,10 +348,14 @@ export function convertZUpToYUp(group: THREE.Group): void {
 	group.rotation.x = -Math.PI / 2;
 }
 
-export function buildSceneFromInstances(
+function buildGeometryInstances(
 	instanceIndices: number[],
 	cache: GeometricalDataCache
-): { scene: THREE.Group | null; instanceCount: number } {
+): {
+	instances: GeometryInstance[];
+	geometryMap: Map<number, THREE.BufferGeometry>;
+	materialMap: Map<number, THREE.MeshStandardMaterial>;
+} {
 	const geometryMap = new Map<number, THREE.BufferGeometry>();
 	const materialMap = new Map<number, THREE.MeshStandardMaterial>();
 
@@ -346,8 +393,23 @@ export function buildSceneFromInstances(
 		});
 	}
 
+	return { instances: geometryInstances, geometryMap, materialMap };
+}
+
+export function buildSceneFromInstances(
+	instanceIndices: number[],
+	cache: GeometricalDataCache
+): {
+	scene: THREE.Group | null;
+	instanceCount: number;
+} {
+	const { instances, geometryMap, materialMap } = buildGeometryInstances(
+		instanceIndices,
+		cache
+	);
+
 	const batches = batchInstancesByMaterialAndGeometry(
-		geometryInstances,
+		instances,
 		geometryMap,
 		materialMap
 	);
@@ -355,17 +417,61 @@ export function buildSceneFromInstances(
 	const group = new THREE.Group();
 
 	for (const batch of batches) {
-		const mergedGeometry = mergeGeometriesForBatch(
+		const { geometry: mergedGeometry, faceRanges } = mergeGeometriesForBatch(
 			batch.instances,
 			geometryMap
 		);
 		const mesh = new THREE.Mesh(mergedGeometry, batch.material);
+		mesh.userData.entityFaceRanges = faceRanges;
 		group.add(mesh);
 	}
 
 	convertZUpToYUp(group);
 
 	return { scene: group, instanceCount: instanceIndices.length };
+}
+
+export function buildHighlightOverlay(
+	highlightedEntityIndices: Set<number>,
+	entityIndices: number[],
+	cache: GeometricalDataCache
+): THREE.Group | null {
+	const entityIndexSet = new Set(entityIndices);
+	const matchedInstanceIndices: number[] = [];
+
+	for (let i = 0; i < cache.instanceCount; i++) {
+		const ei = cache.instanceEntityIndex[i];
+		if (highlightedEntityIndices.has(ei) && entityIndexSet.has(ei)) {
+			matchedInstanceIndices.push(i);
+		}
+	}
+
+	if (matchedInstanceIndices.length === 0) return null;
+
+	const { instances, geometryMap, materialMap } = buildGeometryInstances(
+		matchedInstanceIndices,
+		cache
+	);
+
+	const batches = batchInstancesByMaterialAndGeometry(
+		instances,
+		geometryMap,
+		materialMap
+	);
+
+	const group = new THREE.Group();
+	for (const batch of batches) {
+		const { geometry: mergedGeometry } = mergeGeometriesForBatch(
+			batch.instances,
+			geometryMap
+		);
+		const highlightMat = getHighlightMaterial(batch.material);
+		const mesh = new THREE.Mesh(mergedGeometry, highlightMat);
+		group.add(mesh);
+	}
+
+	convertZUpToYUp(group);
+	return group;
 }
 
 export const buildFilteredScene = (
@@ -427,7 +533,12 @@ export const buildGhostedScene = (
 	cache: GeometricalDataCache | null
 ): GhostedSceneResult => {
 	if (!cache) {
-		return { scene: null, selectedCount: 0, ghostCount: 0, totalCount: 0 };
+		return {
+			scene: null,
+			selectedCount: 0,
+			ghostCount: 0,
+			totalCount: 0,
+		};
 	}
 
 	const entityIndexSet = new Set(entityIndices);

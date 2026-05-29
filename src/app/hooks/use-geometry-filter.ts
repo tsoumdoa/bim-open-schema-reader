@@ -5,7 +5,11 @@ import {
 	UseGeoLastInputs,
 	UseGeometryFilterResult,
 } from "../utils/types";
-import { buildFilteredScene, buildGhostedScene } from "@/lib/geometry-utils";
+import {
+	buildFilteredScene,
+	buildGhostedScene,
+	buildHighlightOverlay,
+} from "@/lib/geometry-utils";
 import { useRef, useState } from "react";
 
 function getEntityIndicesKey(entityIndices: number[]) {
@@ -83,6 +87,9 @@ export function useGeometryFilter(
 ): UseGeometryFilterResult {
 	const { cache, loading, error } = useGeometryFromParquetCtx();
 	const [ghostOthers, setGhostOthers] = useState(false);
+	const [highlightedEntityIndices, setHighlightedEntityIndices] = useState<
+		Set<number>
+	>(new Set());
 
 	const lastResultRef = useRef<UseGeoComputedResult | null>(null);
 	const lastInputsRef = useRef<UseGeoLastInputs | null>(null);
@@ -106,11 +113,24 @@ export function useGeometryFilter(
 			cache
 		);
 	}
-	lastInputsRef.current = { entityIndices, ghostOthers, cache };
+	lastInputsRef.current = {
+		entityIndices,
+		ghostOthers,
+		highlightedEntityIndices,
+		cache,
+	};
+
+	const highlightOverlay =
+		cache && highlightedEntityIndices.size > 0 && !loading && !error
+			? buildHighlightOverlay(highlightedEntityIndices, entityIndices, cache)
+			: null;
 
 	return {
 		...lastResultRef.current!,
 		ghostOthers,
 		toggleGhostOthers,
+		highlightedEntityIndices,
+		setHighlightedEntityIndices,
+		highlightOverlay,
 	};
 }

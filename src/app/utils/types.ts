@@ -6,6 +6,7 @@ import useQueryViewerAndEditor from "../hooks/use-query-viewer-and-editor";
 import { useRunDuckDbQuery } from "../hooks/use-run-duckdb-query";
 import { getEditorState } from "./editor-display-state";
 import * as duckdb from "@duckdb/duckdb-wasm";
+import { Dispatch, SetStateAction } from "react";
 import * as THREE from "three";
 
 export const validFileNames = [
@@ -282,6 +283,7 @@ export type UseGeoComputedResult = {
 export type UseGeoLastInputs = {
 	entityIndices: number[];
 	ghostOthers: boolean;
+	highlightedEntityIndices: Set<number>;
 	cache: unknown;
 };
 export type UseGeometryFilterResult = {
@@ -292,4 +294,7 @@ export type UseGeometryFilterResult = {
 	ghostOthers: boolean;
 	availableEntityCount: number;
 	toggleGhostOthers: () => void;
+	highlightedEntityIndices: Set<number>;
+	setHighlightedEntityIndices: Dispatch<SetStateAction<Set<number>>>;
+	highlightOverlay: THREE.Group | null;
 };
