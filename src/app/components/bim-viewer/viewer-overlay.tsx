@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Box, Ghost, Maximize, Focus } from "lucide-react";
+import { Box, Expand, Focus, Ghost, Maximize, Minimize2 } from "lucide-react";
 
 interface EntityCountBadgeProps {
 	totalEntityCount: number;
@@ -71,7 +71,6 @@ export function GhostToggle({ ghostOthers, onClick }: GhostToggleProps) {
 }
 
 interface ZoomControlsProps {
-	zoomTrigger: "extent" | "selected" | null;
 	onZoomToExtent: () => void;
 	onZoomToSelected: () => void;
 	hasSelection: boolean;
@@ -107,6 +106,35 @@ export function ZoomControls({
 	);
 }
 
+interface ExpandViewerControlProps {
+	isExpanded: boolean;
+	onToggle: () => void;
+}
+
+export function ExpandViewerControl({
+	isExpanded,
+	onToggle,
+}: ExpandViewerControlProps) {
+	return (
+		<Button
+			variant="secondary"
+			size="sm"
+			onClick={onToggle}
+			className="gap-1.5 bg-black/70 text-white hover:bg-black/90 border-none"
+			title={isExpanded ? "Exit expanded view (Esc)" : "Expand 3D view"}
+		>
+			{isExpanded ? (
+				<Minimize2 className="h-4 w-4" />
+			) : (
+				<Expand className="h-4 w-4" />
+			)}
+			<span className="sr-only">
+				{isExpanded ? "Exit expanded view" : "Expand 3D view"}
+			</span>
+		</Button>
+	);
+}
+
 interface ViewerOverlayProps {
 	totalEntityCount: number;
 	ghostCount: number;
@@ -114,7 +142,8 @@ interface ViewerOverlayProps {
 	highlightedCount: number;
 	entityIndicesLength: number;
 	availableEntityCount: number;
-	zoomTrigger: "extent" | "selected" | null;
+	isExpanded: boolean;
+	onToggleExpand: () => void;
 	onZoomToExtent: () => void;
 	onZoomToSelected: () => void;
 	onGhostToggle: () => void;
@@ -128,6 +157,8 @@ export function ViewerOverlay({
 	highlightedCount,
 	entityIndicesLength,
 	availableEntityCount,
+	isExpanded,
+	onToggleExpand,
 	onZoomToExtent,
 	onZoomToSelected,
 	onGhostToggle,
@@ -138,7 +169,13 @@ export function ViewerOverlay({
 
 	return (
 		<>
-			<div className="absolute top-2 left-2 z-10 flex gap-2">
+			<div className="absolute top-2 right-2 z-10">
+				<ExpandViewerControl
+					isExpanded={isExpanded}
+					onToggle={onToggleExpand}
+				/>
+			</div>
+			<div className="absolute top-2 left-2 z-10 flex max-w-[calc(100%-3.5rem)] flex-wrap gap-2">
 				<EntityCountBadge
 					totalEntityCount={totalEntityCount}
 					ghostCount={ghostCount}
@@ -146,6 +183,11 @@ export function ViewerOverlay({
 				/>
 				<SelectionBadge count={highlightedCount} onClear={onClearSelection} />
 			</div>
+			{isExpanded && (
+				<div className="pointer-events-none absolute top-14 left-1/2 z-10 -translate-x-1/2 rounded bg-black/60 px-3 py-1 text-xs text-white">
+					Press Esc to exit expanded view
+				</div>
+			)}
 			{showGhostToggle && (
 				<GhostToggle ghostOthers={ghostOthers} onClick={onGhostToggle} />
 			)}

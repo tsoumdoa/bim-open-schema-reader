@@ -7,7 +7,9 @@ import { useZoomControls } from "./hooks/use-zoom-controls";
 import { ViewerCanvas } from "./viewer-canvas";
 import { ViewerOverlay } from "./viewer-overlay";
 import { useGeometryFilter } from "@/app/hooks/use-geometry-filter";
-import { useRef } from "react";
+import { cn } from "@/lib/utils";
+import { useCallback, useRef, useState } from "react";
+import { useExpandedViewer } from "./hooks/use-expanded-viewer";
 
 function LoadingState() {
 	return (
@@ -50,6 +52,13 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 	} = useGeometryFilter(entityIndices);
 
 	const containerRef = useRef<HTMLDivElement>(null);
+	const [isExpanded, setIsExpanded] = useState(false);
+	const collapseExpanded = useCallback(() => setIsExpanded(false), []);
+	const toggleExpanded = useCallback(
+		() => setIsExpanded((prev) => !prev),
+		[]
+	);
+	useExpandedViewer(isExpanded, collapseExpanded);
 	const {
 		zoomTrigger,
 		handleZoomToExtent,
@@ -60,34 +69,57 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		setHighlightedEntityIndices,
 	});
 
-	useEscapeKey(containerRef, highlightedEntityIndices, clearHighlight);
+	useEscapeKey(
+		containerRef,
+		highlightedEntityIndices,
+		clearHighlight,
+		isExpanded
+	);
 
 	if (loading) return <LoadingState />;
 	if (error) return <ErrorState message={error.message} />;
 	if (!scene || totalEntityCount === 0) return <NoGeometryState />;
 
 	return (
-		<div ref={containerRef} className="relative w-full h-100" tabIndex={0}>
-			<ViewerOverlay
-				totalEntityCount={totalEntityCount}
-				ghostCount={ghostCount}
-				ghostOthers={ghostOthers}
-				highlightedCount={highlightedEntityIndices.size}
-				entityIndicesLength={entityIndices.length}
-				availableEntityCount={availableEntityCount}
-				zoomTrigger={zoomTrigger}
-				onZoomToExtent={handleZoomToExtent}
-				onZoomToSelected={handleZoomToSelected}
-				onGhostToggle={toggleGhostOthers}
-				onClearSelection={clearHighlight}
-			/>
-			<ViewerCanvas
-				scene={scene}
-				highlightOverlay={highlightOverlay}
-				onHighlight={handleHighlight}
-				zoomTrigger={zoomTrigger}
-				onZoomDone={handleZoomDone}
-			/>
-		</div>
+		<>
+			{isExpanded && (
+				<div
+					className="h-100 w-full shrink-0 rounded border border-dashed border-neutral-300 bg-neutral-50"
+					aria-hidden
+				/>
+			)}
+			<div
+				ref={containerRef}
+				className={cn(
+					"relative w-full outline-none",
+					isExpanded
+						? "fixed inset-0 z-50 h-dvh w-dvw bg-neutral-950"
+						: "h-100"
+				)}
+				tabIndex={0}
+			>
+				<ViewerOverlay
+					totalEntityCount={totalEntityCount}
+					ghostCount={ghostCount}
+					ghostOthers={ghostOthers}
+					highlightedCount={highlightedEntityIndices.size}
+					entityIndicesLength={entityIndices.length}
+					availableEntityCount={availableEntityCount}
+					isExpanded={isExpanded}
+					onToggleExpand={toggleExpanded}
+					onZoomToExtent={handleZoomToExtent}
+					onZoomToSelected={handleZoomToSelected}
+					onGhostToggle={toggleGhostOthers}
+					onClearSelection={clearHighlight}
+				/>
+				<ViewerCanvas
+					scene={scene}
+					highlightOverlay={highlightOverlay}
+					onHighlight={handleHighlight}
+					zoomTrigger={zoomTrigger}
+					onZoomDone={handleZoomDone}
+				/>
+			</div>
+		</>
 	);
 }

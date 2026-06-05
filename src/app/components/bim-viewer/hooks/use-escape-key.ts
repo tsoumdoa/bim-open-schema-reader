@@ -5,9 +5,12 @@ import { useEffect, RefObject } from "react";
 export function useEscapeKey(
 	containerRef: RefObject<HTMLDivElement | null>,
 	highlightedEntityIndices: Set<number>,
-	clearHighlight: () => void
+	clearHighlight: () => void,
+	isExpanded: boolean
 ) {
 	useEffect(() => {
+		if (isExpanded) return;
+
 		const el = containerRef.current;
 		if (!el) return;
 
@@ -19,5 +22,10 @@ export function useEscapeKey(
 		}
 		el.addEventListener("keydown", onKeyDown);
 		return () => el.removeEventListener("keydown", onKeyDown);
-	}, [containerRef, highlightedEntityIndices.size, clearHighlight]);
+	}, [
+		containerRef,
+		highlightedEntityIndices.size,
+		clearHighlight,
+		isExpanded,
+	]);
 }

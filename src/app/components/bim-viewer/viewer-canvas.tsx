@@ -29,6 +29,7 @@ export function ViewerCanvas({
 }: ViewerCanvasProps) {
 	return (
 		<Canvas
+			className="h-full w-full"
 			frameloop="demand"
 			shadows
 			gl={{
