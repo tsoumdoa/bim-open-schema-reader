@@ -1,7 +1,9 @@
 "use client";
 
+import { CanvasResizeSync } from "./canvas-resize-sync";
 import { Scene } from "./scene";
 import { ZoomController } from "./zoom-controller";
+import type { RefObject } from "react";
 import {
 	GizmoHelper,
 	GizmoViewcube,
@@ -13,6 +15,8 @@ import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 
 interface ViewerCanvasProps {
+	rootRef: RefObject<HTMLElement | null>;
+	isExpanded: boolean;
 	scene: THREE.Group | null;
 	highlightOverlay: THREE.Group | null;
 	onHighlight: (entityIndex: number, shiftKey: boolean) => void;
@@ -21,6 +25,8 @@ interface ViewerCanvasProps {
 }
 
 export function ViewerCanvas({
+	rootRef,
+	isExpanded,
 	scene,
 	highlightOverlay,
 	onHighlight,
@@ -30,6 +36,7 @@ export function ViewerCanvas({
 	return (
 		<Canvas
 			className="h-full w-full"
+			resize={{ offsetSize: true }}
 			frameloop="demand"
 			shadows
 			gl={{
@@ -38,6 +45,7 @@ export function ViewerCanvas({
 				outputColorSpace: THREE.SRGBColorSpace,
 			}}
 		>
+			<CanvasResizeSync rootRef={rootRef} isExpanded={isExpanded} />
 			<PerspectiveCamera makeDefault position={[50, 50, 50]} fov={50} />
 			<OrbitControls
 				makeDefault

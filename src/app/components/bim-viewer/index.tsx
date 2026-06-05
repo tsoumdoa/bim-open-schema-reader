@@ -112,13 +112,17 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 					onGhostToggle={toggleGhostOthers}
 					onClearSelection={clearHighlight}
 				/>
-				<ViewerCanvas
-					scene={scene}
-					highlightOverlay={highlightOverlay}
-					onHighlight={handleHighlight}
-					zoomTrigger={zoomTrigger}
-					onZoomDone={handleZoomDone}
-				/>
+				<div className="absolute inset-0">
+					<ViewerCanvas
+						rootRef={containerRef}
+						isExpanded={isExpanded}
+						scene={scene}
+						highlightOverlay={highlightOverlay}
+						onHighlight={handleHighlight}
+						zoomTrigger={zoomTrigger}
+						onZoomDone={handleZoomDone}
+					/>
+				</div>
 			</div>
 		</>
 	);
