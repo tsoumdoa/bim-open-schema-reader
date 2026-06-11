@@ -1,14 +1,24 @@
-import { QueryObject, QueryObjects } from "../utils/types";
+import { getTemplateQueryGroups } from "../utils/queries-selector-list";
+import { BosFileType, QueryObject, QueryObjects } from "../utils/types";
 import { nanoid } from "nanoid";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
-export function useQueryObjects() {
+export function useQueryObjects(bosFileType: BosFileType) {
+	const templateQueryGroups = useRef(
+		getTemplateQueryGroups(bosFileType)
+	).current;
 	const [queryObjects, setQueryObjects] = useState<QueryObjects>([]);
 	const [selectedQueryId, setSelectedQueryId] = useState<string | null>(null);
+	const [isTemplatePickerActive, setIsTemplatePickerActive] = useState(true);
+
+	const endTemplatePicker = () => {
+		setIsTemplatePickerActive(false);
+	};
 
 	const addQuery = (queryObject: QueryObject) => {
 		const id = nanoid(7);
 		const newQueryObjects = { ...queryObject, id };
+		endTemplatePicker();
 		setQueryObjects((prev) => {
 			setSelectedQueryId(id);
 			return [...prev, newQueryObjects];
@@ -20,12 +30,17 @@ export function useQueryObjects() {
 			...obj,
 			id: nanoid(7),
 		}));
+		endTemplatePicker();
 		setQueryObjects((prev) => {
 			if (newOnes.length > 0) {
 				setSelectedQueryId(newOnes[newOnes.length - 1].id);
 			}
 			return [...prev, ...newOnes];
 		});
+	};
+
+	const selectTemplateQuery = (template: QueryObject) => {
+		addQuery(template);
 	};
 
 	const removeQuery = (queryObject: QueryObject) => {
@@ -69,8 +84,11 @@ export function useQueryObjects() {
 		queryObjects,
 		selectedQueryId,
 		setSelectedQueryId,
+		templateQueryGroups,
+		isTemplatePickerActive,
 		addQuery,
 		addQueries,
+		selectTemplateQuery,
 		removeQuery,
 		updateQueryTitle,
 		updateQuery,

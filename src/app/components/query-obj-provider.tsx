@@ -1,11 +1,14 @@
 import { useQueryObjects } from "../hooks/use-query-objects";
-import { UseQueryObjects } from "../utils/types";
+import { BosFileType, UseQueryObjects } from "../utils/types";
 import { createContext, useContext } from "react";
 
 const QueryObjCtx = createContext<UseQueryObjects | null>(null);
 
-export default function QueryObjProvider(props: { children: React.ReactNode }) {
-	const queryObjInstance = useQueryObjects();
+export default function QueryObjProvider(props: {
+	children: React.ReactNode;
+	bosFileType: BosFileType;
+}) {
+	const queryObjInstance = useQueryObjects(props.bosFileType);
 
 	return (
 		<QueryObjCtx.Provider value={queryObjInstance}>

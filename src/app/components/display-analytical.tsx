@@ -43,6 +43,7 @@ export default function AnalyticalDisplay(props: {
 	fileName: string;
 	parquetFileEntries: ParquetBlob[];
 	bosFileType: BosFileType;
+	onUnloadModel: () => void;
 }) {
 	const { dbRef, connectionRef, error, loading } = useDuckDB();
 
@@ -57,11 +58,12 @@ export default function AnalyticalDisplay(props: {
 				c={connectionRef.current}
 				bosFileType={props.bosFileType}
 			>
-				<QueryObjProvider>
+				<QueryObjProvider bosFileType={props.bosFileType}>
 					<DbProvider parquetFileEntries={props.parquetFileEntries}>
 						<DashboardContainer
 							fileName={props.fileName}
 							bosFileType={props.bosFileType}
+							onUnloadModel={props.onUnloadModel}
 						/>
 					</DbProvider>
 				</QueryObjProvider>

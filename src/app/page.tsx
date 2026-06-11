@@ -53,6 +53,7 @@ export default function Home() {
 		files,
 		setFiles,
 		bosFileType,
+		unloadModel,
 	} = useHandleProcess();
 	const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ export default function Home() {
 							parquetFileEntries={parquetData.current}
 							fileName={(files && files[0].name) || ""}
 							bosFileType={bosFileType}
+							onUnloadModel={unloadModel}
 						/>
 					) : (
 						<>

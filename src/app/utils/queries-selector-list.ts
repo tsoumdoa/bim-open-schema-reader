@@ -33,7 +33,7 @@ import { countUnplacedViews } from "../sql/view-count-unplaced-views";
 import { listWallBuildUps } from "../sql/wall-build-ups";
 import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
 import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
-import { DenormTableName, QueriesSelector } from "./types";
+import { BosFileType, DenormTableName, QueryObject, QueriesSelector } from "./types";
 
 const levels: QueriesSelector = {
 	queryCategory: "Levels",
@@ -288,6 +288,24 @@ export const queriesSelectorList: QueriesSelector[] = [
 	// structure, //TODO: completely broken for now, can't fix till the next
 	// exporter release
 ];
+
+export function getTemplateQueryGroups(
+	bosFileType: BosFileType
+): QueriesSelector[] {
+	return queriesSelectorList.filter(
+		(selector) =>
+			bosFileType === "GEO" || selector.queryCategory !== "3D Viewer"
+	);
+}
+
+export function getTemplateQueryObjects(bosFileType: BosFileType): QueryObject[] {
+	return getTemplateQueryGroups(bosFileType).flatMap((selector) =>
+		selector.queryObjects.map((queryObject) => ({
+			...queryObject,
+			queryCategory: selector.queryCategory,
+		}))
+	);
+}
 
 export const denormParamQueryBuilderName: {
 	tableName: DenormTableName;
