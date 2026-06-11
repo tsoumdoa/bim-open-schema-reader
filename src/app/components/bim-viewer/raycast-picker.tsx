@@ -67,9 +67,11 @@ export function RaycastPicker({
 	const onHighlightRef = useRef(onHighlight);
 	onHighlightRef.current = onHighlight;
 
-	const pointerDownRef = useRef<{ x: number; y: number; pointerId: number } | null>(
-		null
-	);
+	const pointerDownRef = useRef<{
+		x: number;
+		y: number;
+		pointerId: number;
+	} | null>(null);
 
 	useEffect(() => {
 		const meshes: THREE.Mesh[] = [];
@@ -118,9 +120,7 @@ export function RaycastPicker({
 		};
 
 		const onPointerCancel = (event: PointerEvent) => {
-			if (
-				pointerDownRef.current?.pointerId === event.pointerId
-			) {
+			if (pointerDownRef.current?.pointerId === event.pointerId) {
 				pointerDownRef.current = null;
 			}
 		};

@@ -71,7 +71,6 @@ export function GhostToggle({ ghostOthers, onClick }: GhostToggleProps) {
 }
 
 interface ZoomControlsProps {
-	zoomTrigger: "extent" | "selected" | null;
 	onZoomToExtent: () => void;
 	onZoomToSelected: () => void;
 	hasSelection: boolean;
@@ -114,7 +113,6 @@ interface ViewerOverlayProps {
 	highlightedCount: number;
 	entityIndicesLength: number;
 	availableEntityCount: number;
-	zoomTrigger: "extent" | "selected" | null;
 	onZoomToExtent: () => void;
 	onZoomToSelected: () => void;
 	onGhostToggle: () => void;

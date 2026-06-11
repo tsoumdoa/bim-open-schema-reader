@@ -75,7 +75,6 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 				highlightedCount={highlightedEntityIndices.size}
 				entityIndicesLength={entityIndices.length}
 				availableEntityCount={availableEntityCount}
-				zoomTrigger={zoomTrigger}
 				onZoomToExtent={handleZoomToExtent}
 				onZoomToSelected={handleZoomToSelected}
 				onGhostToggle={toggleGhostOthers}
