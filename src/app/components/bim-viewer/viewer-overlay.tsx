@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Box, Ghost, Maximize, Focus } from "lucide-react";
+import { Box, Ghost, Maximize, Focus, Expand, Minimize2 } from "lucide-react";
 
 interface EntityCountBadgeProps {
 	totalEntityCount: number;
@@ -106,6 +106,29 @@ export function ZoomControls({
 	);
 }
 
+interface ExpandToggleProps {
+	isExpanded: boolean;
+	onToggle: () => void;
+}
+
+export function ExpandToggle({ isExpanded, onToggle }: ExpandToggleProps) {
+	return (
+		<Button
+			variant="secondary"
+			size="sm"
+			onClick={onToggle}
+			className="gap-1.5 bg-black/70 text-white hover:bg-black/90 border-none"
+			title={isExpanded ? "Exit expanded view" : "Expand viewer"}
+		>
+			{isExpanded ? (
+				<Minimize2 className="h-4 w-4" />
+			) : (
+				<Expand className="h-4 w-4" />
+			)}
+		</Button>
+	);
+}
+
 interface ViewerOverlayProps {
 	totalEntityCount: number;
 	ghostCount: number;
@@ -113,6 +136,8 @@ interface ViewerOverlayProps {
 	highlightedCount: number;
 	entityIndicesLength: number;
 	availableEntityCount: number;
+	isExpanded: boolean;
+	onToggleExpand: () => void;
 	onZoomToExtent: () => void;
 	onZoomToSelected: () => void;
 	onGhostToggle: () => void;
@@ -126,6 +151,8 @@ export function ViewerOverlay({
 	highlightedCount,
 	entityIndicesLength,
 	availableEntityCount,
+	isExpanded,
+	onToggleExpand,
 	onZoomToExtent,
 	onZoomToSelected,
 	onGhostToggle,
@@ -143,6 +170,9 @@ export function ViewerOverlay({
 					ghostOthers={ghostOthers}
 				/>
 				<SelectionBadge count={highlightedCount} onClear={onClearSelection} />
+			</div>
+			<div className="absolute top-2 right-2 z-10">
+				<ExpandToggle isExpanded={isExpanded} onToggle={onToggleExpand} />
 			</div>
 			{showGhostToggle && (
 				<GhostToggle ghostOthers={ghostOthers} onClick={onGhostToggle} />

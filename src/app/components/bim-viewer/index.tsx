@@ -1,12 +1,14 @@
 "use client";
 
 import { useGeometryFromParquetCtx } from "../geometry-from-parquet-context";
+import { useBimViewerExpand } from "./hooks/use-bim-viewer-expand";
 import { useEscapeKey } from "./hooks/use-escape-key";
 import { useHighlightManagement } from "./hooks/use-highlight-management";
 import { useZoomControls } from "./hooks/use-zoom-controls";
 import { ViewerCanvas } from "./viewer-canvas";
 import { ViewerOverlay } from "./viewer-overlay";
 import { useGeometryFilter } from "@/app/hooks/use-geometry-filter";
+import { cn } from "@/lib/utils";
 import { useRef } from "react";
 
 function LoadingState() {
@@ -50,6 +52,8 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 	} = useGeometryFilter(entityIndices);
 
 	const containerRef = useRef<HTMLDivElement>(null);
+	const { isExpanded, collapse, toggleExpand, focusTargetRef } =
+		useBimViewerExpand();
 	const {
 		zoomTrigger,
 		handleZoomToExtent,
@@ -60,14 +64,30 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 		setHighlightedEntityIndices,
 	});
 
-	useEscapeKey(containerRef, highlightedEntityIndices, clearHighlight);
+	useEscapeKey(
+		containerRef,
+		highlightedEntityIndices,
+		clearHighlight,
+		isExpanded,
+		collapse
+	);
 
 	if (loading) return <LoadingState />;
 	if (error) return <ErrorState message={error.message} />;
 	if (!scene || totalEntityCount === 0) return <NoGeometryState />;
 
 	return (
-		<div ref={containerRef} className="relative w-full h-100" tabIndex={0}>
+		<div
+			ref={(node) => {
+				containerRef.current = node;
+				focusTargetRef.current = node;
+			}}
+			className={cn(
+				"relative w-full bg-white outline-none",
+				isExpanded ? "fixed inset-0 z-[60] h-svh" : "h-100"
+			)}
+			tabIndex={0}
+		>
 			<ViewerOverlay
 				totalEntityCount={totalEntityCount}
 				ghostCount={ghostCount}
@@ -75,6 +95,8 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 				highlightedCount={highlightedEntityIndices.size}
 				entityIndicesLength={entityIndices.length}
 				availableEntityCount={availableEntityCount}
+				isExpanded={isExpanded}
+				onToggleExpand={toggleExpand}
 				onZoomToExtent={handleZoomToExtent}
 				onZoomToSelected={handleZoomToSelected}
 				onGhostToggle={toggleGhostOthers}
@@ -86,6 +108,8 @@ export function BimViewer({ entityIndices }: { entityIndices: number[] }) {
 				onHighlight={handleHighlight}
 				zoomTrigger={zoomTrigger}
 				onZoomDone={handleZoomDone}
+				isExpanded={isExpanded}
+				containerRef={containerRef}
 			/>
 		</div>
 	);
