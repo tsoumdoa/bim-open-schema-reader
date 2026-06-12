@@ -22,9 +22,14 @@ export default function ListQueriesInSidebar(props: {
 	if (isTemplatePickerActive) {
 		return (
 			<div className="flex flex-col gap-3">
-				<p className="border-b border-zinc-100 px-1 pb-2 text-xs leading-snug text-zinc-600">
-					Pick a template query to get started
-				</p>
+				<div className="rounded-lg border border-sidebar-border bg-sidebar-accent/50 px-3 py-2.5">
+					<p className="text-xs font-medium text-sidebar-foreground">
+						Get started
+					</p>
+					<p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+						Pick a template query below to run your first analysis.
+					</p>
+				</div>
 				<div className="flex max-h-[calc(100vh-11rem)] flex-col gap-3 overflow-y-auto pr-1">
 					{templateQueryGroups.map((group) => (
 						<div key={group.queryCategory}>
