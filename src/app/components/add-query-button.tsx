@@ -30,9 +30,15 @@ export function AddQuery(props: {
 	addQuery: (queryObject: QueryObject) => void;
 	disableShortcutRef: RefObject<boolean>;
 	onQuickExplorerOpen: () => void;
+	isOpen?: boolean;
+	onOpenChange?: (open: boolean) => void;
 }) {
-	const [isOpen, setIsOpen] = useState(false);
-	const isMac = navigator.platform.toLowerCase().includes("mac");
+	const [internalOpen, setInternalOpen] = useState(false);
+	const isOpen = props.isOpen ?? internalOpen;
+	const setIsOpen = props.onOpenChange ?? setInternalOpen;
+	const isMac =
+		typeof navigator !== "undefined" &&
+		navigator.platform.toLowerCase().includes("mac");
 
 	useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {

@@ -50,6 +50,14 @@ export function useHandleProcess() {
 		}
 	};
 
+	const unloadModel = () => {
+		parquetData.current = [];
+		setDbReady(false);
+		setFiles(undefined);
+		setBosFileType("INVALID");
+		setIsProcessing(false);
+	};
+
 	return {
 		handleProcess,
 		isProcessing,
@@ -60,5 +68,6 @@ export function useHandleProcess() {
 		files,
 		setFiles,
 		bosFileType,
+		unloadModel,
 	};
 }
