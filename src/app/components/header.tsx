@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export default function Header() {
 	return (
 		<header className="border-foreground bg-background w-full border-b-4">
@@ -11,14 +9,14 @@ export default function Header() {
 						</h1>
 					</div>
 					<nav className="hidden items-center space-x-8 md:flex">
-						<Link
+						<a
 							href="https://github.com/tsoumdoa/bim-open-schema-reader"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-sm font-bold tracking-wider uppercase hover:underline"
 						>
 							GitHub Repo
-						</Link>
+						</a>
 					</nav>
 				</div>
 			</div>

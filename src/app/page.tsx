@@ -1,5 +1,3 @@
-"use client";
-
 import AnalyticalDisplay from "./components/display-analytical";
 import InitialDisplay from "./components/display-initial";
 import Header from "./components/header";
@@ -13,7 +11,6 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function UnzipFailedAlertDialog(props: {
 	open: boolean;
@@ -55,35 +52,32 @@ export default function Home() {
 		bosFileType,
 		unloadModel,
 	} = useHandleProcess();
-	const queryClient = new QueryClient();
 
 	//TODO: THINK about how to separte with or without geo data with bos
 
 	return (
-		<QueryClientProvider client={queryClient}>
-			<div className="bg-background min-h-screen">
-				<UnzipFailedAlertDialog open={open} setOpen={setOpen} />
-				<main>
-					{dbReady && bosFileType !== "INVALID" ? (
-						<AnalyticalDisplay
-							parquetFileEntries={parquetData.current}
-							fileName={(files && files[0].name) || ""}
-							bosFileType={bosFileType}
-							onUnloadModel={unloadModel}
+		<div className="bg-background min-h-screen">
+			<UnzipFailedAlertDialog open={open} setOpen={setOpen} />
+			<main>
+				{dbReady && bosFileType !== "INVALID" ? (
+					<AnalyticalDisplay
+						parquetFileEntries={parquetData.current}
+						fileName={(files && files[0].name) || ""}
+						bosFileType={bosFileType}
+						onUnloadModel={unloadModel}
+					/>
+				) : (
+					<>
+						<Header />
+						<InitialDisplay
+							setFiles={setFiles}
+							files={files}
+							handleProcess={handleProcess}
+							isProcessing={isProcessing}
 						/>
-					) : (
-						<>
-							<Header />
-							<InitialDisplay
-								setFiles={setFiles}
-								files={files}
-								handleProcess={handleProcess}
-								isProcessing={isProcessing}
-							/>
-						</>
-					)}
-				</main>
-			</div>
-		</QueryClientProvider>
+					</>
+				)}
+			</main>
+		</div>
 	);
 }

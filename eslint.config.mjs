@@ -1,31 +1,41 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import js from "@eslint/js";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import globals from "globals";
+import tseslint from "typescript-eslint";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-	baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-	...compat.extends("next/core-web-vitals", "next/typescript"),
+const eslintConfig = tseslint.config(
 	{
-		ignores: [
-			"node_modules/**",
-			".next/**",
-			"out/**",
-			"build/**",
-			"next-env.d.ts",
-		],
+		ignores: ["node_modules/**", "dist/**", "build/**", "coverage/**"],
 	},
+	js.configs.recommended,
+	...tseslint.configs.recommended,
 	{
+		files: ["**/*.{ts,tsx}"],
+		languageOptions: {
+			ecmaVersion: 2023,
+			globals: globals.browser,
+		},
+		plugins: {
+			"react-hooks": reactHooks,
+			"react-refresh": reactRefresh,
+		},
 		rules: {
+			...reactHooks.configs.recommended.rules,
 			"@typescript-eslint/ban-ts-comment": "off",
 			"@typescript-eslint/no-explicit-any": "off",
+			"react-refresh/only-export-components": [
+				"warn",
+				{ allowConstantExport: true },
+			],
 		},
 	},
-];
+	{
+		files: ["*.config.{js,mjs,ts}"],
+		languageOptions: {
+			globals: globals.node,
+		},
+	}
+);
 
 export default eslintConfig;
