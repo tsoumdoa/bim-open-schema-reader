@@ -17,7 +17,7 @@ const config = {
 		"@trivago/prettier-plugin-sort-imports",
 	],
 	embeddedSqlTags: ["sql"],
-	language: "sql",
+	language: "postgresql",
 	keywordCase: "upper",
 };
 

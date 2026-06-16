@@ -33,7 +33,12 @@ import { countUnplacedViews } from "../sql/view-count-unplaced-views";
 import { listWallBuildUps } from "../sql/wall-build-ups";
 import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
 import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
-import { BosFileType, DenormTableName, QueryObject, QueriesSelector } from "./types";
+import {
+	BosFileType,
+	DenormTableName,
+	QueryObject,
+	QueriesSelector,
+} from "./types";
 
 const levels: QueriesSelector = {
 	queryCategory: "Levels",
@@ -298,7 +303,9 @@ export function getTemplateQueryGroups(
 	);
 }
 
-export function getTemplateQueryObjects(bosFileType: BosFileType): QueryObject[] {
+export function getTemplateQueryObjects(
+	bosFileType: BosFileType
+): QueryObject[] {
 	return getTemplateQueryGroups(bosFileType).flatMap((selector) =>
 		selector.queryObjects.map((queryObject) => ({
 			...queryObject,

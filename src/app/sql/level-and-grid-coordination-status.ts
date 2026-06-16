@@ -19,7 +19,7 @@ export const listLevelWithCoredStatus = sql`
 				name,
 				title,
 				elevation,
-				FIRST_VALUE (elevation) OVER (
+				FIRST_VALUE(elevation) OVER (
 					PARTITION BY
 						name
 				) AS ref_elevation
@@ -30,7 +30,7 @@ export const listLevelWithCoredStatus = sql`
 		name,
 		ref_elevation,
 		CASE
-			WHEN BOOL_AND (elevation = ref_elevation) THEN 'OK'
+			WHEN BOOL_AND(elevation = ref_elevation) THEN 'OK'
 			ELSE 'Uncoordinated level'
 		END AS cord_status,
 		LIST (DISTINCT title) AS models,
@@ -40,7 +40,7 @@ export const listLevelWithCoredStatus = sql`
 			END
 		) AS wrong_models,
 		CASE
-			WHEN NOT BOOL_AND (elevation = ref_elevation) THEN LIST (DISTINCT elevation)
+			WHEN NOT BOOL_AND(elevation = ref_elevation) THEN LIST (DISTINCT elevation)
 		END AS mismatched_elevations
 	FROM
 		level_ref
@@ -127,27 +127,27 @@ export const listGridWithCoredStatus = sql`
 		grid_compare AS (
 			SELECT
 				*,
-				FIRST_VALUE (dir_x) OVER (
+				FIRST_VALUE(dir_x) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_dir_x,
-				FIRST_VALUE (dir_y) OVER (
+				FIRST_VALUE(dir_y) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_dir_y,
-				FIRST_VALUE (center_x) OVER (
+				FIRST_VALUE(center_x) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_center_x,
-				FIRST_VALUE (center_y) OVER (
+				FIRST_VALUE(center_y) OVER (
 					PARTITION BY
 						name,
 						grid_type
 				) AS ref_center_y,
-				FIRST_VALUE (arc_radius) OVER (
+				FIRST_VALUE(arc_radius) OVER (
 					PARTITION BY
 						name,
 						grid_type
@@ -176,7 +176,7 @@ export const listGridWithCoredStatus = sql`
 	SELECT
 		name,
 		CASE
-			WHEN BOOL_AND (model_status = 'OK') THEN 'OK'
+			WHEN BOOL_AND(model_status = 'OK') THEN 'OK'
 			ELSE 'Uncoordinated'
 		END AS cord_status,
 		LIST (DISTINCT title) AS models,

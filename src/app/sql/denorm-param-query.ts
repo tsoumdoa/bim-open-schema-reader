@@ -50,48 +50,49 @@ export const denormNumberParamsPivot = (categoryName: string) => sql`
 `;
 
 export const denormNumberParamsStats = (categoryName: string) => sql`
-  WITH
-    single_data AS (
-      SELECT
-        e.LocalId,
-        p.d_name AS param_name,
-        p.v_value AS raw_value,
-      FROM
-        denorm_entities AS e
-        INNER JOIN denorm_number_params AS p ON e.index = p.p_Entity
-      WHERE e.type = '${categoryName}'
-    ),
-    norm AS (
-      SELECT
-        LocalId,
-        param_name,
-        CASE
-          WHEN raw_value::text IS NULL THEN NULL
-          WHEN trim(raw_value::text) = '' THEN NULL
-          WHEN (raw_value)::float8 = 0 THEN NULL
-          ELSE raw_value
-        END AS norm_value
-      FROM
-        single_data
-    )
-  SELECT
-    param_name,
-    COUNT(DISTINCT LocalId) AS total_rows_per_param,
-    COUNT(DISTINCT LocalId) FILTER (
-      WHERE
-        norm_value IS NOT NULL
-    ) AS rows_with_value_defined,
-    COUNT(DISTINCT LocalId) - COUNT(DISTINCT LocalId) FILTER (
-      WHERE
-        norm_value IS NOT NULL
-    ) AS rows_with_value_undefined,
-    COUNT(DISTINCT norm_value) AS distinct_values
-  FROM
-    norm
-  GROUP BY
-    param_name
-  ORDER BY
-    param_name;
+	WITH
+		single_data AS (
+			SELECT
+				e.LocalId,
+				p.d_name AS param_name,
+				p.v_value AS raw_value,
+			FROM
+				denorm_entities AS e
+				INNER JOIN denorm_number_params AS p ON e.index = p.p_Entity
+			WHERE
+				e.type = '${categoryName}'
+		),
+		norm AS (
+			SELECT
+				LocalId,
+				param_name,
+				CASE
+					WHEN raw_value::text IS NULL THEN NULL
+					WHEN trim(raw_value::text) = '' THEN NULL
+					WHEN (raw_value)::float8 = 0 THEN NULL
+					ELSE raw_value
+				END AS norm_value
+			FROM
+				single_data
+		)
+	SELECT
+		param_name,
+		COUNT(DISTINCT LocalId) AS total_rows_per_param,
+		COUNT(DISTINCT LocalId) FILTER (
+			WHERE
+				norm_value IS NOT NULL
+		) AS rows_with_value_defined,
+		COUNT(DISTINCT LocalId) - COUNT(DISTINCT LocalId) FILTER (
+			WHERE
+				norm_value IS NOT NULL
+		) AS rows_with_value_undefined,
+		COUNT(DISTINCT norm_value) AS distinct_values
+	FROM
+		norm
+	GROUP BY
+		param_name
+	ORDER BY
+		param_name;
 `;
 
 export const denormEntityParams = (categoryName: string) => sql`
