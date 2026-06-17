@@ -1,7 +1,7 @@
 # BIM Open Schema Reader
 
 Ultra-fast, fully local BIM data analysis in your browser.  
-Powered by DuckDB-Wasm and Next.js.
+Powered by DuckDB-Wasm, Vite, and TanStack Router.
 
 - Ultra-fast queries: Run lightning-fast SQL on BIM Open Schema data exported from Revit.
 - 100% private: No servers, no uploads—everything runs locally in your browser.

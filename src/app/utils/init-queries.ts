@@ -68,8 +68,7 @@ export const createHelperViewsAndTables = () => sql`
 		(4, 'ExporterInfo');
 
 	-- denormalize documents
-	CREATE
-	OR REPLACE VIEW denorm_documents AS
+	CREATE OR REPLACE VIEW denorm_documents AS
 	SELECT
 		d.index,
 		p.Strings AS path,
@@ -80,8 +79,7 @@ export const createHelperViewsAndTables = () => sql`
 		LEFT OUTER JOIN Strings t ON d.Title = t."index";
 
 	-- denormalize diagonostics
-	CREATE
-	OR REPLACE VIEW denorm_diagnostics AS
+	CREATE OR REPLACE VIEW denorm_diagnostics AS
 	SELECT
 		d.index,
 		d.Entity,
@@ -93,8 +91,7 @@ export const createHelperViewsAndTables = () => sql`
 		JOIN Enum_DiagnosticType t ON t.index = d.Type;
 
 	-- denormalize entities
-	CREATE
-	OR REPLACE VIEW denorm_entities AS
+	CREATE OR REPLACE VIEW denorm_entities AS
 	SELECT
 		e.LocalId,
 		e.GlobalId,
@@ -114,8 +111,7 @@ export const createHelperViewsAndTables = () => sql`
 		LEFT OUTER JOIN denorm_documents dd ON e.Document = dd."index";
 
 	-- denormalize descriptor
-	CREATE
-	OR REPLACE VIEW denorm_descriptors AS
+	CREATE OR REPLACE VIEW denorm_descriptors AS
 	SELECT
 		d.index AS index,
 		n.Strings AS name,
@@ -130,8 +126,7 @@ export const createHelperViewsAndTables = () => sql`
 		LEFT OUTER JOIN Enum_Parameter t ON t.index = d.Type;
 
 	-- denormalize StringParameters
-	CREATE
-	OR REPLACE VIEW denorm_string_params AS
+	CREATE OR REPLACE VIEW denorm_string_params AS
 	WITH
 		string_descriptors AS (
 			SELECT
@@ -151,8 +146,7 @@ export const createHelperViewsAndTables = () => sql`
 		JOIN Strings v ON v.index = p."Value";
 
 	-- denormalize PointParameters
-	CREATE
-	OR REPLACE VIEW denorm_points_params AS
+	CREATE OR REPLACE VIEW denorm_points_params AS
 	WITH
 		point_descriptors AS (
 			SELECT
@@ -171,8 +165,7 @@ export const createHelperViewsAndTables = () => sql`
 		JOIN point_descriptors d ON d.index = p.Descriptor
 		JOIN Points v ON v.index = p."Value";
 
-	CREATE
-	OR REPLACE VIEW denorm_number_params AS
+	CREATE OR REPLACE VIEW denorm_number_params AS
 	WITH
 		number_descriptors AS (
 			SELECT
@@ -191,8 +184,7 @@ export const createHelperViewsAndTables = () => sql`
 		JOIN number_descriptors d ON d.index = p.Descriptor;
 
 	-- denormalize Integer Parameters
-	CREATE
-	OR REPLACE VIEW denorm_integer_params AS
+	CREATE OR REPLACE VIEW denorm_integer_params AS
 	WITH
 		int_descriptors AS (
 			SELECT
@@ -210,8 +202,7 @@ export const createHelperViewsAndTables = () => sql`
 		JOIN int_descriptors d ON d.index = p.Descriptor;
 
 	-- denormalize Entity Parameters
-	CREATE
-	OR REPLACE VIEW denorm_entity_params AS
+	CREATE OR REPLACE VIEW denorm_entity_params AS
 	WITH
 		entity_descriptors AS (
 			SELECT
@@ -232,8 +223,7 @@ export const createHelperViewsAndTables = () => sql`
 
 	-- DENORM GEOMETRICAL DATA TABLES
 	-- denormalize geometry: VertexBuffer
-	CREATE
-	OR REPLACE VIEW denorm_vertex_buffer_view AS
+	CREATE OR REPLACE VIEW denorm_vertex_buffer_view AS
 	SELECT
 		VertexBuffer.index AS index,
 		VertexBuffer.VertexX / 10000.0 AS x,
@@ -243,8 +233,7 @@ export const createHelperViewsAndTables = () => sql`
 		VertexBuffer;
 
 	-- denormalize geometry: IndexBuffer
-	CREATE
-	OR REPLACE VIEW denorm_index_buffer_view AS
+	CREATE OR REPLACE VIEW denorm_index_buffer_view AS
 	SELECT
 		IndexBuffer.index AS index,
 		IndexBuffer.IndexBuffer AS index_value
@@ -252,8 +241,7 @@ export const createHelperViewsAndTables = () => sql`
 		IndexBuffer;
 
 	-- denormalize geometry: Meshes
-	CREATE
-	OR REPLACE VIEW denorm_meshes_view AS
+	CREATE OR REPLACE VIEW denorm_meshes_view AS
 	SELECT
 		Meshes.index AS index,
 		Meshes.MeshVertexOffset AS vertex_offset,
@@ -262,8 +250,7 @@ export const createHelperViewsAndTables = () => sql`
 		Meshes;
 
 	-- denormalize geometry: Materials
-	CREATE
-	OR REPLACE VIEW denorm_materials_view AS
+	CREATE OR REPLACE VIEW denorm_materials_view AS
 	SELECT
 		Materials.index AS index,
 		Materials.MaterialRed / 255.0 AS red,
@@ -276,8 +263,7 @@ export const createHelperViewsAndTables = () => sql`
 		Materials;
 
 	-- denormalize geometry: Transforms
-	CREATE
-	OR REPLACE VIEW denorm_transforms_view AS
+	CREATE OR REPLACE VIEW denorm_transforms_view AS
 	SELECT
 		Transforms.index AS index,
 		Transforms.TransformTX AS tx,
@@ -294,8 +280,7 @@ export const createHelperViewsAndTables = () => sql`
 		Transforms;
 
 	-- denormalize geometry: Instances
-	CREATE
-	OR REPLACE VIEW denorm_instances_view AS
+	CREATE OR REPLACE VIEW denorm_instances_view AS
 	SELECT
 		Instances.index AS index,
 		Instances.InstanceEntityIndex AS entity_index,
@@ -307,8 +292,7 @@ export const createHelperViewsAndTables = () => sql`
 		Instances;
 
 	-- denormalize geometry: Elements (joins all geometry tables with entities)
-	CREATE
-	OR REPLACE VIEW denorm_geometry_elements AS
+	CREATE OR REPLACE VIEW denorm_geometry_elements AS
 	SELECT
 		i.index AS instance_index,
 		i.entity_index,

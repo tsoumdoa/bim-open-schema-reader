@@ -4,11 +4,11 @@ import { cleanCategoryCount } from "../utils/clean-category-count";
 import { listCountByCategory } from "../utils/init-queries";
 import { BosFileType, QueryObject } from "../utils/types";
 import { AddQuery } from "./add-query-button";
-import { UnloadModelButton } from "./unload-model-button";
 import QueryDisplayItem from "./query-display-item";
 import { useQueryObjCtx } from "./query-obj-provider";
 import { QuickExplorer } from "./quick-explorer-overlay";
 import SideBar from "./side-bar-content";
+import { UnloadModelButton } from "./unload-model-button";
 import { DataReadinessFilterProvider } from "./use-data-readiness-filter";
 import { useDuckDb } from "./use-db";
 import { Badge } from "@/components/ui/badge";
@@ -54,15 +54,9 @@ function DashboardHeader(props: {
 	);
 }
 
-function DashboardMain(props: {
-	onOpenAddQuery: () => void;
-}) {
-	const {
-		queryObjects,
-		selectedQueryId,
-		removeQuery,
-		isTemplatePickerActive,
-	} = useQueryObjCtx();
+function DashboardMain(props: { onOpenAddQuery: () => void }) {
+	const { queryObjects, selectedQueryId, removeQuery, isTemplatePickerActive } =
+		useQueryObjCtx();
 
 	const selectedQuery = queryObjects.find(
 		(q: QueryObject) => q.id === selectedQueryId
@@ -118,9 +112,7 @@ function isMacShortcutLabel() {
 		typeof navigator !== "undefined" &&
 		navigator.platform.toLowerCase().includes("mac");
 	return (
-		<span className="text-xs text-zinc-400">
-			({isMac ? "⌘K" : "ctrl+K"})
-		</span>
+		<span className="text-xs text-zinc-400">({isMac ? "⌘K" : "ctrl+K"})</span>
 	);
 }
 
@@ -165,7 +157,9 @@ export default function DashboardContainer(props: {
 					/>
 
 					<div className="flex-1 overflow-auto">
-						<DashboardMain onOpenAddQuery={() => handleAddQueryOpenChange(true)} />
+						<DashboardMain
+							onOpenAddQuery={() => handleAddQueryOpenChange(true)}
+						/>
 					</div>
 				</main>
 				{isActive &&

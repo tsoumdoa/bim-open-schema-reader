@@ -15,7 +15,6 @@ import {
 	DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone";
 import { Shield, Zap, Eye, Lock } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 
 function FeatureGrid() {
@@ -30,14 +29,14 @@ function FeatureGrid() {
 				</div>
 				<p className="leading-relaxed font-medium">
 					Powered by DuckDB-Wasm, run lightning-fast SQL queries on{" "}
-					<Link
+					<a
 						href="https://github.com/ara3d/bim-open-schema"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="underline"
 					>
 						BIM Open Schema
-					</Link>{" "}
+					</a>{" "}
 					data exported from Revit — all directly in your browser.
 				</p>
 			</div>

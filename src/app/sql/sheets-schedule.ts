@@ -62,7 +62,7 @@ export const sheetSchedule = sql`
 		"Sheet Number",
 		"Sheet Name",
 		view_names,
-		LENGTH (view_names) AS view_count,
+		LENGTH(view_names) AS view_count,
 		"Scale",
 		"Current Revision",
 		"Sheet Issue Date",

@@ -13,21 +13,11 @@
 		"isolatedModules": true,
 		"jsx": "react-jsx",
 		"incremental": true,
-		"plugins": [
-			{
-				"name": "next"
-			}
-		],
+		"types": ["vite/client"],
 		"paths": {
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": [
-		"next-env.d.ts",
-		"**/*.ts",
-		"**/*.tsx",
-		".next/types/**/*.ts",
-		".next/dev/types/**/*.ts"
-	],
-	"exclude": ["node_modules", "ara3d-webgl"]
+	"include": ["src", "vite.config.ts"],
+	"exclude": ["node_modules", "dist", "ara3d-webgl"]
 }
