@@ -329,13 +329,6 @@ export const createHelperViewsAndTables = () => sql`
 		LEFT OUTER JOIN denorm_materials_view mat ON i.material_index = mat.index;
 `;
 
-export const listAllTableInfo = sql`
-	SELECT
-		*
-	FROM
-		information_schema.tables;
-`;
-
 export const listAllTableInfoWithColumnInfo = sql`
 	SELECT
 		table_name,

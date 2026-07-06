@@ -1,8 +1,4 @@
-import {
-	ParquetBlob,
-	GeometryContextValue,
-	GeometricalDataCache,
-} from "@/app/utils/types";
+import { GeometryContextValue, GeometricalDataCache } from "@/app/utils/types";
 import {
 	clearGeometryObjectCache,
 	loadGeometryDataFromDuckDB,
@@ -16,8 +12,6 @@ const GeometryFromParquetContext = createContext<GeometryContextValue | null>(
 
 export function GeometryProviderFromParquet(props: {
 	children: React.ReactNode;
-	parquetFileEntries: ParquetBlob[];
-	db: duckdb.AsyncDuckDB;
 	conn: duckdb.AsyncDuckDBConnection;
 }) {
 	const [loading, setLoading] = useState(true);
@@ -34,10 +28,7 @@ export function GeometryProviderFromParquet(props: {
 
 				console.log("start loadGeometryDataFromDuckDB");
 				console.time("loadGeometryDataFromDuckDB");
-				const data = await loadGeometryDataFromDuckDB(
-					props.conn,
-					props.parquetFileEntries
-				);
+				const data = await loadGeometryDataFromDuckDB(props.conn);
 				console.timeEnd("loadGeometryDataFromDuckDB");
 
 				if (cancelled) return;
@@ -58,7 +49,7 @@ export function GeometryProviderFromParquet(props: {
 		return () => {
 			cancelled = true;
 		};
-	}, [props.conn, props.parquetFileEntries]);
+	}, [props.conn]);
 
 	return (
 		<GeometryFromParquetContext.Provider value={{ loading, error, cache }}>

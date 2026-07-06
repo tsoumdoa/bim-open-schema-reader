@@ -3,13 +3,13 @@ import { floorSchedule } from "../sql/floor-schedule";
 import { floorScheduleByType } from "../sql/floor-schedule-by-type";
 import {
 	renderAllGeometry,
-	renderWallsGeometry,
-	renderFloorsGeometry,
 	renderColumnsGeometry,
 	renderDoorsGeometry,
+	renderFloorsGeometry,
+	renderWallsGeometry,
 	renderWindowsGeometry,
 } from "../sql/geometry-queries";
-import { listGrids, listLevels } from "../sql/level-and-grid";
+import { listGrids } from "../sql/level-and-grid";
 import {
 	listGridWithCoredStatus,
 	listLevelWithCoredStatus,
@@ -20,10 +20,6 @@ import { roomScheduleByLevel } from "../sql/room-count-by-level";
 import { simpleRoomSchedule } from "../sql/room-simple-schedule";
 import { rvtSchedule } from "../sql/rvt-schedule";
 import { sheetSchedule } from "../sql/sheets-schedule";
-import { structuralColumnMaterials } from "../sql/structural-column-materials";
-import { structuralColumnSchedule } from "../sql/structural-column-schedule";
-import { structuralFrameMaterials } from "../sql/structural-frame-materials";
-import { structuralFrameSchedule } from "../sql/structural-frame-schedule";
 import { tagsTotalCountByCategory } from "../sql/tags-total-count-by-category";
 import { tagsTotalCountByFamily } from "../sql/tags-total-count-by-family";
 import { countByViewFamily } from "../sql/view-count-by-view-family";
@@ -33,12 +29,7 @@ import { countUnplacedViews } from "../sql/view-count-unplaced-views";
 import { listWallBuildUps } from "../sql/wall-build-ups";
 import { wallDoubleAndPointParameters } from "../sql/wall-double-and-pt-parameters";
 import { wallElementBasicInfo } from "../sql/wall-element-basic-info";
-import {
-	BosFileType,
-	DenormTableName,
-	QueryObject,
-	QueriesSelector,
-} from "./types";
+import { BosFileType, DenormTableName, QueriesSelector } from "./types";
 
 const levels: QueriesSelector = {
 	queryCategory: "Levels",
@@ -216,32 +207,6 @@ const floors: QueriesSelector = {
 	],
 };
 
-const structure: QueriesSelector = {
-	queryCategory: "Structure",
-	queryObjects: [
-		{
-			queryTitle: "Column Schedule",
-			sqlQuery: structuralColumnSchedule,
-			explanation: "Structural column Schedule",
-		},
-		{
-			queryTitle: "Column Materials",
-			sqlQuery: structuralColumnMaterials,
-			explanation: "Structural column Materials",
-		},
-		{
-			queryTitle: "Frame Schedule",
-			sqlQuery: structuralFrameSchedule,
-			explanation: "Structural frame Schedule",
-		},
-		{
-			queryTitle: "Frame Materials",
-			sqlQuery: structuralFrameMaterials,
-			explanation: "Structural frame Materials",
-		},
-	],
-};
-
 const viewer3d: QueriesSelector = {
 	queryCategory: "3D Viewer",
 	queryObjects: [
@@ -290,8 +255,8 @@ export const queriesSelectorList: QueriesSelector[] = [
 	rooms,
 	cadLinks,
 	floors,
-	// structure, //TODO: completely broken for now, can't fix till the next
-	// exporter release
+	// TODO: structure queries were removed from runtime until the exporter
+	// supports the required data shape again.
 ];
 
 export function getTemplateQueryGroups(
@@ -300,17 +265,6 @@ export function getTemplateQueryGroups(
 	return queriesSelectorList.filter(
 		(selector) =>
 			bosFileType === "GEO" || selector.queryCategory !== "3D Viewer"
-	);
-}
-
-export function getTemplateQueryObjects(
-	bosFileType: BosFileType
-): QueryObject[] {
-	return getTemplateQueryGroups(bosFileType).flatMap((selector) =>
-		selector.queryObjects.map((queryObject) => ({
-			...queryObject,
-			queryCategory: selector.queryCategory,
-		}))
 	);
 }
 

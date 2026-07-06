@@ -22,11 +22,7 @@ function DbProvider(props: {
 	}
 	if (isInitialized) {
 		return (
-			<GeometryProviderFromParquet
-				parquetFileEntries={props.parquetFileEntries}
-				db={db}
-				conn={conn}
-			>
+			<GeometryProviderFromParquet conn={conn}>
 				{props.children}
 			</GeometryProviderFromParquet>
 		);

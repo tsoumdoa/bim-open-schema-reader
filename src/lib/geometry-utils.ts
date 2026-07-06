@@ -2,7 +2,6 @@ import {
 	FilteredGeometryResult,
 	GeometricalDataCache,
 	GeometryInstance,
-	ParquetBlob,
 } from "@/app/utils/types";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import * as THREE from "three";
@@ -10,7 +9,7 @@ import * as THREE from "three";
 const VERTEX_MULTIPLIER = 10000.0;
 const MATERIAL_DIVISOR = 255.0;
 
-export class GeometryObjectCache {
+class GeometryObjectCache {
 	private geometryCache = new Map<number, THREE.BufferGeometry>();
 	private materialCache = new Map<number, THREE.MeshStandardMaterial>();
 	private transformCache = new Map<number, THREE.Matrix4>();
@@ -116,7 +115,7 @@ export function clearGeometryObjectCache(): void {
 	geometryObjectCache.clear();
 }
 
-export interface BatchedGeometry {
+interface BatchedGeometry {
 	geometry: THREE.BufferGeometry;
 	material: THREE.MeshStandardMaterial;
 	instances: GeometryInstance[];
@@ -134,7 +133,7 @@ function getHighlightMaterial(
 	baseMaterial: THREE.MeshStandardMaterial
 ): THREE.MeshStandardMaterial {
 	const baseColor = baseMaterial.color.getHex();
-	let cached = highlightMaterialCache.get(baseColor);
+	const cached = highlightMaterialCache.get(baseColor);
 	if (cached) return cached;
 
 	const mat = baseMaterial.clone();
@@ -149,7 +148,7 @@ function getHighlightMaterial(
 	return mat;
 }
 
-export function batchInstancesByMaterialAndGeometry(
+function batchInstancesByMaterialAndGeometry(
 	instances: GeometryInstance[],
 	geometries: Map<number, THREE.BufferGeometry>,
 	materials: Map<number, THREE.MeshStandardMaterial>
@@ -344,7 +343,7 @@ function buildGhostGeometry(
 	return mergedGeometry;
 }
 
-export function convertZUpToYUp(group: THREE.Group): void {
+function convertZUpToYUp(group: THREE.Group): void {
 	group.rotation.x = -Math.PI / 2;
 }
 
@@ -396,7 +395,7 @@ function buildGeometryInstances(
 	return { instances: geometryInstances, geometryMap, materialMap };
 }
 
-export function buildSceneFromInstances(
+function buildSceneFromInstances(
 	instanceIndices: number[],
 	cache: GeometricalDataCache
 ): {
@@ -596,7 +595,7 @@ export const buildGhostedScene = (
 	};
 };
 
-export function computeVertexNormals(
+function computeVertexNormals(
 	positions: Float32Array,
 	indices: Uint32Array,
 	vertexCount: number,
@@ -663,8 +662,7 @@ export function computeVertexNormals(
 }
 
 export async function loadGeometryDataFromDuckDB(
-	conn: duckdb.AsyncDuckDBConnection,
-	_parquetFileEntries: ParquetBlob[]
+	conn: duckdb.AsyncDuckDBConnection
 ): Promise<GeometricalDataCache> {
 	const vertexQuery = `SELECT VertexX as x, VertexY as y, VertexZ as z FROM VertexBuffer`;
 	const indexQuery = `SELECT IndexBuffer as index_value FROM IndexBuffer`;

@@ -16,19 +16,6 @@ type DropzoneContextType = {
 	maxFiles?: DropzoneOptions["maxFiles"];
 };
 
-const renderBytes = (bytes: number) => {
-	const units = ["B", "KB", "MB", "GB", "TB", "PB"];
-	let size = bytes;
-	let unitIndex = 0;
-
-	while (size >= 1024 && unitIndex < units.length - 1) {
-		size /= 1024;
-		unitIndex++;
-	}
-
-	return `${size.toFixed(2)}${units[unitIndex]}`;
-};
-
 const DropzoneContext = createContext<DropzoneContextType | undefined>(
 	undefined
 );
@@ -158,8 +145,7 @@ export const DropzoneEmptyState = ({
 	children,
 	className,
 }: DropzoneEmptyStateProps) => {
-	const { src, accept, maxSize, minSize /* , maxFiles */ } =
-		useDropzoneContext();
+	const { src } = useDropzoneContext();
 
 	if (src) {
 		return null;
@@ -167,21 +153,6 @@ export const DropzoneEmptyState = ({
 
 	if (children) {
 		return children;
-	}
-
-	let caption = "";
-
-	if (accept) {
-		caption += "Accepts ";
-		caption += new Intl.ListFormat("en").format(Object.keys(accept));
-	}
-
-	if (minSize && maxSize) {
-		caption += ` between ${renderBytes(minSize)} and ${renderBytes(maxSize)}`;
-	} else if (minSize) {
-		caption += ` at least ${renderBytes(minSize)}`;
-	} else if (maxSize) {
-		caption += ` less than ${renderBytes(maxSize)}`;
 	}
 
 	return (

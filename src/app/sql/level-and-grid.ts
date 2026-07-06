@@ -1,27 +1,5 @@
 import { sql } from "../utils/init-queries";
 
-export const listLevels = sql`
-	SELECT
-		p.index,
-		p.name,
-		p.project_name,
-		round(r0.value * 304.8, 0) AS elevation
-	FROM
-		denorm_entities AS p
-		INNER JOIN denorm_string_params AS r2 ON p.index = r2.entity
-		INNER JOIN denorm_number_params AS r0 ON p.index = r0.entity
-	WHERE
-		p.category LIKE 'Levels'
-		AND r0.name LIKE 'Elevation'
-	GROUP BY
-		p.name,
-		p.index,
-		p.project_name,
-		r0.value
-	ORDER BY
-		r0.value DESC;
-`;
-
 export const listGrids = sql`
 	WITH
 		grid_points AS (

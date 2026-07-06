@@ -413,7 +413,7 @@ const sheetsSchedulesCategory: CategoryObj = {
 	],
 };
 
-export const categoriesCategory: CategoryObjs = [
+const categoriesCategory: CategoryObjs = [
 	projectSettingCategory,
 	archCategory,
 	levelGridCategory,
@@ -457,7 +457,7 @@ export function findCategoryGroup(categoryName: string): GeneralCategoryObj {
 		}
 	}
 
-	if (/\.(dwg)(\s*[\(\[].*[\)\]])?$/i.test(categoryName)) {
+	if (/\.(dwg)(\s*[([].*[\])])?$/i.test(categoryName)) {
 		// return "RVT & CAD Links";
 		return {
 			generalCategory: "RVT & CAD Links",

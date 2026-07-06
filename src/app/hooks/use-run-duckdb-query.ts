@@ -16,15 +16,11 @@ export function useRunDuckDbQuery(
 		retry: false,
 		refetchOnWindowFocus: false, //to prevent query when user switches tab
 		queryFn: async () => {
-			try {
-				const start = performance.now();
-				const result = await runQuery(c, sql);
-				const end = performance.now();
-				setQueryTime(end - start);
-				return result;
-			} catch (e) {
-				throw e;
-			}
+			const start = performance.now();
+			const result = await runQuery(c, sql);
+			const end = performance.now();
+			setQueryTime(end - start);
+			return result;
 		},
 		enabled: enabled,
 	});
