@@ -93,28 +93,23 @@ export const denormGeoTableNames = [
 ];
 
 export type DenormTableName = (typeof denormTableNames)[number];
-export type DenormGeoTableName = (typeof denormGeoTableNames)[number];
-
 export type ParquetBlob = {
 	filename: string;
 	parquet: Uint8Array;
 };
 
-export const queryCategories = [
-	"3D Viewer",
-	"CAD & RVT Links",
-	"Floors",
-	"Grids",
-	"Levels",
-	"Materials",
-	"Rooms",
-	"Sheets",
-	"Structure",
-	"Tags",
-	"Views",
-	"Walls",
-] as const;
-export type QueryCategory = (typeof queryCategories)[number];
+type QueryCategory =
+	| "3D Viewer"
+	| "CAD & RVT Links"
+	| "Floors"
+	| "Grids"
+	| "Levels"
+	| "Materials"
+	| "Rooms"
+	| "Sheets"
+	| "Tags"
+	| "Views"
+	| "Walls";
 
 export type QueriesSelector = {
 	queryCategory: QueryCategory;
@@ -131,8 +126,7 @@ export type QueryObject = {
 	returnedRowsNumber?: number;
 };
 
-const exportFileTypes = ["csv", "tsv", "json"] as const;
-export type ExportFileType = (typeof exportFileTypes)[number];
+export type ExportFileType = "csv" | "tsv" | "json";
 export type UseRunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type RunDuckDbQuery = ReturnType<typeof useRunDuckDbQuery>;
 export type QueryObjects = QueryObject[];
@@ -150,10 +144,6 @@ export type DuckDBCtx = {
 	conn: duckdb.AsyncDuckDBConnection;
 	bosFileType: BosFileType;
 };
-export type QueryObjectCtx = {
-	useQueryObjects: UseQueryObjects;
-};
-
 // for categorizing categories
 export const generalCategory = [
 	"Project Setting",
@@ -177,14 +167,14 @@ export const generalCategory = [
 	"Analytical",
 	"Misc",
 ] as const;
-export type GeneralCategory = (typeof generalCategory)[number];
+type GeneralCategory = (typeof generalCategory)[number];
 
 export type CategoryObj = {
 	generalCategory: GeneralCategory;
 	categoryWithReadiness: CategoryWithReadiness[];
 };
 
-export type CategoryWithReadiness = {
+type CategoryWithReadiness = {
 	categoryName: string;
 	analyticalReadiness: AnalyticsReadinessLevels;
 };
@@ -214,8 +204,6 @@ export const analyticReadinessTitles = Object.freeze([
 	"Limited Value",
 ] as const);
 export type AnalyticsReadinessLevels = (typeof analyticReadinessLevels)[number];
-export type AnalyticsReadinessTitle = (typeof analyticReadinessTitles)[number];
-
 // for geometrical data processing
 
 export type FilteredGeometryResult = {

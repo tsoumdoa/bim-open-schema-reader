@@ -16,7 +16,11 @@ export default function useFilterByDataReadiness() {
 			setSelected(new Set([value]));
 		} else {
 			const newSet = new Set(selected);
-			newSet.has(value) ? newSet.delete(value) : newSet.add(value);
+			if (newSet.has(value)) {
+				newSet.delete(value);
+			} else {
+				newSet.add(value);
+			}
 			setSelected(newSet);
 		}
 	};

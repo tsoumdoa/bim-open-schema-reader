@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 const CLICK_DRAG_THRESHOLD_PX = 5;
 
-export function findEntityByFaceIndex(
+function findEntityByFaceIndex(
 	faceIndex: number,
 	faceRanges: EntityFaceRangesSoA
 ): number | null {

@@ -9,7 +9,7 @@ interface EntityCountBadgeProps {
 	ghostOthers: boolean;
 }
 
-export function EntityCountBadge({
+function EntityCountBadge({
 	totalEntityCount,
 	ghostCount,
 	ghostOthers,
@@ -34,7 +34,7 @@ interface SelectionBadgeProps {
 	onClear: () => void;
 }
 
-export function SelectionBadge({ count, onClear }: SelectionBadgeProps) {
+function SelectionBadge({ count, onClear }: SelectionBadgeProps) {
 	if (count === 0) return null;
 	return (
 		<div className="bg-yellow-500/90 text-black px-3 py-1.5 rounded text-xs font-medium flex items-center gap-1">
@@ -56,7 +56,7 @@ interface GhostToggleProps {
 	onClick: () => void;
 }
 
-export function GhostToggle({ ghostOthers, onClick }: GhostToggleProps) {
+function GhostToggle({ ghostOthers, onClick }: GhostToggleProps) {
 	return (
 		<Button
 			variant={ghostOthers ? "default" : "secondary"}
@@ -76,7 +76,7 @@ interface ZoomControlsProps {
 	hasSelection: boolean;
 }
 
-export function ZoomControls({
+function ZoomControls({
 	onZoomToExtent,
 	onZoomToSelected,
 	hasSelection,
@@ -111,7 +111,7 @@ interface ExpandToggleProps {
 	onToggle: () => void;
 }
 
-export function ExpandToggle({ isExpanded, onToggle }: ExpandToggleProps) {
+function ExpandToggle({ isExpanded, onToggle }: ExpandToggleProps) {
 	return (
 		<Button
 			variant="secondary"

@@ -43,7 +43,6 @@ export function denormParamQueryBuilder(
 		sqlQuery: "",
 		explanation: "",
 	};
-	denormParamQueryBuilder;
 	switch (paramType) {
 		case "denorm_number_params":
 			if (queryType === "pivot") {

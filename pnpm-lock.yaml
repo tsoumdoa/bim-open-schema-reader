@@ -11,9 +11,6 @@ importers:
       '@codemirror/autocomplete':
         specifier: ^6.20.3
         version: 6.20.3
-      '@codemirror/commands':
-        specifier: ^6.10.3
-        version: 6.10.3
       '@codemirror/lang-sql':
         specifier: ^6.10.0
         version: 6.10.0
@@ -35,12 +32,6 @@ importers:
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.17
         version: 2.1.17(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-label':
-        specifier: ^2.1.9
-        version: 2.1.9(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-menubar':
-        specifier: ^1.1.17
-        version: 1.1.17(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@radix-ui/react-scroll-area':
         specifier: ^1.2.11
         version: 1.2.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -50,9 +41,6 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.5
         version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
-      '@radix-ui/react-toggle':
-        specifier: ^1.1.11
-        version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@radix-ui/react-tooltip':
         specifier: ^1.2.9
         version: 1.2.9(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -72,9 +60,6 @@ importers:
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@uiw/codemirror-theme-dracula':
-        specifier: ^4.25.10
-        version: 4.25.10(@codemirror/language@6.12.3)(@codemirror/state@6.6.0)(@codemirror/view@6.43.1)
-      '@uiw/codemirror-theme-github':
         specifier: ^4.25.10
         version: 4.25.10(@codemirror/language@6.12.3)(@codemirror/state@6.6.0)(@codemirror/view@6.43.1)
       '@uiw/react-codemirror':
@@ -162,9 +147,6 @@ importers:
       babel-plugin-react-compiler:
         specifier: 1.0.0
         version: 1.0.0
-      baseline-browser-mapping:
-        specifier: ^2.10.35
-        version: 2.10.35
       esbuild:
         specifier: ^0.28.1
         version: 0.28.1
@@ -1841,9 +1823,6 @@ packages:
 
   '@uiw/codemirror-theme-dracula@4.25.10':
     resolution: {integrity: sha512-YW3tsKfNOAQix7mH72AVj3Sb2QBk3Js7j4B0NStJifq1uPsm3hGc1TJ9a7UAht+xf8TNrUc1vlecrkUlfsL7yQ==}
-
-  '@uiw/codemirror-theme-github@4.25.10':
-    resolution: {integrity: sha512-iMM2QT4FaebJMO4W7lXmxNkRPIjKzgY26wL0QG0Ugy0gzsnxoNz4zgNeFIblPA8rvrN3vOIhNNh4nk9UOlFKxA==}
 
   '@uiw/codemirror-themes@4.25.10':
     resolution: {integrity: sha512-Fqiz1HIuDlDftcL+/O53V333UOH6MqQ84VbiQB5egn6u+uDwAqACp1FrdAoi4wgpR3b3TGW4Gr0wIYcrJSSz1A==}
@@ -4930,14 +4909,6 @@ snapshots:
       '@codemirror/view': 6.43.1
 
   '@uiw/codemirror-theme-dracula@4.25.10(@codemirror/language@6.12.3)(@codemirror/state@6.6.0)(@codemirror/view@6.43.1)':
-    dependencies:
-      '@uiw/codemirror-themes': 4.25.10(@codemirror/language@6.12.3)(@codemirror/state@6.6.0)(@codemirror/view@6.43.1)
-    transitivePeerDependencies:
-      - '@codemirror/language'
-      - '@codemirror/state'
-      - '@codemirror/view'
-
-  '@uiw/codemirror-theme-github@4.25.10(@codemirror/language@6.12.3)(@codemirror/state@6.6.0)(@codemirror/view@6.43.1)':
     dependencies:
       '@uiw/codemirror-themes': 4.25.10(@codemirror/language@6.12.3)(@codemirror/state@6.6.0)(@codemirror/view@6.43.1)
     transitivePeerDependencies:
